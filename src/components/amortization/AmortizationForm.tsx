@@ -1,3 +1,4 @@
+// File: `src/components/amortization/AmortizationForm.tsx`
 import React from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { ToggleSwitch } from '../common/ToggleSwitch';
@@ -16,6 +17,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
         initialRentalIncome, setInitialRentalIncome,
         initialOffsetBalance, setInitialOffsetBalance,
         monthlyExpenditure, setMonthlyExpenditure,
+        monthlyExpenditurePre2031, setMonthlyExpenditurePre2031,
         rentalGrowthRate, setRentalGrowthRate,
         isRefinanced, setIsRefinanced,
         considerOffsetIncome, setConsiderOffsetIncome,
@@ -32,7 +34,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                 Amortization Calculator
             </h2>
             <p className="mt-2 text-gray-600">
-                Monthly schedule from Jan 2031 to Dec 2040. Results update automatically.
+                Monthly schedule from Jan 2026 to Dec 2040. Results update automatically.
             </p>
 
             <div className="mt-8 space-y-6">
@@ -113,6 +115,14 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                 step={500}
                                 value={String(monthlyExpenditure)}
                                 onChange={(e) => setMonthlyExpenditure(parseFloat(e.target.value) || 0)}
+                                symbol="$"
+                            />
+                            <InputGroup
+                                label="Monthly Expenditure Pre 2031"
+                                id="monthlyExpenditurePre2031"
+                                step={100}
+                                value={String(monthlyExpenditurePre2031)}
+                                onChange={(e) => setMonthlyExpenditurePre2031(parseFloat(e.target.value) || 0)}
                                 symbol="$"
                             />
                         </div>

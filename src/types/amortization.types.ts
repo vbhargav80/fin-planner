@@ -1,3 +1,4 @@
+// File: `src/types/amortization.types.ts`
 export interface AmortizationRow {
     date: string;
     beginningBalance: number;
@@ -18,6 +19,7 @@ export interface AmortizationInputs {
     initialRentalIncome: number;
     initialOffsetBalance: number;
     monthlyExpenditure: number;
+    monthlyExpenditurePre2031: number;
     rentalGrowthRate: number;
     isRefinanced: boolean;
     considerOffsetIncome: boolean;
@@ -41,6 +43,8 @@ export interface AmortizationCalculatorState {
     setInitialOffsetBalance: (value: number) => void;
     monthlyExpenditure: number;
     setMonthlyExpenditure: (value: number) => void;
+    monthlyExpenditurePre2031: number;
+    setMonthlyExpenditurePre2031: (value: number) => void;
     rentalGrowthRate: number;
     setRentalGrowthRate: (value: number) => void;
     isRefinanced: boolean;

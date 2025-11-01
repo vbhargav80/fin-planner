@@ -1,8 +1,9 @@
+// File: `src/utils/calculations/amortizationCalculations.ts`
 import type { AmortizationRow, AmortizationInputs } from '../../types/amortization.types';
 import { formatDate } from '../formatters';
 
 const LOAN_DETAILS = {
-    startDate: new Date('2031-01-01T12:00:00Z'),
+    startDate: new Date('2026-01-01T12:00:00Z'),
     endDate: new Date('2040-12-01T12:00:00Z'),
 };
 
@@ -40,6 +41,8 @@ export function calculateAmortizationSchedule(
     const workingEndDate = new Date(LOAN_DETAILS.startDate);
     workingEndDate.setFullYear(workingEndDate.getFullYear() + inputs.yearsWorking);
 
+    const pre2031Cutoff = new Date('2031-01-01T00:00:00Z');
+
     while (currentDate <= LOAN_DETAILS.endDate) {
         // Apply annual rental growth at the start of each year
         if (currentDate.getMonth() === 0 && currentDate.getFullYear() > LOAN_DETAILS.startDate.getFullYear()) {
@@ -63,8 +66,9 @@ export function calculateAmortizationSchedule(
         }
 
         const workingIncome = (inputs.continueWorking && currentDate < workingEndDate) ? inputs.netIncome : 0;
+        const monthlyExpenditureForMonth = currentDate < pre2031Cutoff ? inputs.monthlyExpenditurePre2031 : inputs.monthlyExpenditure;
         const totalIncoming = currentMonthlyRental + workingIncome + offsetIncome;
-        const totalOutgoing = repaymentForMonth + inputs.monthlyExpenditure;
+        const totalOutgoing = repaymentForMonth + monthlyExpenditureForMonth;
         const newOffsetBalance = currentOffsetBalance + totalIncoming - totalOutgoing;
         const totalShortfall = totalIncoming - totalOutgoing;
 

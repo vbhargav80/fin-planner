@@ -1,4 +1,4 @@
-
+// File: `src/hooks/useAmortizationCalculator.ts`
 import { useState, useEffect, useMemo } from 'react';
 import type {AmortizationRow, AmortizationCalculatorState} from '../types/amortization.types';
 import { calculateAmortizationSchedule, calculateMonthlyRepayment } from '../utils/calculations/amortizationCalculations';
@@ -6,11 +6,12 @@ import { calculateAmortizationSchedule, calculateMonthlyRepayment } from '../uti
 export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
     const [interestRate, setInterestRate] = useState<number>(6);
-    const [principal, setPrincipal] = useState<number>(550000);
+    const [principal, setPrincipal] = useState<number>(900000);
     const [monthlyRepayment, setMonthlyRepayment] = useState<number>(6750);
-    const [initialRentalIncome, setInitialRentalIncome] = useState<number>(4500);
+    const [initialRentalIncome, setInitialRentalIncome] = useState<number>(4300);
     const [initialOffsetBalance, setInitialOffsetBalance] = useState<number>(1000000);
     const [monthlyExpenditure, setMonthlyExpenditure] = useState<number>(10000);
+    const [monthlyExpenditurePre2031, setMonthlyExpenditurePre2031] = useState<number>(2000);
     const [rentalGrowthRate, setRentalGrowthRate] = useState<number>(2.5);
     const [isRefinanced, setIsRefinanced] = useState<boolean>(false);
     const [considerOffsetIncome, setConsiderOffsetIncome] = useState<boolean>(false);
@@ -34,6 +35,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
             initialRentalIncome,
             initialOffsetBalance,
             monthlyExpenditure,
+            monthlyExpenditurePre2031,
             rentalGrowthRate,
             isRefinanced,
             considerOffsetIncome,
@@ -51,6 +53,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         initialRentalIncome,
         initialOffsetBalance,
         monthlyExpenditure,
+        monthlyExpenditurePre2031,
         rentalGrowthRate,
         actualMonthlyRepayment,
         continueWorking,
@@ -68,6 +71,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         initialRentalIncome, setInitialRentalIncome,
         initialOffsetBalance, setInitialOffsetBalance,
         monthlyExpenditure, setMonthlyExpenditure,
+        monthlyExpenditurePre2031, setMonthlyExpenditurePre2031,
         rentalGrowthRate, setRentalGrowthRate,
         isRefinanced, setIsRefinanced,
         considerOffsetIncome, setConsiderOffsetIncome,

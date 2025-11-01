@@ -1,3 +1,4 @@
+
 export type CalculatorId = 'super' | 'homeLoan';
 
 export interface InputGroupProps {
@@ -27,7 +28,7 @@ export interface RangeSliderProps {
     disabled?: boolean;
 }
 
-export interface SidebarProps {
+export interface NavbarProps {
     activeCalculator: CalculatorId;
     onNavigate: (id: CalculatorId) => void;
 }

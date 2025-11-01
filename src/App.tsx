@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sidebar } from './components/common/Sidebar';
+import { Navbar } from './components/common/Navbar';
 import { SuperCalculator } from './components/super/SuperCalculator';
 import { AmortizationCalculator } from './components/amortization/AmortizationCalculator';
 import type { CalculatorId } from './types/common.types';
@@ -19,8 +19,8 @@ export default function App() {
     };
 
     return (
-        <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 font-inter antialiased">
-            <Sidebar activeCalculator={activeCalculator} onNavigate={setActiveCalculator} />
+        <div className="flex flex-col min-h-screen bg-gray-100 font-inter antialiased">
+            <Navbar activeCalculator={activeCalculator} onNavigate={setActiveCalculator} />
             <main className="flex-1 overflow-hidden">
                 {renderCalculator()}
             </main>

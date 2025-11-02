@@ -1,4 +1,3 @@
-// File: `src/hooks/useAmortizationCalculator.ts`
 import { useState, useEffect, useMemo } from 'react';
 import type {AmortizationRow, AmortizationCalculatorState} from '../types/amortization.types';
 import { calculateAmortizationSchedule, calculateMonthlyRepayment } from '../utils/calculations/amortizationCalculations';
@@ -45,7 +44,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
             netIncome,
         };
 
-        const data = calculateAmortizationSchedule(inputs, actualMonthlyRepayment);
+        const data = calculateAmortizationSchedule(inputs);
         setAmortizationData(data);
     }, [
         interestRate,
@@ -55,12 +54,13 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         monthlyExpenditure,
         monthlyExpenditurePre2031,
         rentalGrowthRate,
-        actualMonthlyRepayment,
         continueWorking,
         yearsWorking,
         netIncome,
         considerOffsetIncome,
-        offsetIncomeRate
+        offsetIncomeRate,
+        isRefinanced,
+        monthlyRepayment
     ]);
 
     return {

@@ -1,4 +1,3 @@
-// File: `src/utils/calculations/amortizationCalculations.ts`
 import type { AmortizationRow, AmortizationInputs } from '../../types/amortization.types';
 import { formatDate } from '../formatters';
 
@@ -25,8 +24,7 @@ export function calculateMonthlyRepayment(
 }
 
 export function calculateAmortizationSchedule(
-    inputs: AmortizationInputs,
-    actualMonthlyRepayment: number
+    inputs: AmortizationInputs
 ): AmortizationRow[] {
     const data: AmortizationRow[] = [];
     let currentLoanBalance = inputs.principal;
@@ -42,6 +40,7 @@ export function calculateAmortizationSchedule(
     workingEndDate.setFullYear(workingEndDate.getFullYear() + inputs.yearsWorking);
 
     const pre2031Cutoff = new Date('2031-01-01T00:00:00Z');
+    const refinanceEffectiveDate = new Date('2031-01-01T00:00:00Z');
 
     while (currentDate <= LOAN_DETAILS.endDate) {
         // Apply annual rental growth at the start of each year
@@ -60,7 +59,15 @@ export function calculateAmortizationSchedule(
         if (beginningBalance > 0) {
             const effectiveBalanceForInterest = Math.max(0, beginningBalance - currentOffsetBalance);
             const interestCharged = effectiveBalanceForInterest * monthlyInterestRate;
-            repaymentForMonth = Math.min(actualMonthlyRepayment, beginningBalance + interestCharged);
+
+            // Decide target repayment for this month:
+            // - If refinance is enabled and the current date is on/after 1 Jan 2031, calculate new 25-year repayment based on remaining principal.
+            // - Otherwise use the user-provided monthlyExpenditure (repayment) value.
+            const targetMonthlyRepayment = (inputs.isRefinanced && currentDate >= refinanceEffectiveDate)
+                ? calculateMonthlyRepayment(beginningBalance, inputs.interestRate)
+                : inputs.monthlyRepayment;
+
+            repaymentForMonth = Math.min(targetMonthlyRepayment, beginningBalance + interestCharged);
             const principalPaid = repaymentForMonth - interestCharged;
             endingBalance = beginningBalance - principalPaid;
         }

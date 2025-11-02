@@ -17,7 +17,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [considerOffsetIncome, setConsiderOffsetIncome] = useState<boolean>(false);
     const [offsetIncomeRate, setOffsetIncomeRate] = useState<number>(3);
     const [continueWorking, setContinueWorking] = useState<boolean>(false);
-    const [yearsWorking, setYearsWorking] = useState<number>(0);
+    const [yearsWorking, setYearsWorking] = useState<number>(3);
     const [netIncome, setNetIncome] = useState<number>(10000);
 
     const actualMonthlyRepayment = useMemo(() => {

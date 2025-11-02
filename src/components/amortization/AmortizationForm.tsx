@@ -3,7 +3,7 @@ import React from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { ToggleSwitch } from '../common/ToggleSwitch';
 import { RangeSlider } from '../common/RangeSlider';
-import type {AmortizationCalculatorState} from '../../types/amortization.types';
+import type { AmortizationCalculatorState } from '../../types/amortization.types';
 
 interface AmortizationFormProps {
     calculator: AmortizationCalculatorState;
@@ -91,23 +91,22 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                         {/* Incomings */}
                         <div>
                             <h4 className="text-sm font-semibold text-gray-600 mb-3">Incomings</h4>
-                            {/* Fields: max 2 per row */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <InputGroup
+                                <RangeSlider
                                     label="Net Rent"
-                                    id="initialRentalIncome"
-                                    step={50}
-                                    value={String(initialRentalIncome)}
-                                    onChange={(e) => setInitialRentalIncome(parseFloat(e.target.value) || 0)}
-                                    symbol="$"
+                                    value={initialRentalIncome}
+                                    min={4000}
+                                    max={5000}
+                                    step={100}
+                                    onChange={setInitialRentalIncome}
                                 />
-                                <InputGroup
+                                <RangeSlider
                                     label="Net Income (while working)"
-                                    id="netIncome"
-                                    step={500}
-                                    value={String(netIncome)}
-                                    onChange={(e) => setNetIncome(parseFloat(e.target.value) || 0)}
-                                    symbol="$"
+                                    value={netIncome}
+                                    min={5000}
+                                    max={15000}
+                                    step={1000}
+                                    onChange={setNetIncome}
                                     disabled={!continueWorking}
                                 />
                             </div>
@@ -116,23 +115,22 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                         {/* Outgoings */}
                         <div>
                             <h4 className="text-sm font-semibold text-gray-600 mb-3">Outgoings</h4>
-                            {/* Fields: max 2 per row */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <InputGroup
+                                <RangeSlider
                                     label="Monthly Expenditure"
-                                    id="monthlyExpenditure"
-                                    step={500}
-                                    value={String(monthlyExpenditure)}
-                                    onChange={(e) => setMonthlyExpenditure(parseFloat(e.target.value) || 0)}
-                                    symbol="$"
+                                    value={monthlyExpenditure}
+                                    min={5000}
+                                    max={15000}
+                                    step={1000}
+                                    onChange={setMonthlyExpenditure}
                                 />
-                                <InputGroup
+                                <RangeSlider
                                     label="Monthly Expenditure Pre 2031"
-                                    id="monthlyExpenditurePre2031"
-                                    step={100}
-                                    value={String(monthlyExpenditurePre2031)}
-                                    onChange={(e) => setMonthlyExpenditurePre2031(parseFloat(e.target.value) || 0)}
-                                    symbol="$"
+                                    value={monthlyExpenditurePre2031}
+                                    min={1000}
+                                    max={5000}
+                                    step={1000}
+                                    onChange={setMonthlyExpenditurePre2031}
                                 />
                                 <InputGroup
                                     label="Monthly Repayment"

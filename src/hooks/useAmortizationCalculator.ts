@@ -7,7 +7,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
     const [interestRate, setInterestRate] = useState<number>(6);
     const [principal, setPrincipal] = useState<number>(900000);
-    const [monthlyRepayment, setMonthlyRepayment] = useState<number>(6750);
+    const [monthlyRepayment, setMonthlyRepayment] = useState<number>(6800);
     const [initialRentalIncome, setInitialRentalIncome] = useState<number>(4300);
     const [initialOffsetBalance, setInitialOffsetBalance] = useState<number>(1000000);
     const [monthlyExpenditure, setMonthlyExpenditure] = useState<number>(10000);

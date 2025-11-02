@@ -86,7 +86,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                         Monthly Cashflow
                     </h3>
 
-                    {/* Sections stacked vertically (row-based) */}
                     <div className="space-y-8">
                         {/* Incomings */}
                         <div>
@@ -132,14 +131,14 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                     step={1000}
                                     onChange={setMonthlyExpenditurePre2031}
                                 />
-                                <InputGroup
+                                <RangeSlider
                                     label="Monthly Repayment"
-                                    id="monthlyRepayment"
+                                    value={isRefinanced ? actualMonthlyRepayment : monthlyRepayment}
+                                    min={5500}
+                                    max={7000}
                                     step={50}
-                                    value={isRefinanced ? actualMonthlyRepayment.toFixed(2) : String(monthlyRepayment)}
-                                    onChange={(e) => setMonthlyRepayment(parseFloat(e.target.value) || 0)}
+                                    onChange={setMonthlyRepayment}
                                     disabled={isRefinanced}
-                                    symbol="$"
                                 />
                             </div>
                         </div>
@@ -152,14 +151,13 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                         Assumptions & Actions
                     </h3>
                     <div className="space-y-4">
-                        <InputGroup
+                        <RangeSlider
                             label="Annual Rental Growth"
-                            id="rentalGrowthRate"
-                            step={0.1}
-                            value={String(rentalGrowthRate)}
-                            onChange={(e) => setRentalGrowthRate(parseFloat(e.target.value) || 0)}
-                            symbol="%"
-                            symbolPosition="right"
+                            value={rentalGrowthRate}
+                            min={1}
+                            max={4}
+                            step={0.25}
+                            onChange={setRentalGrowthRate}
                         />
                         <ToggleSwitch
                             label="Refinance for 25-year term"

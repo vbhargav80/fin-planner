@@ -1,4 +1,4 @@
-// File: `src/components/amortization/AmortizationForm.tsx`
+// File: 'src/components/amortization/AmortizationForm.tsx'
 import React from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { ToggleSwitch } from '../common/ToggleSwitch';
@@ -28,6 +28,15 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
         actualMonthlyRepayment,
     } = calculator;
 
+    // Snap interest rate to discrete 0.25% steps within [4, 8]
+    const handleInterestRateChange = React.useCallback((v: number) => {
+        const step = 0.25;
+        const min = 4;
+        const max = 8;
+        const snapped = Math.min(max, Math.max(min, Math.round(v / step) * step));
+        setInterestRate(Number(snapped.toFixed(2)));
+    }, [setInterestRate]);
+
     return (
         <div className="md:w-[35%] p-6 sm:p-8 overflow-y-auto">
             <h2 className="text-3xl font-bold text-gray-900">
@@ -44,30 +53,29 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                         Loan Details
                     </h3>
                     <div className="space-y-4">
-                        <InputGroup
+                        <RangeSlider
                             label="Starting Loan"
-                            id="principal"
-                            step={10000}
-                            value={String(principal)}
-                            onChange={(e) => setPrincipal(parseFloat(e.target.value) || 0)}
-                            symbol="$"
+                            value={principal}
+                            min={800000}
+                            max={1100000}
+                            step={50000}
+                            onChange={setPrincipal}
                         />
-                        <InputGroup
+                        <RangeSlider
                             label="Starting Offset"
-                            id="initialOffsetBalance"
-                            step={10000}
-                            value={String(initialOffsetBalance)}
-                            onChange={(e) => setInitialOffsetBalance(parseFloat(e.target.value) || 0)}
-                            symbol="$"
+                            value={initialOffsetBalance}
+                            min={800000}
+                            max={1000000}
+                            step={50000}
+                            onChange={setInitialOffsetBalance}
                         />
-                        <InputGroup
+                        <RangeSlider
                             label="Interest Rate"
-                            id="interestRate"
-                            step={0.1}
-                            value={String(interestRate)}
-                            onChange={(e) => setInterestRate(parseFloat(e.target.value) || 0)}
-                            symbol="%"
-                            symbolPosition="right"
+                            value={interestRate}
+                            min={4}
+                            max={8}
+                            step={0.25}
+                            onChange={handleInterestRateChange}
                         />
                     </div>
                 </section>

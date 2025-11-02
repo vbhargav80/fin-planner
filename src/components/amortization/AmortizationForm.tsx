@@ -85,54 +85,65 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                     <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-4">
                         Monthly Cashflow
                     </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                            <h4 className="text-sm font-semibold text-gray-600">Incomings</h4>
-                            <InputGroup
-                                label="Net Rent"
-                                id="initialRentalIncome"
-                                step={50}
-                                value={String(initialRentalIncome)}
-                                onChange={(e) => setInitialRentalIncome(parseFloat(e.target.value) || 0)}
-                                symbol="$"
-                            />
-                            <InputGroup
-                                label="Net Income (while working)"
-                                id="netIncome"
-                                step={500}
-                                value={String(netIncome)}
-                                onChange={(e) => setNetIncome(parseFloat(e.target.value) || 0)}
-                                symbol="$"
-                                disabled={!continueWorking}
-                            />
+
+                    {/* Sections stacked vertically (row-based) */}
+                    <div className="space-y-8">
+                        {/* Incomings */}
+                        <div>
+                            <h4 className="text-sm font-semibold text-gray-600 mb-3">Incomings</h4>
+                            {/* Fields: max 2 per row */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <InputGroup
+                                    label="Net Rent"
+                                    id="initialRentalIncome"
+                                    step={50}
+                                    value={String(initialRentalIncome)}
+                                    onChange={(e) => setInitialRentalIncome(parseFloat(e.target.value) || 0)}
+                                    symbol="$"
+                                />
+                                <InputGroup
+                                    label="Net Income (while working)"
+                                    id="netIncome"
+                                    step={500}
+                                    value={String(netIncome)}
+                                    onChange={(e) => setNetIncome(parseFloat(e.target.value) || 0)}
+                                    symbol="$"
+                                    disabled={!continueWorking}
+                                />
+                            </div>
                         </div>
-                        <div className="space-y-4">
-                            <h4 className="text-sm font-semibold text-gray-600">Outgoings</h4>
-                            <InputGroup
-                                label="Monthly Repayment"
-                                id="monthlyRepayment"
-                                step={50}
-                                value={isRefinanced ? actualMonthlyRepayment.toFixed(2) : String(monthlyRepayment)}
-                                onChange={(e) => setMonthlyRepayment(parseFloat(e.target.value) || 0)}
-                                disabled={isRefinanced}
-                                symbol="$"
-                            />
-                            <InputGroup
-                                label="Monthly Expenditure"
-                                id="monthlyExpenditure"
-                                step={500}
-                                value={String(monthlyExpenditure)}
-                                onChange={(e) => setMonthlyExpenditure(parseFloat(e.target.value) || 0)}
-                                symbol="$"
-                            />
-                            <InputGroup
-                                label="Monthly Expenditure Pre 2031"
-                                id="monthlyExpenditurePre2031"
-                                step={100}
-                                value={String(monthlyExpenditurePre2031)}
-                                onChange={(e) => setMonthlyExpenditurePre2031(parseFloat(e.target.value) || 0)}
-                                symbol="$"
-                            />
+
+                        {/* Outgoings */}
+                        <div>
+                            <h4 className="text-sm font-semibold text-gray-600 mb-3">Outgoings</h4>
+                            {/* Fields: max 2 per row */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <InputGroup
+                                    label="Monthly Expenditure"
+                                    id="monthlyExpenditure"
+                                    step={500}
+                                    value={String(monthlyExpenditure)}
+                                    onChange={(e) => setMonthlyExpenditure(parseFloat(e.target.value) || 0)}
+                                    symbol="$"
+                                />
+                                <InputGroup
+                                    label="Monthly Expenditure Pre 2031"
+                                    id="monthlyExpenditurePre2031"
+                                    step={100}
+                                    value={String(monthlyExpenditurePre2031)}
+                                    onChange={(e) => setMonthlyExpenditurePre2031(parseFloat(e.target.value) || 0)}
+                                    symbol="$"
+                                />
+                                <InputGroup
+                                    label="Monthly Repayment"
+                                    id="monthlyRepayment"
+                                    step={50}
+                                    value={isRefinanced ? actualMonthlyRepayment.toFixed(2) : String(monthlyRepayment)}
+                                    onChange={(e) => setMonthlyRepayment(parseFloat(e.target.value) || 0)}
+                                    disabled={isRefinanced}
+                                    symbol="$"
+                                />
+                            </div>
                         </div>
                     </div>
                 </section>

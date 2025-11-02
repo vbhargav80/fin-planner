@@ -13,6 +13,7 @@ export interface DrawdownPlanInputs {
     annualInterestRate: number; // %
     monthlyDrawdown: number;
     startMonth: string; // 'YYYY-MM'
+    netMonthlyRent: number; // NEW: base net monthly rent at sale
 }
 
 export interface DrawdownRow {
@@ -22,6 +23,7 @@ export interface DrawdownRow {
     interestEarned: number;
     drawdown: number;
     endBalance: number;
+    rentLost: number; // NEW
 }
 
 export interface SaleDrawdownDerived {
@@ -47,4 +49,5 @@ export interface SaleDrawdownState extends SaleInputs, DrawdownPlanInputs, SaleD
     setAnnualInterestRate: (v: number) => void;
     setMonthlyDrawdown: (v: number) => void;
     setStartMonth: (v: string) => void;
+    setNetMonthlyRent: (v: number) => void; // NEW
 }

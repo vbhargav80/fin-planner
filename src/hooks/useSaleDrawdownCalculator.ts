@@ -16,13 +16,14 @@ export function useSaleDrawdownCalculator(): SaleDrawdownState {
     // Drawdown Plan
     const [annualInterestRate, setAnnualInterestRate] = useState<number>(2); // %
     const [monthlyDrawdown, setMonthlyDrawdown] = useState<number>(10_000);
-    const [startMonth, setStartMonth] = useState<string>('2031-01'); // default to Jan 2031
+    const [startMonth, setStartMonth] = useState<string>('2031-01'); // Jan 2031
+    const [netMonthlyRent, setNetMonthlyRent] = useState<number>(230); // NEW default
 
     const derived = useMemo(
         () =>
             computeSaleDrawdownDerived(
                 { salePrice, costBase, depreciationClaimed, sellingCosts, person1TaxRate, person2TaxRate, cgtDiscountRate },
-                { annualInterestRate, monthlyDrawdown, startMonth }
+                { annualInterestRate, monthlyDrawdown, startMonth, netMonthlyRent }
             ),
         [
             salePrice,
@@ -35,6 +36,7 @@ export function useSaleDrawdownCalculator(): SaleDrawdownState {
             annualInterestRate,
             monthlyDrawdown,
             startMonth,
+            netMonthlyRent,
         ]
     );
 
@@ -50,6 +52,7 @@ export function useSaleDrawdownCalculator(): SaleDrawdownState {
         annualInterestRate,
         monthlyDrawdown,
         startMonth,
+        netMonthlyRent, // NEW
         // setters
         setSalePrice,
         setCostBase,
@@ -61,6 +64,7 @@ export function useSaleDrawdownCalculator(): SaleDrawdownState {
         setAnnualInterestRate,
         setMonthlyDrawdown,
         setStartMonth,
+        setNetMonthlyRent, // NEW
         // derived
         taxableGain: derived.taxableGain,
         person1Tax: derived.person1Tax,

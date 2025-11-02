@@ -58,6 +58,9 @@ export const DrawdownResults: React.FC<Props> = ({
                             <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-indigo-100 uppercase tracking-wider">
                                 Ending Balance
                             </th>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-indigo-100 uppercase tracking-wider">
+                                Monthly Rent Lost
+                            </th>
                         </tr>
                         </thead>
                         <tbody className="bg-indigo-800 divide-y divide-indigo-700">
@@ -84,6 +87,9 @@ export const DrawdownResults: React.FC<Props> = ({
                                 </td>
                                 <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-white font-mono">
                                     {formatCurrency(row.endBalance)}
+                                </td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-emerald-300 font-mono">
+                                    {formatCurrency(row.rentLost)}
                                 </td>
                             </tr>
                         ))}

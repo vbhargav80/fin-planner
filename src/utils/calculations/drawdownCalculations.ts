@@ -34,10 +34,7 @@ export function calculateSaleAndTaxes(sale: SaleInputs) {
     const p2Rate = clampNonNegative(sale.person2TaxRate) / 100;
     const discountRate = clampNonNegative(sale.cgtDiscountRate) / 100; // expect 0.5
 
-    // Deduct depreciation from cost base
     const adjustedCostBase = Math.max(0, costBase - depreciation);
-
-    // Capital gain (no losses carried, no indexation in this simple model)
     const rawGain = salePrice - sellingCosts - adjustedCostBase;
     const taxableGain = Math.max(0, rawGain);
 
@@ -48,7 +45,6 @@ export function calculateSaleAndTaxes(sale: SaleInputs) {
     const person2Tax = perOwnerDiscountedGain * p2Rate;
     const totalTax = person1Tax + person2Tax;
 
-    // Cash received after selling costs and CGT
     const netProceeds = Math.max(0, salePrice - sellingCosts - totalTax);
 
     return { taxableGain, person1Tax, person2Tax, totalTax, netProceeds };
@@ -68,6 +64,10 @@ export function buildDrawdownSchedule(
     const monthlyDraw = Math.max(0, plan.monthlyDrawdown);
     const startDate = parseMonthString(plan.startMonth);
 
+    // NEW: rent lost baseline and annual growth
+    const ANNUAL_RENT_GROWTH = 0.025;
+    let currentRentLost = clampNonNegative(plan.netMonthlyRent);
+
     const schedule: DrawdownRow[] = [];
     let balance = clampNonNegative(startingBalance);
 
@@ -79,6 +79,12 @@ export function buildDrawdownSchedule(
     let months = 0;
     while (balance > 0 && months < maxMonths) {
         const date = addMonthsUTC(startDate, months);
+
+        // Apply 2.5% growth each January after the first month
+        if (months > 0 && date.getUTCMonth() === 0) {
+            currentRentLost *= (1 + ANNUAL_RENT_GROWTH);
+        }
+
         const startBalance = balance;
         const interest = startBalance * monthlyRate;
         const available = startBalance + interest;
@@ -92,6 +98,7 @@ export function buildDrawdownSchedule(
             interestEarned: interest,
             drawdown: draw,
             endBalance,
+            rentLost: currentRentLost, // NEW
         });
 
         balance = endBalance;

@@ -1,3 +1,4 @@
+// File: 'src/components/drawdown-simulator/DrawdownForm.tsx'
 import React from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { RangeSlider } from '../common/RangeSlider';
@@ -97,6 +98,15 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                 <section>
                     <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-4">Drawdown Plan</h3>
                     <div className="grid grid-cols-1 gap-4">
+                        <RangeSlider
+                            label="Net Monthly Rent"
+                            value={model.netMonthlyRent}
+                            min={200}
+                            max={300}
+                            step={10}
+                            onChange={model.setNetMonthlyRent}
+                            formatValue={(v) => fmtCurrency(v)}
+                        />
                         <RangeSlider
                             label="Est. Annual Interest Rate (%)"
                             value={model.annualInterestRate}

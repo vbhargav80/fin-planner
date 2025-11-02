@@ -17,13 +17,16 @@ export interface DrawdownPlanInputs {
     netRentGrowthRate: number; // added
 }
 
+// Permissive schedule item shape without using `any`
+export type DrawdownScheduleItem = Record<string, number | string | boolean | null>;
+
 export interface SaleDrawdownDerived {
     taxableGain: number;
     person1Tax: number;
     person2Tax: number;
     totalTax: number;
     netProceeds: number;
-    schedule: any[];
+    schedule: DrawdownScheduleItem[];
     monthsToDeplete: number;
     depletionDateLabel: string;
     durationLabel: string;
@@ -67,7 +70,7 @@ export interface SaleDrawdownState {
     person2Tax: number;
     totalTax: number;
     netProceeds: number;
-    schedule: any[];
+    schedule: DrawdownScheduleItem[];
     monthsToDeplete: number;
     depletionDateLabel: string;
     durationLabel: string;

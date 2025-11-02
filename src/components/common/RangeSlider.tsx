@@ -1,4 +1,3 @@
-// File: 'src/components/common/RangeSlider.tsx'
 import React from 'react';
 
 interface RangeSliderProps {
@@ -9,6 +8,7 @@ interface RangeSliderProps {
     step?: number;
     onChange: (value: number) => void;
     disabled?: boolean;
+    formatValue?: (value: number) => string;
 }
 
 export const RangeSlider: React.FC<RangeSliderProps> = ({
@@ -19,9 +19,11 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
                                                             step = 1,
                                                             onChange,
                                                             disabled = false,
+                                                            formatValue,
                                                         }) => {
-    const decimals =
-        !Number.isInteger(step) ? (step.toString().split('.')[1]?.length ?? 2) : 0;
+    const decimals = !Number.isInteger(step)
+        ? (step.toString().split('.')[1]?.length ?? 2)
+        : 0;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const next = Number(e.target.value);
@@ -29,13 +31,16 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
         onChange(next);
     };
 
+    const displayValue =
+        formatValue
+            ? formatValue(value)
+            : (decimals > 0 ? value.toFixed(decimals) : String(value));
+
     return (
         <div className="w-full">
             <div className="flex items-center justify-between mb-1">
                 <label className="text-sm text-gray-700">{label}</label>
-                <span className="text-sm font-medium text-gray-900">
-          {decimals > 0 ? value.toFixed(decimals) : value}
-        </span>
+                <span className="text-sm font-medium text-gray-900">{displayValue}</span>
             </div>
             <input
                 type="range"

@@ -1,3 +1,4 @@
+// File: 'src/components/common/Sidebar.tsx'
 import React from 'react';
 import { Calculator, Landmark, LayoutDashboard } from 'lucide-react';
 import type { SidebarProps } from '../../types/common.types';
@@ -6,6 +7,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeCalculator, onNavigate }
     const navItems = [
         { id: 'super' as const, name: 'Super Calculator', icon: Calculator },
         { id: 'homeLoan' as const, name: 'Amortization', icon: Landmark },
+        { id: 'drawdown' as const, name: 'Drawdown Simulator', icon: Calculator },
     ];
 
     return (
@@ -17,7 +19,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeCalculator, onNavigate }
                 </h1>
             </div>
             <ul className="mt-4 space-y-2 px-4">
-                {navItems.map(item => (
+                {navItems.map((item) => (
                     <li key={item.id}>
                         <button
                             onClick={() => onNavigate(item.id)}

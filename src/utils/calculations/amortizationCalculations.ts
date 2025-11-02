@@ -1,4 +1,4 @@
-// File: `src/utils/calculations/amortizationCalculations.ts`
+// File: 'src/utils/calculations/amortizationCalculations.ts'
 import type { AmortizationRow, AmortizationInputs } from '../../types/amortization.types';
 import { formatDate } from '../formatters';
 
@@ -6,6 +6,9 @@ const LOAN_DETAILS = {
     startDate: new Date('2026-01-01T12:00:00Z'),
     endDate: new Date('2040-12-01T12:00:00Z'),
 };
+
+// Working income is considered only from Jan 2031 onwards
+const WORKING_START_DATE = new Date('2031-01-01T00:00:00Z');
 
 export function calculateMonthlyRepayment(
     principal: number,
@@ -35,7 +38,9 @@ export function calculateRefiMonthlyPayment(inputs: AmortizationInputs): number 
     let currentMonthlyRental = inputs.initialRentalIncome;
 
     const currentDate = new Date(LOAN_DETAILS.startDate);
-    const workingEndDate = new Date(LOAN_DETAILS.startDate);
+    // Working window starts in 2031; so for this pre-2031 loop, working income is never applied
+    const workingStartDate = new Date(WORKING_START_DATE);
+    const workingEndDate = new Date(workingStartDate);
     workingEndDate.setFullYear(workingEndDate.getFullYear() + inputs.yearsWorking);
 
     // Process months up to and including Dec 2030 (robust to time-of-day)
@@ -64,8 +69,14 @@ export function calculateRefiMonthlyPayment(inputs: AmortizationInputs): number 
             endingBalance = beginningBalance - principalPaid;
         }
 
+        // Working income only starts from Jan 2031, so it's 0 in this loop
+        const workingIncomeEligible =
+            inputs.continueWorking &&
+            currentDate >= workingStartDate &&
+            currentDate < workingEndDate;
+        const workingIncome = workingIncomeEligible ? inputs.netIncome : 0;
+
         const isPre2031 = currentDate.getFullYear() < 2031;
-        const workingIncome = (inputs.continueWorking && currentDate < workingEndDate) ? inputs.netIncome : 0;
         const monthlyExpenditureForMonth = isPre2031 ? inputs.monthlyExpenditurePre2031 : inputs.monthlyExpenditure;
         const totalIncoming = currentMonthlyRental + workingIncome + offsetIncome;
         const totalOutgoing = repaymentForMonth + monthlyExpenditureForMonth;
@@ -95,7 +106,9 @@ export function calculateAmortizationSchedule(
     const monthlyOffsetIncomeRate = inputs.offsetIncomeRate / 100 / 12;
     const currentDate = new Date(LOAN_DETAILS.startDate);
 
-    const workingEndDate = new Date(LOAN_DETAILS.startDate);
+    // Working starts from Jan 2031 and continues for `yearsWorking`
+    const workingStartDate = new Date(WORKING_START_DATE);
+    const workingEndDate = new Date(workingStartDate);
     workingEndDate.setFullYear(workingEndDate.getFullYear() + inputs.yearsWorking);
 
     const pre2031Cutoff = new Date('2031-01-01T00:00:00Z');
@@ -137,8 +150,16 @@ export function calculateAmortizationSchedule(
             refiMonthlyPayment = calculateMonthlyRepayment(refiPrincipal, inputs.interestRate);
         }
 
-        const workingIncome = (inputs.continueWorking && currentDate < workingEndDate) ? inputs.netIncome : 0;
-        const monthlyExpenditureForMonth = currentDate < pre2031Cutoff ? inputs.monthlyExpenditurePre2031 : inputs.monthlyExpenditure;
+        // Working income only from Jan 2031 to `workingEndDate`
+        const workingIncomeEligible =
+            inputs.continueWorking &&
+            currentDate >= workingStartDate &&
+            currentDate < workingEndDate;
+        const workingIncome = workingIncomeEligible ? inputs.netIncome : 0;
+
+        const monthlyExpenditureForMonth =
+            currentDate < pre2031Cutoff ? inputs.monthlyExpenditurePre2031 : inputs.monthlyExpenditure;
+
         const totalIncoming = currentMonthlyRental + workingIncome + offsetIncome;
         const totalOutgoing = repaymentForMonth + monthlyExpenditureForMonth;
         const newOffsetBalance = currentOffsetBalance + totalIncoming - totalOutgoing;

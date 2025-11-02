@@ -1,3 +1,4 @@
+// File: 'src/components/drawdown-simulator/DrawdownForm.tsx'
 import React, { useState } from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { RangeSlider } from '../common/RangeSlider';
@@ -69,42 +70,51 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                                 onChange={model.setCostBase}
                                 formatValue={(v) => fmtCurrency(v)}
                             />
-                            <RangeSlider
-                                label="Depreciation Claimed"
-                                value={model.depreciationClaimed}
-                                min={30_000}
-                                max={100_000}
-                                step={10_000}
-                                onChange={model.setDepreciationClaimed}
-                                formatValue={(v) => fmtCurrency(v)}
-                            />
-                            <RangeSlider
-                                label="Selling Costs"
-                                value={model.sellingCosts}
-                                min={30_000}
-                                max={100_000}
-                                step={10_000}
-                                onChange={model.setSellingCosts}
-                                formatValue={(v) => fmtCurrency(v)}
-                            />
-                            <RangeSlider
-                                label="Person 1 Tax Rate (%)"
-                                value={p1Idx}
-                                min={0}
-                                max={TAX_RATES.length - 1}
-                                step={1}
-                                onChange={(idx) => model.setPerson1TaxRate(TAX_RATES[Math.round(idx)] as number)}
-                                formatValue={(idx) => `${TAX_RATES[Math.round(idx)]}%`}
-                            />
-                            <RangeSlider
-                                label="Person 2 Tax Rate (%)"
-                                value={p2Idx}
-                                min={0}
-                                max={TAX_RATES.length - 1}
-                                step={1}
-                                onChange={(idx) => model.setPerson2TaxRate(TAX_RATES[Math.round(idx)] as number)}
-                                formatValue={(idx) => `${TAX_RATES[Math.round(idx)]}%`}
-                            />
+
+                            {/* Depreciation Claimed and Selling Costs side-by-side */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <RangeSlider
+                                    label="Depreciation Claimed"
+                                    value={model.depreciationClaimed}
+                                    min={30_000}
+                                    max={100_000}
+                                    step={10_000}
+                                    onChange={model.setDepreciationClaimed}
+                                    formatValue={(v) => fmtCurrency(v)}
+                                />
+                                <RangeSlider
+                                    label="Selling Costs"
+                                    value={model.sellingCosts}
+                                    min={30_000}
+                                    max={100_000}
+                                    step={10_000}
+                                    onChange={model.setSellingCosts}
+                                    formatValue={(v) => fmtCurrency(v)}
+                                />
+                            </div>
+
+                            {/* Tax rates side-by-side */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <RangeSlider
+                                    label="Person 1 Tax Rate (%)"
+                                    value={p1Idx}
+                                    min={0}
+                                    max={TAX_RATES.length - 1}
+                                    step={1}
+                                    onChange={(idx) => model.setPerson1TaxRate(TAX_RATES[Math.round(idx)] as number)}
+                                    formatValue={(idx) => `${TAX_RATES[Math.round(idx)]}%`}
+                                />
+                                <RangeSlider
+                                    label="Person 2 Tax Rate (%)"
+                                    value={p2Idx}
+                                    min={0}
+                                    max={TAX_RATES.length - 1}
+                                    step={1}
+                                    onChange={(idx) => model.setPerson2TaxRate(TAX_RATES[Math.round(idx)] as number)}
+                                    formatValue={(idx) => `${TAX_RATES[Math.round(idx)]}%`}
+                                />
+                            </div>
+
                             <InputGroup
                                 label="CGT Discount"
                                 id="cgtDiscount"

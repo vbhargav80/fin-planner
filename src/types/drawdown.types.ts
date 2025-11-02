@@ -1,4 +1,3 @@
-// File: 'src/types/drawdown.types.ts'
 export interface SaleCalculationInputs {
     salePrice: number;
     costBase: number;
@@ -9,16 +8,25 @@ export interface SaleCalculationInputs {
     cgtDiscountRate: number;
 }
 
+export type SaleInputs = SaleCalculationInputs; // alias for consumers expecting `SaleInputs`
+
 export interface DrawdownPlanInputs {
     annualInterestRate: number;
     monthlyDrawdown: number;
-    startMonth: string;
+    startMonth: string; // YYYY-MM
     netMonthlyRent: number;
-    netRentGrowthRate: number; // added
+    netRentGrowthRate: number;
 }
 
-// Permissive schedule item shape without using `any`
-export type DrawdownScheduleItem = Record<string, number | string | boolean | null>;
+// Row shape rendered by DrawdownResults
+export interface DrawdownRow {
+    dateLabel: string;
+    startBalance: number;
+    interestEarned: number;
+    drawdown: number;
+    endBalance: number;
+    rentLost: number;
+}
 
 export interface SaleDrawdownDerived {
     taxableGain: number;
@@ -26,9 +34,9 @@ export interface SaleDrawdownDerived {
     person2Tax: number;
     totalTax: number;
     netProceeds: number;
-    schedule: DrawdownScheduleItem[];
-    monthsToDeplete: number;
-    depletionDateLabel: string;
+    schedule: DrawdownRow[];
+    monthsToDeplete: number | null;       // allow null when it does not deplete
+    depletionDateLabel: string | null;    // allow null when it does not deplete
     durationLabel: string;
 }
 
@@ -47,7 +55,7 @@ export interface SaleDrawdownState {
     monthlyDrawdown: number;
     startMonth: string;
     netMonthlyRent: number;
-    netRentGrowthRate: number; // added
+    netRentGrowthRate: number;
 
     // setters
     setSalePrice: (value: number) => void;
@@ -62,7 +70,7 @@ export interface SaleDrawdownState {
     setMonthlyDrawdown: (value: number) => void;
     setStartMonth: (value: string) => void;
     setNetMonthlyRent: (value: number) => void;
-    setNetRentGrowthRate: (value: number) => void; // added
+    setNetRentGrowthRate: (value: number) => void;
 
     // derived outputs
     taxableGain: number;
@@ -70,8 +78,8 @@ export interface SaleDrawdownState {
     person2Tax: number;
     totalTax: number;
     netProceeds: number;
-    schedule: DrawdownScheduleItem[];
-    monthsToDeplete: number;
-    depletionDateLabel: string;
+    schedule: DrawdownRow[];
+    monthsToDeplete: number | null;       // match calculation nullability
+    depletionDateLabel: string | null;    // match calculation nullability
     durationLabel: string;
 }

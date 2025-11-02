@@ -1,7 +1,6 @@
-// File: 'src/utils/calculations/drawdownCalculations.ts'
 import type {
     DrawdownRow,
-    SaleInputs,
+    SaleInputs,              // now exported via alias
     DrawdownPlanInputs,
     SaleDrawdownDerived,
 } from '../../types/drawdown.types';
@@ -32,13 +31,12 @@ export function calculateSaleAndTaxes(sale: SaleInputs) {
     const sellingCosts = clampNonNegative(sale.sellingCosts);
     const p1Rate = clampNonNegative(sale.person1TaxRate) / 100;
     const p2Rate = clampNonNegative(sale.person2TaxRate) / 100;
-    const discountRate = clampNonNegative(sale.cgtDiscountRate) / 100; // expect 0.5
+    const discountRate = clampNonNegative(sale.cgtDiscountRate) / 100;
 
     const adjustedCostBase = Math.max(0, costBase - depreciation);
     const rawGain = salePrice - sellingCosts - adjustedCostBase;
     const taxableGain = Math.max(0, rawGain);
 
-    // 50/50 ownership: each applies CGT discount individually
     const perOwnerDiscountedGain = (taxableGain * 0.5) * (1 - discountRate);
 
     const person1Tax = perOwnerDiscountedGain * p1Rate;
@@ -64,7 +62,6 @@ export function buildDrawdownSchedule(
     const monthlyDraw = Math.max(0, plan.monthlyDrawdown);
     const startDate = parseMonthString(plan.startMonth);
 
-    // NEW: rent lost baseline and annual growth
     const ANNUAL_RENT_GROWTH = 0.025;
     let currentRentLost = clampNonNegative(plan.netMonthlyRent);
 
@@ -80,7 +77,6 @@ export function buildDrawdownSchedule(
     while (balance > 0 && months < maxMonths) {
         const date = addMonthsUTC(startDate, months);
 
-        // Apply 2.5% growth each January after the first month
         if (months > 0 && date.getUTCMonth() === 0) {
             currentRentLost *= (1 + ANNUAL_RENT_GROWTH);
         }
@@ -92,13 +88,13 @@ export function buildDrawdownSchedule(
         const endBalance = Math.max(0, available - draw);
 
         schedule.push({
-            index: months,
+            // removed `index` to satisfy DrawdownRow
             dateLabel: formatMonthLabel(date),
             startBalance,
             interestEarned: interest,
             drawdown: draw,
             endBalance,
-            rentLost: currentRentLost, // NEW
+            rentLost: currentRentLost,
         });
 
         balance = endBalance;

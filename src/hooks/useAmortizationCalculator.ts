@@ -1,6 +1,7 @@
+// File: `src/hooks/useAmortizationCalculator.ts`
 import { useState, useEffect, useMemo } from 'react';
 import type {AmortizationRow, AmortizationCalculatorState} from '../types/amortization.types';
-import { calculateAmortizationSchedule, calculateMonthlyRepayment } from '../utils/calculations/amortizationCalculations';
+import { calculateAmortizationSchedule, calculateRefiMonthlyPayment } from '../utils/calculations/amortizationCalculations';
 
 export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
@@ -20,11 +21,41 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [netIncome, setNetIncome] = useState<number>(10000);
 
     const actualMonthlyRepayment = useMemo(() => {
-        if (isRefinanced && principal > 0) {
-            return calculateMonthlyRepayment(principal, interestRate);
+        if (isRefinanced) {
+            return calculateRefiMonthlyPayment({
+                interestRate,
+                principal,
+                monthlyRepayment,
+                initialRentalIncome,
+                initialOffsetBalance,
+                monthlyExpenditure,
+                monthlyExpenditurePre2031,
+                rentalGrowthRate,
+                isRefinanced,
+                considerOffsetIncome,
+                offsetIncomeRate,
+                continueWorking,
+                yearsWorking,
+                netIncome,
+            });
         }
         return monthlyRepayment;
-    }, [isRefinanced, principal, interestRate, monthlyRepayment]);
+    }, [
+        isRefinanced,
+        interestRate,
+        principal,
+        monthlyRepayment,
+        initialRentalIncome,
+        initialOffsetBalance,
+        monthlyExpenditure,
+        monthlyExpenditurePre2031,
+        rentalGrowthRate,
+        considerOffsetIncome,
+        offsetIncomeRate,
+        continueWorking,
+        yearsWorking,
+        netIncome,
+    ]);
 
     useEffect(() => {
         const inputs = {

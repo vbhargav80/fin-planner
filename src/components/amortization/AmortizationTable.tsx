@@ -27,6 +27,12 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                                 Beginning Balance
                             </th>
                             <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-indigo-100 uppercase tracking-wider">
+                                Ending Balance
+                            </th>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-indigo-100 uppercase tracking-wider">
+                                Offset Balance
+                            </th>
+                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-indigo-100 uppercase tracking-wider">
                                 Repayment
                             </th>
                             <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-indigo-100 uppercase tracking-wider">
@@ -46,12 +52,6 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                             <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-indigo-100 uppercase tracking-wider">
                                 Total Shortfall
                             </th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-indigo-100 uppercase tracking-wider">
-                                Ending Balance
-                            </th>
-                            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-indigo-100 uppercase tracking-wider">
-                                Offset Balance
-                            </th>
                         </tr>
                         </thead>
                         <tbody className="bg-indigo-800 divide-y divide-indigo-700">
@@ -69,6 +69,12 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                                 </td>
                                 <td className="px-4 py-3 whitespace-nowrap text-sm text-indigo-200 font-mono">
                                     {formatCurrency(row.beginningBalance)}
+                                </td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-white font-mono">
+                                    {formatCurrency(row.endingBalance)}
+                                </td>
+                                <td className="px-4 py-3 whitespace-nowrap text-sm text-indigo-100 font-medium font-mono">
+                                    {formatCurrency(row.offsetBalance)}
                                 </td>
                                 <td className="px-4 py-3 whitespace-nowrap text-sm text-green-300 font-mono">
                                     {formatCurrency(row.repayment)}
@@ -91,12 +97,6 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                                     row.totalShortfall < 0 ? 'text-red-300' : 'text-green-300'
                                 }`}>
                                     {formatCurrency(row.totalShortfall)}
-                                </td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-white font-mono">
-                                    {formatCurrency(row.endingBalance)}
-                                </td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-indigo-100 font-medium font-mono">
-                                    {formatCurrency(row.offsetBalance)}
                                 </td>
                             </tr>
                         ))}

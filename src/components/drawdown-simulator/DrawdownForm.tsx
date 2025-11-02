@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { RangeSlider } from '../common/RangeSlider';
 import { MonthYearPicker } from '../common/MonthYearPicker';
@@ -7,6 +7,8 @@ import type { SaleDrawdownState } from '../../types/drawdown.types';
 interface Props { model: SaleDrawdownState }
 
 export const DrawdownForm: React.FC<Props> = ({ model }) => {
+    const [activeTab, setActiveTab] = useState<'sale' | 'plan'>('sale');
+
     const fmtCurrency = (n: number) => `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
     const TAX_RATES = [16, 30, 37, 45] as const;
 
@@ -18,128 +20,156 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
             <h2 className="text-3xl font-bold text-gray-900">Drawdown Simulator</h2>
             <p className="mt-2 text-gray-600">Net sale proceeds calculator with monthly drawdown plan.</p>
 
-            <div className="mt-8 space-y-8">
-                {/* Sale Calculation */}
-                <section>
-                    <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-4">Sale Calculation</h3>
-                    <div className="grid grid-cols-1 gap-4">
-                        <RangeSlider
-                            label="Asset Sale Price"
-                            value={model.salePrice}
-                            min={700_000}
-                            max={1_500_000}
-                            step={50_000} // updated increment
-                            onChange={model.setSalePrice}
-                            formatValue={(v) => fmtCurrency(v)}
-                        />
-                        <RangeSlider
-                            label="Cost Base"
-                            value={model.costBase}
-                            min={300_000}
-                            max={500_000}
-                            step={10_000}
-                            onChange={model.setCostBase}
-                            formatValue={(v) => fmtCurrency(v)}
-                        />
-                        <RangeSlider
-                            label="Depreciation Claimed"
-                            value={model.depreciationClaimed}
-                            min={30_000}
-                            max={100_000}
-                            step={10_000}
-                            onChange={model.setDepreciationClaimed}
-                            formatValue={(v) => fmtCurrency(v)}
-                        />
-                        <RangeSlider
-                            label="Selling Costs"
-                            value={model.sellingCosts}
-                            min={30_000}
-                            max={100_000}
-                            step={10_000}
-                            onChange={model.setSellingCosts}
-                            formatValue={(v) => fmtCurrency(v)}
-                        />
-                        <RangeSlider
-                            label="Person 1 Tax Rate (%)"
-                            value={p1Idx}
-                            min={0}
-                            max={TAX_RATES.length - 1}
-                            step={1}
-                            onChange={(idx) => model.setPerson1TaxRate(TAX_RATES[Math.round(idx)] as number)}
-                            formatValue={(idx) => `${TAX_RATES[Math.round(idx)]}%`}
-                        />
-                        <RangeSlider
-                            label="Person 2 Tax Rate (%)"
-                            value={p2Idx}
-                            min={0}
-                            max={TAX_RATES.length - 1}
-                            step={1}
-                            onChange={(idx) => model.setPerson2TaxRate(TAX_RATES[Math.round(idx)] as number)}
-                            formatValue={(idx) => `${TAX_RATES[Math.round(idx)]}%`}
-                        />
-                        <InputGroup
-                            label="CGT Discount"
-                            id="cgtDiscount"
-                            value={String(model.cgtDiscountRate)}
-                            symbol="%"
-                            symbolPosition="right"
-                            step={0.1}
-                            onChange={(e) => model.setCgtDiscountRate(Number(e.target.value))}
-                            disabled={true}
-                        />
-                    </div>
-                </section>
+            {/* Tabs */}
+            <div className="mt-6 border-b border-gray-200">
+                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                    <button
+                        onClick={() => setActiveTab('sale')}
+                        className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium ${
+                            activeTab === 'sale'
+                                ? 'border-indigo-600 text-indigo-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                    >
+                        Sale Calculation
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('plan')}
+                        className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium ${
+                            activeTab === 'plan'
+                                ? 'border-indigo-600 text-indigo-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                    >
+                        Drawdown Plan
+                    </button>
+                </nav>
+            </div>
 
-                {/* Drawdown Plan */}
-                <section>
-                    <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-4">Drawdown Plan</h3>
-                    <div className="grid grid-cols-1 gap-4">
-                        <RangeSlider
-                            label="Net Monthly Rent"
-                            value={model.netMonthlyRent}
-                            min={800}
-                            max={1200}
-                            step={25}
-                            onChange={model.setNetMonthlyRent}
-                            formatValue={(v) => fmtCurrency(v)}
-                        />
-                        <RangeSlider
-                            label="Net Monthly Rent Growth Rate (%)"
-                            value={model.netRentGrowthRate}
-                            min={1}
-                            max={5}
-                            step={0.25}
-                            onChange={model.setNetRentGrowthRate}
-                            formatValue={(v) => `${v.toFixed(2)}%`}
-                        />
-                        <RangeSlider
-                            label="Est. Annual Interest Rate (%)"
-                            value={model.annualInterestRate}
-                            min={1}
-                            max={6}
-                            step={0.25}
-                            onChange={model.setAnnualInterestRate}
-                            formatValue={(v) => `${v.toFixed(2)}%`}
-                        />
-                        <RangeSlider
-                            label="Monthly Drawdown"
-                            value={model.monthlyDrawdown}
-                            min={5_000}
-                            max={15_000}
-                            step={1_000}
-                            onChange={model.setMonthlyDrawdown}
-                            formatValue={(v) => fmtCurrency(v)}
-                        />
-                        <MonthYearPicker
-                            id="startMonth"
-                            label="Drawdown Start Date"
-                            value={model.startMonth}
-                            onChange={model.setStartMonth}
-                            minYear={2000}
-                            maxYear={2100}
-                        />
-                    </div>
-                </section>
+            <div className="mt-6">
+                {activeTab === 'sale' && (
+                    <section className="space-y-4">
+                        <h3 className="text-lg font-medium text-gray-900">Sale Calculation</h3>
+                        <div className="grid grid-cols-1 gap-4">
+                            <RangeSlider
+                                label="Asset Sale Price"
+                                value={model.salePrice}
+                                min={700_000}
+                                max={1_500_000}
+                                step={50_000}
+                                onChange={model.setSalePrice}
+                                formatValue={(v) => fmtCurrency(v)}
+                            />
+                            <RangeSlider
+                                label="Cost Base"
+                                value={model.costBase}
+                                min={300_000}
+                                max={500_000}
+                                step={10_000}
+                                onChange={model.setCostBase}
+                                formatValue={(v) => fmtCurrency(v)}
+                            />
+                            <RangeSlider
+                                label="Depreciation Claimed"
+                                value={model.depreciationClaimed}
+                                min={30_000}
+                                max={100_000}
+                                step={10_000}
+                                onChange={model.setDepreciationClaimed}
+                                formatValue={(v) => fmtCurrency(v)}
+                            />
+                            <RangeSlider
+                                label="Selling Costs"
+                                value={model.sellingCosts}
+                                min={30_000}
+                                max={100_000}
+                                step={10_000}
+                                onChange={model.setSellingCosts}
+                                formatValue={(v) => fmtCurrency(v)}
+                            />
+                            <RangeSlider
+                                label="Person 1 Tax Rate (%)"
+                                value={p1Idx}
+                                min={0}
+                                max={TAX_RATES.length - 1}
+                                step={1}
+                                onChange={(idx) => model.setPerson1TaxRate(TAX_RATES[Math.round(idx)] as number)}
+                                formatValue={(idx) => `${TAX_RATES[Math.round(idx)]}%`}
+                            />
+                            <RangeSlider
+                                label="Person 2 Tax Rate (%)"
+                                value={p2Idx}
+                                min={0}
+                                max={TAX_RATES.length - 1}
+                                step={1}
+                                onChange={(idx) => model.setPerson2TaxRate(TAX_RATES[Math.round(idx)] as number)}
+                                formatValue={(idx) => `${TAX_RATES[Math.round(idx)]}%`}
+                            />
+                            <InputGroup
+                                label="CGT Discount"
+                                id="cgtDiscount"
+                                value={String(model.cgtDiscountRate)}
+                                symbol="%"
+                                symbolPosition="right"
+                                step={0.1}
+                                onChange={(e) => model.setCgtDiscountRate(Number(e.target.value))}
+                                disabled={true}
+                            />
+                        </div>
+                    </section>
+                )}
+
+                {activeTab === 'plan' && (
+                    <section className="space-y-4">
+                        <h3 className="text-lg font-medium text-gray-900">Drawdown Plan</h3>
+                        <div className="grid grid-cols-1 gap-4">
+                            <RangeSlider
+                                label="Net Monthly Rent"
+                                value={model.netMonthlyRent}
+                                min={800}
+                                max={1200}
+                                step={25}
+                                onChange={model.setNetMonthlyRent}
+                                formatValue={(v) => fmtCurrency(v)}
+                            />
+                            <RangeSlider
+                                label="Net Monthly Rent Growth Rate (%)"
+                                value={model.netRentGrowthRate}
+                                min={1}
+                                max={5}
+                                step={0.25}
+                                onChange={model.setNetRentGrowthRate}
+                                formatValue={(v) => `${v.toFixed(2)}%`}
+                            />
+                            <RangeSlider
+                                label="Est. Annual Interest Rate (%)"
+                                value={model.annualInterestRate}
+                                min={1}
+                                max={6}
+                                step={0.25}
+                                onChange={model.setAnnualInterestRate}
+                                formatValue={(v) => `${v.toFixed(2)}%`}
+                            />
+                            <RangeSlider
+                                label="Monthly Drawdown"
+                                value={model.monthlyDrawdown}
+                                min={5_000}
+                                max={15_000}
+                                step={1_000}
+                                onChange={model.setMonthlyDrawdown}
+                                formatValue={(v) => fmtCurrency(v)}
+                            />
+                            <MonthYearPicker
+                                id="startMonth"
+                                label="Drawdown Start Date"
+                                value={model.startMonth}
+                                onChange={model.setStartMonth}
+                                minYear={2000}
+                                maxYear={2100}
+                            />
+                        </div>
+                    </section>
+                )}
             </div>
         </div>
     );

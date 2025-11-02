@@ -1,4 +1,5 @@
 // File: 'src/components/drawdown-simulator/DrawdownResults.tsx'
+// Only the wrapper div className changed to be full-width on mobile
 import React from 'react';
 import type { DrawdownRow } from '../../types/drawdown.types';
 import { formatCurrency } from '../../utils/formatters';
@@ -26,10 +27,8 @@ export const DrawdownResults: React.FC<Props> = ({
                                                      schedule,
                                                  }) => {
     return (
-        <div className="md:w-[65%] bg-indigo-700 text-white p-6 sm:p-10 flex flex-col">
-            <h3 className="text-2xl font-bold text-white mb-4 text-center">
-                Monthly Drawdown Results
-            </h3>
+        <div className="w-full md:w-[65%] bg-indigo-700 text-white p-6 sm:p-10 flex flex-col">
+            <h3 className="text-2xl font-bold text-white mb-4 text-center">Monthly Drawdown Results</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
                 <Pill label="Net Proceeds" value={formatCurrency(netProceeds)} />

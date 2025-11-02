@@ -1,16 +1,12 @@
-// File: 'src/components/drawdown-simulator/DrawdownForm.tsx'
 import React from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { RangeSlider } from '../common/RangeSlider';
 import { MonthYearPicker } from '../common/MonthYearPicker';
 import type { SaleDrawdownState } from '../../types/drawdown.types';
 
-interface Props {
-    model: SaleDrawdownState;
-}
+interface Props { model: SaleDrawdownState }
 
 export const DrawdownForm: React.FC<Props> = ({ model }) => {
-    const toStr = (n: number) => (Number.isFinite(n) ? String(n) : '0');
     const fmtCurrency = (n: number) => `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
     const TAX_RATES = [16, 30, 37, 45] as const;
 
@@ -18,7 +14,7 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
     const p2Idx = Math.max(0, TAX_RATES.indexOf(model.person2TaxRate as (typeof TAX_RATES)[number]));
 
     return (
-        <div className="md:w-[35%] p-6 sm:p-8 overflow-y-auto">
+        <div className="w-full md:w-[35%] p-6 sm:p-8">
             <h2 className="text-3xl font-bold text-gray-900">Drawdown Simulator</h2>
             <p className="mt-2 text-gray-600">Net sale proceeds calculator with monthly drawdown plan.</p>
 
@@ -32,7 +28,7 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                             value={model.salePrice}
                             min={700_000}
                             max={1_500_000}
-                            step={100_000}
+                            step={50_000} // updated increment
                             onChange={model.setSalePrice}
                             formatValue={(v) => fmtCurrency(v)}
                         />
@@ -84,7 +80,7 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                         <InputGroup
                             label="CGT Discount"
                             id="cgtDiscount"
-                            value={toStr(model.cgtDiscountRate)}
+                            value={String(model.cgtDiscountRate)}
                             symbol="%"
                             symbolPosition="right"
                             step={0.1}
@@ -101,11 +97,20 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                         <RangeSlider
                             label="Net Monthly Rent"
                             value={model.netMonthlyRent}
-                            min={200}
-                            max={300}
-                            step={10}
+                            min={800}
+                            max={1200}
+                            step={25}
                             onChange={model.setNetMonthlyRent}
                             formatValue={(v) => fmtCurrency(v)}
+                        />
+                        <RangeSlider
+                            label="Net Monthly Rent Growth Rate (%)"
+                            value={model.netRentGrowthRate}
+                            min={1}
+                            max={5}
+                            step={0.25}
+                            onChange={model.setNetRentGrowthRate}
+                            formatValue={(v) => `${v.toFixed(2)}%`}
                         />
                         <RangeSlider
                             label="Est. Annual Interest Rate (%)"

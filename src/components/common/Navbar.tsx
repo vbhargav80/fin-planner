@@ -1,13 +1,13 @@
 // File: 'src/components/common/Navbar.tsx'
 import React from 'react';
-import { Calculator, Landmark, LayoutDashboard } from 'lucide-react';
+import { Landmark, LayoutDashboard, CalendarArrowDownIcon, PiggyBankIcon } from 'lucide-react';
 import type { NavbarProps } from '../../types/common.types';
 
 export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) => {
     const navItems = [
-        { id: 'super' as const, name: 'Super Calculator', icon: Calculator },
+        { id: 'super' as const, name: 'Super Calculator', icon: PiggyBankIcon },
         { id: 'homeLoan' as const, name: 'Amortization', icon: Landmark },
-        { id: 'drawdown' as const, name: 'Drawdown Simulator', icon: Calculator },
+        { id: 'drawdown' as const, name: 'Drawdown Simulator', icon: CalendarArrowDownIcon },
     ];
 
     return (
@@ -18,7 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
                         <div className="flex items-center gap-2">
                             <LayoutDashboard size={28} className="text-indigo-400" />
                             <span className="text-xl font-bold text-white flex items-center gap-2">
-                Financial Planning Tool
+                Finance Tools
               </span>
                         </div>
                         <div className="flex items-center space-x-2">

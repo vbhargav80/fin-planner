@@ -8,7 +8,7 @@ export const DrawdownSimulator: React.FC = () => {
     const model = useSaleDrawdownCalculator();
 
     return (
-        <div className="min-h-full flex">
+        <div className="w-full flex flex-col md:flex-row items-stretch gap-4 md:gap-6">
             <DrawdownForm model={model} />
             <DrawdownResults
                 netProceeds={model.netProceeds}

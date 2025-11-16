@@ -16,6 +16,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
         scrollToFirstDepletedOffset,
         triggerScrollToFirstDepletedOffset,
         clearScrollToFirstDepletedOffset,
+        hasDepletedOffsetRows,
     } = calculator;
     const theadRef = useRef<HTMLTableSectionElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -319,15 +320,17 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
                 </svg>
             </button>
-            <button
-                onClick={triggerScrollToFirstDepletedOffset}
-                className="absolute top-5 left-5 z-24 z-20 bg-red-600/80 hover:bg-red-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white"
-                aria-label="Scroll to first depleted offset row"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14m0 0l-7-7m7 7l7-7" />
-                </svg>
-            </button>
+            {hasDepletedOffsetRows && (
+                <button
+                    onClick={triggerScrollToFirstDepletedOffset}
+                    className="absolute top-5 left-5 z-24 z-20 bg-red-600/80 hover:bg-red-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white"
+                    aria-label="Scroll to first depleted offset row"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14m0 0l-7-7m7 7l7-7" />
+                    </svg>
+                </button>
+            )}
 
         </div>
     );

@@ -51,6 +51,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
     const [scrollTo2031, setScrollTo2031] = useState(0);
     const [scrollToFirstDepletedOffset, setScrollToFirstDepletedOffset] = useState(0);
+    const [hasDepletedOffsetRows, setHasDepletedOffsetRows] = useState(false);
 
     const triggerScrollTo2031 = () => {
         setScrollTo2031(prev => prev + 1);
@@ -138,6 +139,8 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     useEffect(() => {
         const data = calculateAmortizationSchedule(state);
         setAmortizationData(data);
+        const hasDepleted = data.some(row => row.offsetBalance <= 0);
+        setHasDepletedOffsetRows(hasDepleted);
     }, [state]);
 
     return {
@@ -153,5 +156,6 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         clearScrollToFirstDepletedOffset,
         calculateOptimalExpenditure,
         calculateOptimalWorkingYears,
+        hasDepletedOffsetRows,
     };
 }

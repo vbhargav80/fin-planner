@@ -60,4 +60,5 @@ export interface AmortizationCalculatorState {
     clearScrollToFirstDepletedOffset: () => void;
     calculateOptimalExpenditure: () => void;
     calculateOptimalWorkingYears: () => void;
+    hasDepletedOffsetRows: boolean;
 }

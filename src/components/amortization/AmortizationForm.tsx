@@ -4,6 +4,7 @@ import { InputGroup } from '../common/InputGroup';
 import { ToggleSwitch } from '../common/ToggleSwitch';
 import { RangeSlider } from '../common/RangeSlider';
 import type { AmortizationCalculatorState } from '../../types/amortization.types';
+import { Briefcase, Wallet } from 'lucide-react';
 
 interface AmortizationFormProps {
     calculator: AmortizationCalculatorState;
@@ -241,18 +242,20 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                 )}
             </div>
 
-            <div className="mt-8 space-y-4">
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                     onClick={calculateOptimalExpenditure}
-                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
                 >
-                    Calculate Optimal Expenditure
+                    <Wallet size={16} />
+                    <span className="text-sm">Optimize Expenditure</span>
                 </button>
                 <button
                     onClick={calculateOptimalWorkingYears}
-                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
                 >
-                    Calculate Optimal Working Years &amp; Income
+                    <Briefcase size={16} />
+                    <span className="text-sm">Optimize Work &amp; Income</span>
                 </button>
             </div>
         </div>

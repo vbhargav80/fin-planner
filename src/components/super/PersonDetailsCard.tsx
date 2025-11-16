@@ -1,110 +1,115 @@
 import React, { useState } from 'react';
 import { RangeSlider } from '../common/RangeSlider';
 import { formatCurrency } from '../../utils/formatters';
-import { ToggleSwitch } from '../common/ToggleSwitch';
 import type { SuperCalculatorState } from '../../types/super.types';
+import PersonTabsPanel from '../PersonTabsPanel';
 
-// Pick only the props needed from the main state
-type PersonDetailsCardProps = Pick<
-    SuperCalculatorState,
-    | 'myAge' | 'setMyAge'
-    | 'wifeAge' | 'setWifeAge'
-    | 'mySuper' | 'setMySuper'
-    | 'wifeSuper' | 'setWifeSuper'
-    | 'myContributionPre50' | 'setMyContributionPre50'
-    | 'myContributionPost50' | 'setMyContributionPost50'
-    | 'wifeContributionPre50' | 'setWifeContributionPre50'
-    | 'wifeContributionPost50' | 'setWifeContributionPost50'
-    | 'myExtraYearlyContribution' | 'setMyExtraYearlyContribution'
-    | 'wifeExtraYearlyContribution' | 'setWifeExtraYearlyContribution'
-    | 'makeExtraContribution'
-> & {
+interface PersonDetailsCardProps extends SuperCalculatorState {
     isBalanceMode: boolean;
     isMonthly: boolean;
-};
+}
 
-export const PersonDetailsCard: React.FC<PersonDetailsCardProps> = ({
-    myAge, setMyAge,
-    wifeAge, setWifeAge,
-    mySuper, setMySuper,
-    wifeSuper, setWifeSuper,
-    myContributionPre50, setMyContributionPre50,
-    myContributionPost50, setMyContributionPost50,
-    wifeContributionPre50, setWifeContributionPre50,
-    wifeContributionPost50, setWifeContributionPost50,
-    myExtraYearlyContribution, setMyExtraYearlyContribution,
-    wifeExtraYearlyContribution, setWifeExtraYearlyContribution,
-    makeExtraContribution,
-    isBalanceMode,
-    isMonthly,
-}) => {
-    const [activePersonTab, setActivePersonTab] = useState<'self' | 'spouse'>('self');
+export const PersonDetailsCard: React.FC<PersonDetailsCardProps> = (props) => {
+    const {
+        myAge, setMyAge,
+        mySuper, setMySuper,
+        myContributionPre50, setMyContributionPre50,
+        myContributionPost50, setMyContributionPost50,
+        myExtraYearlyContribution, setMyExtraYearlyContribution,
+        myExtraContributionYears, setMyExtraContributionYears,
+        wifeAge, setWifeAge,
+        wifeSuper, setWifeSuper,
+        wifeContributionPre50, setWifeContributionPre50,
+        wifeContributionPost50, setWifeContributionPost50,
+        wifeExtraYearlyContribution, setWifeExtraYearlyContribution,
+        wifeExtraContributionYears, setWifeExtraContributionYears,
+        isBalanceMode,
+        isMonthly,
+        makeExtraContribution,
+    } = props;
+
+    const [activeTab, setActiveTab] = useState<'me' | 'spouse'>('me');
 
     return (
-        <div className="bg-white border-l-4 border-indigo-500 rounded-lg shadow-lg">
-            <div className="flex">
-                <button
-                    type="button"
-                    onClick={() => setActivePersonTab('self')}
-                    className={`w-1/2 p-4 text-center font-medium transition-colors duration-150 rounded-tl-lg ${
-                        activePersonTab === 'self'
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                    }`}
-                >
-                    You
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setActivePersonTab('spouse')}
-                    className={`w-1/2 p-4 text-center font-medium rounded-tr-lg transition-colors duration-150 ${
-                        activePersonTab === 'spouse'
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                    }`}
-                >
-                    Spouse
-                </button>
-            </div>
-            <div className="p-4 border-t border-gray-200">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                    {activePersonTab === 'self' && (
-                        <>
-                            <RangeSlider label="Current Age" value={Number(myAge)} min={45} max={60} step={1} onChange={(n) => setMyAge(String(n))} />
-                            <RangeSlider label="Current Super" value={Number(mySuper)} min={380000} max={450000} step={5000} onChange={(n) => setMySuper(String(n))} formatValue={(v) => formatCurrency(v)} />
-                            {isBalanceMode && (
-                                <>
-                                    <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Pre-50)`} value={Number(myContributionPre50)} min={0} max={isMonthly ? 1200 : 18000} step={isMonthly ? 50 : 500} onChange={(n) => setMyContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                    <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Post-50)`} value={Number(myContributionPost50)} min={0} max={isMonthly ? 1200 : 12000} step={isMonthly ? 50 : 500} onChange={(n) => setMyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                </>
-                            )}
-                            {isBalanceMode && makeExtraContribution && (
-                                <div className="sm:col-span-2">
-                                    <RangeSlider label="Extra End-of-Year Contribution" value={Number(myExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                </div>
-                            )}
-                        </>
-                    )}
+        <PersonTabsPanel className="!p-0">
+            <ul className="flex text-sm font-medium text-center text-gray-500 divide-x divide-gray-200 rounded-t-lg">
+                <li className="w-full">
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('me')}
+                        className={`inline-block w-full p-4 rounded-tl-lg transition-colors duration-150 focus:outline-none ${activeTab === 'me' ? 'bg-indigo-600 text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'}`}
+                    >You</button>
+                </li>
+                <li className="w-full">
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('spouse')}
+                        className={`inline-block w-full p-4 rounded-tr-lg transition-colors duration-150 focus:outline-none ${activeTab === 'spouse' ? 'bg-indigo-600 text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'}`}
+                    >Spouse</button>
+                </li>
+            </ul>
 
-                    {activePersonTab === 'spouse' && (
+            {activeTab === 'me' && (
+                <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 border-t border-gray-200">
+                    <div className="sm:col-span-1">
+                        <RangeSlider label="Current Age" value={Number(myAge)} min={30} max={55} step={1} onChange={(n) => setMyAge(String(n))} />
+                    </div>
+                    <div className="sm:col-span-1">
+                        <RangeSlider label="Current Super" value={Number(mySuper)} min={0} max={1000000} step={10000} onChange={(n) => setMySuper(String(n))} formatValue={(v) => formatCurrency(v)} />
+                    </div>
+                    {isBalanceMode && (
                         <>
-                            <RangeSlider label="Current Age" value={Number(wifeAge)} min={42} max={60} step={1} onChange={(n) => setWifeAge(String(n))} />
-                            <RangeSlider label="Current Super" value={Number(wifeSuper)} min={100000} max={150000} step={5000} onChange={(n) => setWifeSuper(String(n))} formatValue={(v) => formatCurrency(v)} />
-                            {isBalanceMode && (
+                            <div className="sm:col-span-1">
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Pre 50)`} value={Number(myContributionPre50)} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={(n) => setMyContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                            </div>
+                            <div className="sm:col-span-1">
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Post 50)`} value={Number(myContributionPost50)} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={(n) => setMyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                            </div>
+                            {makeExtraContribution && (
                                 <>
-                                    <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Pre-50)`} value={Number(wifeContributionPre50)} min={0} max={isMonthly ? 1200 : 18000} step={isMonthly ? 50 : 500} onChange={(n) => setWifeContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                    <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Post-50)`} value={Number(wifeContributionPost50)} min={0} max={isMonthly ? 1200 : 12000} step={isMonthly ? 50 : 500} onChange={(n) => setWifeContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                    <div className="sm:col-span-1">
+                                        <RangeSlider label="Extra Yearly Cont." value={Number(myExtraYearlyContribution)} min={0} max={27500} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                    </div>
+                                    <div className="sm:col-span-1">
+                                        <RangeSlider label="For How Many Years" value={Number(myExtraContributionYears)} min={0} max={15} step={1} onChange={(n) => setMyExtraContributionYears(String(n))} formatValue={(v) => `${v} yrs`} />
+                                    </div>
                                 </>
-                            )}
-                            {isBalanceMode && makeExtraContribution && (
-                                <div className="sm:col-span-2">
-                                    <RangeSlider label="Extra End-of-Year Contribution" value={Number(wifeExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                </div>
                             )}
                         </>
                     )}
                 </div>
-            </div>
-        </div>
+            )}
+
+            {activeTab === 'spouse' && (
+                <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 border-t border-gray-200">
+                    <div className="sm:col-span-1">
+                        <RangeSlider label="Current Age" value={Number(wifeAge)} min={30} max={55} step={1} onChange={(n) => setWifeAge(String(n))} />
+                    </div>
+                    <div className="sm:col-span-1">
+                        <RangeSlider label="Current Super" value={Number(wifeSuper)} min={0} max={1000000} step={10000} onChange={(n) => setWifeSuper(String(n))} formatValue={(v) => formatCurrency(v)} />
+                    </div>
+                    {isBalanceMode && (
+                        <>
+                            <div className="sm:col-span-1">
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Pre 50)`} value={Number(wifeContributionPre50)} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={(n) => setWifeContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                            </div>
+                            <div className="sm:col-span-1">
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Post 50)`} value={Number(wifeContributionPost50)} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={(n) => setWifeContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                            </div>
+                            {makeExtraContribution && (
+                                <>
+                                    <div className="sm:col-span-1">
+                                        <RangeSlider label="Extra Yearly Cont." value={Number(wifeExtraYearlyContribution)} min={0} max={27500} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                    </div>
+                                    <div className="sm:col-span-1">
+                                        <RangeSlider label="For How Many Years" value={Number(wifeExtraContributionYears)} min={0} max={15} step={1} onChange={(n) => setWifeExtraContributionYears(String(n))} formatValue={(v) => `${v} yrs`} />
+                                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
+                </div>
+            )}
+        </PersonTabsPanel>
     );
 };

@@ -27,6 +27,8 @@ const defaultState = {
     // Extra yearly
     myExtraYearlyContribution: '2000',
     wifeExtraYearlyContribution: '2000',
+    myExtraContributionYears: '1',
+    wifeExtraContributionYears: '1',
 };
 
 export function useSuperCalculator(): SuperCalculatorState {
@@ -41,6 +43,8 @@ export function useSuperCalculator(): SuperCalculatorState {
     const [myContributionPost50, setMyContributionPost50] = useState(defaultState.myMonthlyContributionPost50);
     const [wifeContributionPre50, setWifeContributionPre50] = useState(defaultState.wifeMonthlyContribution);
     const [wifeContributionPost50, setWifeContributionPost50] = useState(defaultState.wifeMonthlyContributionPost50);
+    const [myExtraContributionYears, setMyExtraContributionYears] = useState(defaultState.myExtraContributionYears);
+    const [wifeExtraContributionYears, setWifeExtraContributionYears] = useState(defaultState.wifeExtraContributionYears);
     const [myExtraYearlyContribution, setMyExtraYearlyContribution] = useState(defaultState.myExtraYearlyContribution);
     const [wifeExtraYearlyContribution, setWifeExtraYearlyContribution] = useState(defaultState.wifeExtraYearlyContribution);
     const [netReturn, setNetReturn] = useState(defaultState.netReturn);
@@ -79,6 +83,8 @@ export function useSuperCalculator(): SuperCalculatorState {
             wifeContributionPost50: parseFloat(defaultState.wifeMonthlyContributionPost50),
             myExtraYearlyContribution: parseFloat(defaultState.myExtraYearlyContribution),
             wifeExtraYearlyContribution: parseFloat(defaultState.wifeExtraYearlyContribution),
+            myExtraContributionYears: parseFloat(defaultState.myExtraContributionYears),
+            wifeExtraContributionYears: parseFloat(defaultState.wifeExtraContributionYears),
             netReturn: parseFloat(defaultState.netReturn),
             contributionFrequency: defaultState.contributionFrequency,
             makeExtraContribution: defaultState.makeExtraContribution,
@@ -104,6 +110,8 @@ export function useSuperCalculator(): SuperCalculatorState {
             wifeContributionPost50: parseFloat(wifeContributionPost50),
             myExtraYearlyContribution: parseFloat(myExtraYearlyContribution),
             wifeExtraYearlyContribution: parseFloat(wifeExtraYearlyContribution),
+            myExtraContributionYears: parseFloat(myExtraContributionYears),
+            wifeExtraContributionYears: parseFloat(wifeExtraContributionYears),
             netReturn: parseFloat(netReturn),
             contributionFrequency,
             makeExtraContribution,
@@ -115,7 +123,7 @@ export function useSuperCalculator(): SuperCalculatorState {
         setBreakdownData(result.breakdown);
         setError(result.error || '');
 
-    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50, myExtraYearlyContribution, wifeExtraYearlyContribution, netReturn, calcMode, contributionFrequency, makeExtraContribution]);
+    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50, myExtraYearlyContribution, wifeExtraYearlyContribution, myExtraContributionYears, wifeExtraContributionYears, netReturn, calcMode, contributionFrequency, makeExtraContribution]);
 
     return {
         myAge, setMyAge,
@@ -134,8 +142,10 @@ export function useSuperCalculator(): SuperCalculatorState {
         myContributionPre50, setMyContributionPre50,
         myContributionPost50, setMyContributionPost50,
         myExtraYearlyContribution, setMyExtraYearlyContribution,
+        myExtraContributionYears, setMyExtraContributionYears,
         wifeContributionPre50, setWifeContributionPre50,
         wifeContributionPost50, setWifeContributionPost50,
         wifeExtraYearlyContribution, setWifeExtraYearlyContribution,
+        wifeExtraContributionYears, setWifeExtraContributionYears,
     };
 }

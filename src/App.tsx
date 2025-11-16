@@ -7,7 +7,7 @@ import { DrawdownSimulator } from './components/drawdown-simulator/DrawdownSimul
 import type { CalculatorId } from './types/common.types';
 
 export default function App() {
-    const [activeCalculator, setActiveCalculator] = useState<CalculatorId>('super');
+    const [activeCalculator, setActiveCalculator] = useState<CalculatorId>('homeLoan');
 
     const renderCalculator = () => {
         switch (activeCalculator) {

@@ -28,6 +28,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
         yearsWorking, setYearsWorking,
         netIncome, setNetIncome,
         actualMonthlyRepayment,
+        calculateOptimalExpenditure,
     } = calculator;
 
     // Snap interest rate to discrete 0.25% steps within [4, 8]
@@ -89,9 +90,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
             <div className="mt-8 space-y-6">
                 {activeTab === 'loan' && (
                     <section>
-                        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-4">
-                            Loan Details
-                        </h3>
                         <div className="space-y-4">
                             <RangeSlider
                                 label="Starting Loan"
@@ -123,10 +121,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
 
                 {activeTab === 'cashflow' && (
                     <section>
-                        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-4">
-                            Monthly Cashflow
-                        </h3>
-
                         <div className="space-y-8">
                             {/* Incomings */}
                             <div>
@@ -182,6 +176,14 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                         disabled={isRefinanced}
                                     />
                                 </div>
+                                <div className="mt-4">
+                                    <button
+                                        onClick={calculateOptimalExpenditure}
+                                        className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+                                    >
+                                        Calculate Optimal Expenditure
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -189,9 +191,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
 
                 {activeTab === 'assumptions' && (
                     <section>
-                        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-4">
-                            Assumptions &amp; Actions
-                        </h3>
                         <div className="space-y-4">
                             <RangeSlider
                                 label="Annual Rental Growth"

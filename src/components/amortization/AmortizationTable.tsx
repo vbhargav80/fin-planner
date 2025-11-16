@@ -312,7 +312,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
 
             <button
                 onClick={triggerScrollTo2031}
-                className="absolute top-10 right-10 z-20 bg-indigo-600/50 hover:bg-indigo-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white"
+                className="absolute top-5 right-5 z-20 bg-indigo-600/50 hover:bg-indigo-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white"
                 aria-label="Scroll to Jan 2031"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -321,7 +321,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
             </button>
             <button
                 onClick={triggerScrollToFirstDepletedOffset}
-                className="absolute top-10 left-10 z-24 z-20 bg-red-600/80 hover:bg-red-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white"
+                className="absolute top-5 left-5 z-24 z-20 bg-red-600/80 hover:bg-red-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white"
                 aria-label="Scroll to first depleted offset row"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

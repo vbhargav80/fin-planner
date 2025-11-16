@@ -6,8 +6,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const navItems = [
-        { id: 'super' as const, name: 'Super Calculator', icon: PiggyBank },
         { id: 'homeLoan' as const, name: 'Amortization', icon: Landmark },
+        { id: 'super' as const, name: 'Super Calculator', icon: PiggyBank },
         { id: 'drawdown' as const, name: 'Drawdown Simulator', icon: CalendarRange },
     ];
 

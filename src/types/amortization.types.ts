@@ -65,5 +65,6 @@ export interface AmortizationCalculatorState {
     clearScrollTo2031: () => void;
     scrollToFirstDepletedOffset: number;
     triggerScrollToFirstDepletedOffset: () => void;
-    clearScrollToFirstDepletedOffset: () => void;
+    clearScrollToFirstDepletedOffset: ()_=> void;
+    calculateOptimalExpenditure: () => void;
 }

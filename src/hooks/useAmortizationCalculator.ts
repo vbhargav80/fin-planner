@@ -38,6 +38,47 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         setScrollToFirstDepletedOffset(0);
     };
 
+    const calculateOptimalExpenditure = () => {
+        const inputs = {
+            interestRate,
+            principal,
+            monthlyRepayment,
+            initialRentalIncome,
+            initialOffsetBalance,
+            monthlyExpenditure,
+            monthlyExpenditurePre2031,
+            rentalGrowthRate,
+            isRefinanced,
+            considerOffsetIncome,
+            offsetIncomeRate,
+            continueWorking,
+            yearsWorking,
+            netIncome,
+        };
+
+        let low = 0;
+        let high = 50000; // Assume expenditure won't exceed this
+        let optimalExpenditure = monthlyExpenditure;
+
+        for (let i = 0; i < 30; i++) { // 30 iterations for precision
+            const mid = (low + high) / 2;
+            const schedule = calculateAmortizationSchedule({ ...inputs, monthlyExpenditure: mid });
+            const finalOffsetBalance = schedule[schedule.length - 1].offsetBalance;
+
+            // Check if offset is depleted at any point before the target date
+            const isDepletedEarly = schedule.some(row => row.offsetBalance < 0);
+
+            if (isDepletedEarly || finalOffsetBalance < 0) {
+                high = mid;
+            } else {
+                optimalExpenditure = mid;
+                low = mid;
+            }
+        }
+
+        setMonthlyExpenditure(optimalExpenditure);
+    };
+
     const actualMonthlyRepayment = useMemo(() => {
         if (isRefinanced) {
             return calculateRefiMonthlyPayment({
@@ -135,5 +176,6 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         scrollToFirstDepletedOffset,
         triggerScrollToFirstDepletedOffset,
         clearScrollToFirstDepletedOffset,
+        calculateOptimalExpenditure,
     };
 }

@@ -40,7 +40,7 @@ export function useSuperCalculator(): SuperCalculatorState {
 
     useEffect(() => {
         calculate();
-    }, [calculate]);
+    }, [calculate, calcMode]);
 
     return {
         myAge, setMyAge,

@@ -1,5 +1,5 @@
-import { useEffect, useReducer, useState } from 'react';
-import type { SuperResultData, SuperBreakdownRow, SuperCalculatorState, State, Action } from '../types/super.types';
+import { useMemo, useReducer } from 'react';
+import type { SuperCalculatorState, State, Action } from '../types/super.types';
 import { calculateSuper } from '../utils/calculations/superCalculations';
 
 // Define defaults in a single place
@@ -76,23 +76,7 @@ export function useSuperCalculator(): SuperCalculatorState {
     const wifeContributionPre50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPre50 : state.wifeYearlyContributionPre50;
     const wifeContributionPost50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPost50 : state.wifeYearlyContributionPost50;
 
-    // Compute initial results synchronously
-    const initialComputation = (() => {
-        const inputs = {
-            ...initialState,
-            myContributionPre50: initialState.myMonthlyContributionPre50,
-            myContributionPost50: initialState.myMonthlyContributionPost50,
-            wifeContributionPre50: initialState.wifeMonthlyContributionPre50,
-            wifeContributionPost50: initialState.wifeMonthlyContributionPost50,
-        };
-        return calculateSuper(inputs, initialState.calcMode);
-    })();
-
-    const [results, setResults] = useState<SuperResultData | null>(initialComputation.results);
-    const [error, setError] = useState<string>(initialComputation.error || '');
-    const [breakdownData, setBreakdownData] = useState<SuperBreakdownRow[]>(initialComputation.breakdown);
-
-    useEffect(() => {
+    const { results, breakdownData, error } = useMemo(() => {
         const inputs = {
             ...state,
             myContributionPre50,
@@ -100,20 +84,19 @@ export function useSuperCalculator(): SuperCalculatorState {
             wifeContributionPre50,
             wifeContributionPost50,
         };
-
         const result = calculateSuper(inputs, state.calcMode);
-
-        setResults(result.results);
-        setBreakdownData(result.breakdown);
-        setError(result.error || '');
-
+        return {
+            results: result.results,
+            breakdownData: result.breakdown,
+            error: result.error || '',
+        };
     }, [state, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50]);
 
     return {
         state,
         dispatch,
         results,
-        error,
+        error: error,
         breakdownData,
         myContributionPre50,
         myContributionPost50,

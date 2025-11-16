@@ -6,6 +6,7 @@ import type { SuperCalculatorState } from '../../types/super.types';
 import { ToggleSwitch } from '../common/ToggleSwitch';
 import * as SuperConstants from '../../constants/super';
 import { PersonDetailsCard } from './PersonDetailsCard';
+import { Tabs } from '../common/Tabs';
 
 interface SuperFormProps {
     calculator: SuperCalculatorState;
@@ -25,6 +26,10 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
     const { targetAge, targetBalance, netReturn, calcMode, contributionFrequency, makeExtraContribution } = state;
     const isMonthly = contributionFrequency === 'monthly';
     const isBalanceMode = state.calcMode === 'balance';
+    const CALC_MODE_TABS = [
+        { id: 'contribution', label: 'Calculate Contribution' },
+        { id: 'balance', label: 'Calculate Balance' },
+    ];
 
     return (
         <div className="md:w-[45%] p-6 sm:p-8 overflow-y-auto">
@@ -35,26 +40,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 {/* Calculation type toggle */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Calculation Type</label>
-                    <div className="mt-1 flex w-full gap-1 rounded-full bg-gray-900 p-1 shadow-inner">
-                        <button
-                            type="button"
-                            onClick={() => dispatch({ type: 'SET_CALC_MODE', payload: 'contribution' })}
-                            className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
-                                calcMode === 'contribution' ? 'bg-white text-gray-900 border-gray-900 shadow-sm' : 'bg-transparent text-white border-transparent hover:bg-gray-700'
-                            }`}
-                        >
-                            Calculate Contribution
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => dispatch({ type: 'SET_CALC_MODE', payload: 'balance' })}
-                            className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
-                                calcMode === 'balance' ? 'bg-white text-gray-900 border-gray-900 shadow-sm' : 'bg-transparent text-white border-transparent hover:bg-gray-700'
-                            }`}
-                        >
-                            Calculate Balance
-                        </button>
-                    </div>
+                    <Tabs tabs={CALC_MODE_TABS} activeTab={calcMode} onTabClick={(id) => dispatch({ type: 'SET_CALC_MODE', payload: id as any })} variant="pill" className="mt-1" />
                 </div>
 
                 {/* Goals & Assumptions Panel */}

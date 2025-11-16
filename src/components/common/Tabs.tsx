@@ -9,7 +9,7 @@ interface TabsProps {
     tabs: Tab[];
     activeTab: string;
     onTabClick: (id: string) => void;
-    variant?: 'button' | 'underline' | 'dark-underline' | 'full-width';
+    variant?: 'button' | 'underline' | 'dark-underline' | 'full-width' | 'pill';
     className?: string;
 }
 
@@ -67,6 +67,27 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant
                             activeTab === tab.id
                                 ? 'bg-indigo-800 text-white'
                                 : 'text-indigo-300 hover:text-white'
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+        );
+    }
+
+    if (variant === 'pill') {
+        return (
+            <div className={`flex w-full gap-1 rounded-full bg-gray-900 p-1 shadow-inner ${className}`}>
+                {tabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => onTabClick(tab.id)}
+                        className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                            activeTab === tab.id
+                                ? 'bg-white text-gray-900 border-gray-900 shadow-sm'
+                                : 'bg-transparent text-white border-transparent hover:bg-gray-700'
                         }`}
                     >
                         {tab.label}

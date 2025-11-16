@@ -1,5 +1,5 @@
 // File: `src/hooks/useAmortizationCalculator.ts`
-import { useState, useEffect, useReducer } from 'react';
+import { useState, useEffect, useReducer, useCallback } from 'react';
 import type { AmortizationRow, AmortizationCalculatorState, State, Action } from '../types/amortization.types';
 import { calculateAmortizationSchedule } from '../utils/calculations/amortizationCalculations';
 import * as AmortizationConstants from '../constants/amortization';
@@ -55,20 +55,20 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [hasDepletedOffsetRows, setHasDepletedOffsetRows] = useState(false);
 
     const triggerScrollTo2031 = () => {
-        setScrollTo2031(prev => prev + 1);
+        setScrollTo2031(c => c + 1);
     };
 
-    const clearScrollTo2031 = () => {
+    const clearScrollTo2031 = useCallback(() => {
         setScrollTo2031(0);
-    };
+    }, []);
 
     const triggerScrollToFirstDepletedOffset = () => {
-        setScrollToFirstDepletedOffset(prev => prev + 1);
+        setScrollToFirstDepletedOffset(c => c + 1);
     };
 
-    const clearScrollToFirstDepletedOffset = () => {
+    const clearScrollToFirstDepletedOffset = useCallback(() => {
         setScrollToFirstDepletedOffset(0);
-    };
+    }, []);
 
     const calculateOptimalExpenditure = () => {
         const inputs = { ...state };

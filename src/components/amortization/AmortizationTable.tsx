@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState, useLayoutEffect} from 'react';
+import React, {useEffect, useRef, useState, useLayoutEffect } from 'react';
 import type {AmortizationCalculatorState} from '../../types/amortization.types';
 import { formatCurrency } from '../../utils/formatters';
 
@@ -24,17 +24,6 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
     const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
     const [isJan2031Pinned, setIsJan2031Pinned] = useState(false);
 
-    const amortizationDataRef = useRef(amortizationData);
-    const headerHeightRef = useRef(headerHeight);
-
-    useEffect(() => {
-        amortizationDataRef.current = amortizationData;
-    }, [amortizationData]);
-
-    useEffect(() => {
-        headerHeightRef.current = headerHeight;
-    }, [headerHeight]);
-
     useLayoutEffect(() => {
         const thead = theadRef.current;
         if (!thead) return;
@@ -59,14 +48,13 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
 
         const id = window.setInterval(measure, 300);
         return () => window.clearInterval(id);
-    }, [headerHeight]);
+    }, []);
 
     // Scroll to Jan 2031 row when explicitly requested via button
     useEffect(() => {
         if (!scrollTo2031) return; // only react when counter changes from button click
 
-        const data = amortizationDataRef.current;
-        const index = data.findIndex((row) => row.date === 'Jan 2031');
+        const index = amortizationData.findIndex((row) => row.date === 'Jan 2031');
         if (index === -1) {
             console.warn('[AmortizationTable] Jan 2031 row not found');
             clearScrollTo2031();
@@ -82,18 +70,16 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
         }
 
         const extraPadding = 8;
-        let raf1 = 0;
-        let raf2 = 0;
+        let rafId = 0;
 
         const doScroll = () => {
-            const currentHeaderHeight = headerHeightRef.current;
             const containerRect = container.getBoundingClientRect();
             const rowRect = rowEl.getBoundingClientRect();
             const rowTopInContainer = rowRect.top - containerRect.top;
 
             const targetTop = Math.max(
                 0,
-                container.scrollTop + rowTopInContainer - currentHeaderHeight - extraPadding,
+                container.scrollTop + rowTopInContainer - headerHeight - extraPadding,
             );
 
             container.scrollTo({ top: targetTop, behavior: 'smooth' });
@@ -101,22 +87,18 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
         };
 
         // Double RAF to ensure layout & sticky header are fully applied
-        raf1 = requestAnimationFrame(() => {
-            raf2 = requestAnimationFrame(doScroll);
-        });
+        rafId = requestAnimationFrame(doScroll);
 
         return () => {
-            if (raf1) cancelAnimationFrame(raf1);
-            if (raf2) cancelAnimationFrame(raf2);
+            if (rafId) cancelAnimationFrame(rafId);
         };
-    }, [scrollTo2031, clearScrollTo2031]);
+    }, [scrollTo2031, clearScrollTo2031, amortizationData, headerHeight]);
 
     // Scroll to first depleted-offset row when requested
     useEffect(() => {
         if (!scrollToFirstDepletedOffset) return;
 
-        const data = amortizationDataRef.current;
-        const index = data.findIndex((row) => row.offsetBalance <= 0);
+        const index = amortizationData.findIndex((row) => row.offsetBalance <= 0);
         if (index === -1) {
             console.warn('[AmortizationTable] No depleted-offset row found');
             clearScrollToFirstDepletedOffset();
@@ -132,33 +114,28 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
         }
 
         const extraPadding = 8;
-        let raf1 = 0;
-        let raf2 = 0;
+        let rafId = 0;
 
         const doScroll = () => {
-            const currentHeaderHeight = headerHeightRef.current;
             const containerRect = container.getBoundingClientRect();
             const rowRect = rowEl.getBoundingClientRect();
             const rowTopInContainer = rowRect.top - containerRect.top;
 
             const targetTop = Math.max(
                 0,
-                container.scrollTop + rowTopInContainer - currentHeaderHeight - extraPadding,
+                container.scrollTop + rowTopInContainer - headerHeight - extraPadding,
             );
 
             container.scrollTo({ top: targetTop, behavior: 'smooth' });
             clearScrollToFirstDepletedOffset();
         };
 
-        raf1 = requestAnimationFrame(() => {
-            raf2 = requestAnimationFrame(doScroll);
-        });
+        rafId = requestAnimationFrame(doScroll);
 
         return () => {
-            if (raf1) cancelAnimationFrame(raf1);
-            if (raf2) cancelAnimationFrame(raf2);
+            if (rafId) cancelAnimationFrame(rafId);
         };
-    }, [scrollToFirstDepletedOffset, clearScrollToFirstDepletedOffset]);
+    }, [scrollToFirstDepletedOffset, clearScrollToFirstDepletedOffset, amortizationData, headerHeight]);
 
     // Scroll-driven sticky behavior for Jan 2031 row
     useEffect(() => {

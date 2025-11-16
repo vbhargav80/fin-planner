@@ -90,7 +90,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
             <div className="mt-8 space-y-6">
                 {activeTab === 'loan' && (
                     <section>
-                        <div className="space-y-4">
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
                             <RangeSlider
                                 label="Starting Loan"
                                 value={principal}
@@ -123,7 +123,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                     <section>
                         <div className="space-y-8">
                             {/* Incomings */}
-                            <div>
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                 <h4 className="text-sm font-semibold text-gray-600 mb-3">Incomings</h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <RangeSlider
@@ -147,7 +147,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                             </div>
 
                             {/* Outgoings */}
-                            <div>
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                 <h4 className="text-sm font-semibold text-gray-600 mb-3">Outgoings</h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <RangeSlider
@@ -176,14 +176,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                         disabled={isRefinanced}
                                     />
                                 </div>
-                                <div className="mt-4">
-                                    <button
-                                        onClick={calculateOptimalExpenditure}
-                                        className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
-                                    >
-                                        Calculate Optimal Expenditure
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </section>
@@ -191,55 +183,70 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
 
                 {activeTab === 'assumptions' && (
                     <section>
-                        <div className="space-y-4">
-                            <RangeSlider
-                                label="Annual Rental Growth"
-                                value={rentalGrowthRate}
-                                min={1}
-                                max={4}
-                                step={0.25}
-                                onChange={setRentalGrowthRate}
-                            />
-                            <ToggleSwitch
-                                label="Refinance for 25-year term"
-                                checked={isRefinanced}
-                                onChange={setIsRefinanced}
-                            />
-                            <ToggleSwitch
-                                label="Consider Offset Interest Income"
-                                checked={considerOffsetIncome}
-                                onChange={setConsiderOffsetIncome}
-                            />
-                            {considerOffsetIncome && (
-                                <InputGroup
-                                    label="Offset Income Rate"
-                                    id="offsetIncomeRate"
-                                    step={0.1}
-                                    value={String(offsetIncomeRate)}
-                                    onChange={(e) => setOffsetIncomeRate(parseFloat(e.target.value) || 0)}
-                                    symbol="%"
-                                    symbolPosition="right"
-                                />
-                            )}
-                            <ToggleSwitch
-                                label="Continue Working"
-                                checked={continueWorking}
-                                onChange={setContinueWorking}
-                            />
-                            {continueWorking && (
+                        <div className="space-y-6">
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
                                 <RangeSlider
-                                    label="Number of years"
-                                    value={yearsWorking}
-                                    min={0}
-                                    max={10}
-                                    step={1}
-                                    onChange={setYearsWorking}
-                                    disabled={!continueWorking}
+                                    label="Annual Rental Growth"
+                                    value={rentalGrowthRate}
+                                    min={1}
+                                    max={4}
+                                    step={0.25}
+                                    onChange={setRentalGrowthRate}
                                 />
-                            )}
+                                <ToggleSwitch
+                                    label="Refinance for 25-year term"
+                                    checked={isRefinanced}
+                                    onChange={setIsRefinanced}
+                                />
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
+                                <ToggleSwitch
+                                    label="Consider Offset Interest Income"
+                                    checked={considerOffsetIncome}
+                                    onChange={setConsiderOffsetIncome}
+                                />
+                                {considerOffsetIncome && (
+                                    <InputGroup
+                                        label="Offset Income Rate"
+                                        id="offsetIncomeRate"
+                                        step={0.1}
+                                        value={String(offsetIncomeRate)}
+                                        onChange={(e) => setOffsetIncomeRate(parseFloat(e.target.value) || 0)}
+                                        symbol="%"
+                                        symbolPosition="right"
+                                    />
+                                )}
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
+                                <ToggleSwitch
+                                    label="Continue Working"
+                                    checked={continueWorking}
+                                    onChange={setContinueWorking}
+                                />
+                                {continueWorking && (
+                                    <RangeSlider
+                                        label="Number of years"
+                                        value={yearsWorking}
+                                        min={0}
+                                        max={10}
+                                        step={1}
+                                        onChange={setYearsWorking}
+                                        disabled={!continueWorking}
+                                    />
+                                )}
+                            </div>
                         </div>
                     </section>
                 )}
+            </div>
+
+            <div className="mt-8">
+                <button
+                    onClick={calculateOptimalExpenditure}
+                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+                >
+                    Calculate Optimal Expenditure
+                </button>
             </div>
         </div>
     );

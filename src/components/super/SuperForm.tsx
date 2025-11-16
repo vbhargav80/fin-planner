@@ -63,12 +63,12 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 {calcMode === 'balance' && (
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Contribution Frequency</label>
-                        <div className="mt-1 flex w-full gap-1 rounded-full bg-gray-900 p-1 shadow-inner">
+                        <div className="mt-1 flex w-full gap-1 rounded-full bg-indigo-200 p-1 shadow-inner">
                             <button
                                 type="button"
                                 onClick={() => setContributionFrequency('monthly')}
-                                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
-                                    isMonthly ? 'bg-white text-gray-900 border-gray-900 shadow-sm' : 'bg-transparent text-white border-transparent hover:bg-gray-700'
+                                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 ${
+                                    isMonthly ? 'bg-white text-indigo-800 shadow-sm' : 'bg-transparent text-gray-700 hover:bg-indigo-100'
                                 }`}
                             >
                                 Monthly
@@ -76,8 +76,8 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             <button
                                 type="button"
                                 onClick={() => setContributionFrequency('yearly')}
-                                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
-                                    !isMonthly ? 'bg-white text-gray-900 border-gray-900 shadow-sm' : 'bg-transparent text-white border-transparent hover:bg-gray-700'
+                                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 ${
+                                    !isMonthly ? 'bg-white text-indigo-800 shadow-sm' : 'bg-transparent text-gray-700 hover:bg-indigo-100'
                                 }`}
                             >
                                 Yearly

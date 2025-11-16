@@ -31,7 +31,11 @@ export function calculateSuper(
         return { results: null, breakdown: [], error: '' };
     }
 
-    if (calcMode === 'balance' && (!monthlyContribution || !monthlyContributionPost50)) {
+    // For balance mode, allow zero contributions; only guard against invalid (NaN) numbers
+    if (
+        calcMode === 'balance' &&
+        ([monthlyContribution, monthlyContributionPost50].some((v) => isNaN(v as number)))
+    ) {
         return { results: null, breakdown: [], error: '' };
     }
 

@@ -1,4 +1,3 @@
-
 import React, {useEffect, useRef, useState, useLayoutEffect} from 'react';
 import type {AmortizationCalculatorState} from '../../types/amortization.types';
 import { formatCurrency } from '../../utils/formatters';
@@ -13,6 +12,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [headerHeight, setHeaderHeight] = useState(0);
     const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+    const [isJan2031Pinned, setIsJan2031Pinned] = useState(false);
 
     useLayoutEffect(() => {
         const thead = theadRef.current;
@@ -40,76 +40,90 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
         return () => window.clearInterval(id);
     }, [amortizationData, headerHeight]);
 
+    // Scroll to Jan 2031 row when requested
     useEffect(() => {
         if (scrollTo2031 === 0) return; // Do not scroll on initial render
 
-        const index = amortizationData.findIndex(row => row.date === 'Jan 2031');
+        const index = amortizationData.findIndex((row) => row.date === 'Jan 2031');
         if (index === -1) {
             console.warn('Jan 2031 row not found in amortizationData');
             return;
         }
 
-        const containerElement = scrollContainerRef.current;
-        const rowElement = rowRefs.current[index];
-        if (!containerElement || !rowElement) return;
+        const container = scrollContainerRef.current;
+        const rowEl = rowRefs.current[index];
+        if (!container || !rowEl) return;
 
-        // Defer to next frames to ensure layout (sticky header, table sizing) is settled
+        const extraPadding = 4;
+
+        // Use scrollIntoView first to bring the row into view, then adjust for sticky header
         let raf1 = 0;
         let raf2 = 0;
-        const doScroll = () => {
-            // Temporarily disable sticky on the target row to get a stable scrollIntoView
-            const prevPosition = rowElement.style.position;
-            const prevTop = rowElement.style.top;
-            const prevZIndex = rowElement.style.zIndex;
-            const disableSticky = () => {
-                rowElement.style.position = 'static';
-                rowElement.style.top = '';
-                rowElement.style.zIndex = '';
-            };
-            const restoreSticky = () => {
-                rowElement.style.position = prevPosition;
-                rowElement.style.top = prevTop;
-                rowElement.style.zIndex = prevZIndex;
-            };
 
-            const before = containerElement.scrollTop;
-            disableSticky();
-            // First, bring the row to the top of the scroll container
-            rowElement.scrollIntoView({ block: 'start', inline: 'nearest' });
+        const doScrollWithOffset = () => {
+            const containerRect = container.getBoundingClientRect();
+            const rowRect = rowEl.getBoundingClientRect();
+            const rowRelativeTop = rowRect.top - containerRect.top;
 
-            requestAnimationFrame(() => {
-                // Then, nudge up by the sticky header height so the row sits just below it
-                const extraPadding = 4;
-                containerElement.scrollTo({
-                    top: Math.max(0, containerElement.scrollTop - headerHeight - extraPadding),
-                    behavior: 'smooth',
-                });
+            const targetScrollTop = Math.max(
+                0,
+                container.scrollTop + rowRelativeTop - headerHeight - extraPadding
+            );
 
-                // Fallback: if nothing changed, compute via rect math
-                const after = containerElement.scrollTop;
-                if (Math.abs(after - before) < 1) {
-                    const containerRect = containerElement.getBoundingClientRect();
-                    const rowRect = rowElement.getBoundingClientRect();
-                    const rowRelativeTop = rowRect.top - containerRect.top;
-                    const targetScrollTop = Math.max(
-                        0,
-                        containerElement.scrollTop + rowRelativeTop - headerHeight - extraPadding
-                    );
-                    containerElement.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
-                }
-
-                // Restore sticky styles after the scroll starts
-                requestAnimationFrame(restoreSticky);
-            });
+            container.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
         };
+
         raf1 = requestAnimationFrame(() => {
-            raf2 = requestAnimationFrame(doScroll);
+            // Ensure the element is scrolled roughly into view first
+            rowEl.scrollIntoView({ block: 'start' });
+            raf2 = requestAnimationFrame(doScrollWithOffset);
         });
+
         return () => {
             if (raf1) cancelAnimationFrame(raf1);
             if (raf2) cancelAnimationFrame(raf2);
         };
-    }, [scrollTo2031, headerHeight, amortizationData.length]); // Only re-run when the button is clicked or layout-relevant values change
+    }, [scrollTo2031, headerHeight, amortizationData]);
+
+    // Scroll-driven sticky behavior for Jan 2031 row
+    useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        const index = amortizationData.findIndex(r => r.date === 'Jan 2031');
+        if (index === -1) {
+            // Ensure it's not pinned if row doesn't exist
+            setIsJan2031Pinned(false);
+            return;
+        }
+
+        let ticking = false;
+        const handle = () => {
+            const rowEl = rowRefs.current[index!];
+            if (!rowEl || !container) return;
+            const containerRect = container.getBoundingClientRect();
+            const rowRect = rowEl.getBoundingClientRect();
+            const relativeTop = rowRect.top - containerRect.top;
+            const shouldPin = relativeTop <= headerHeight + 1; // within/above header -> pin
+            setIsJan2031Pinned(prev => (prev !== shouldPin ? shouldPin : prev));
+        };
+        const onScroll = () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                ticking = false;
+                handle();
+            });
+        };
+
+        container.addEventListener('scroll', onScroll, { passive: true } as AddEventListenerOptions);
+        // Evaluate once on attach and on header changes
+        requestAnimationFrame(handle);
+
+        return () => {
+            container.removeEventListener('scroll', onScroll as EventListener);
+        };
+    }, [amortizationData, headerHeight]);
 
     return (
         <div className="md:w-[65%] bg-indigo-700 text-white p-6 sm:p-10 flex flex-col relative">
@@ -157,59 +171,59 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                     </thead>
                     <tbody className="bg-indigo-800 divide-y divide-indigo-700">
                     {amortizationData.map((row, index) => {
-                        const isStickyRow = row.date === 'Jan 2031';
+                        const isJanRow = row.date === 'Jan 2031';
                         const isNegativeOffset = row.offsetBalance <= 0;
 
-                        const stickyClass = isStickyRow ? 'sticky' : '';
+                        const stickyActive = isJanRow && isJan2031Pinned;
                         const bgClass = isNegativeOffset
                             ? 'bg-red-900 hover:bg-red-700'
-                            : isStickyRow
+                            : isJanRow
                                 ? 'bg-indigo-900'
                                 : 'hover:bg-indigo-700/50';
 
-                        const stickyStyles = isStickyRow
-                            ? { top: `${headerHeight}px`, zIndex: 5 }
-                            : {};
+                        const stickyTdStyle = stickyActive
+                            ? { position: 'sticky' as const, top: `${headerHeight}px`, zIndex: 5, backgroundColor: '#1e293b' }
+                            : undefined;
+                        const stickyTdClass = stickyActive ? ' shadow-[0_1px_0_0_rgba(0,0,0,0.2)]' : '';
 
                         return (
                             <tr
                                 key={index}
                                 ref={el => { rowRefs.current[index] = el; }}
-                                className={`transition-colors duration-200 ${stickyClass} ${bgClass}`}
-                                style={stickyStyles}
+                                className={`transition-colors duration-200 ${bgClass}`}
                             >
-                                <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-white">
+                                <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium text-white${stickyTdClass}`} style={stickyTdStyle}>
                                     {row.date}
                                 </td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-indigo-200 font-mono">
+                                <td className={`px-4 py-3 whitespace-nowrap text-sm text-indigo-200 font-mono${stickyTdClass}`} style={stickyTdStyle}>
                                     {formatCurrency(row.beginningBalance)}
                                 </td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-white font-mono">
+                                <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium text-white font-mono${stickyTdClass}`} style={stickyTdStyle}>
                                     {formatCurrency(row.endingBalance)}
                                 </td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-indigo-100 font-medium font-mono">
+                                <td className={`px-4 py-3 whitespace-nowrap text-sm text-indigo-100 font-medium font-mono${stickyTdClass}`} style={stickyTdStyle}>
                                     {formatCurrency(row.offsetBalance)}
                                 </td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-green-300 font-mono">
+                                <td className={`px-4 py-3 whitespace-nowrap text-sm text-green-300 font-mono${stickyTdClass}`} style={stickyTdStyle}>
                                     {formatCurrency(row.repayment)}
                                 </td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-blue-300 font-mono">
+                                <td className={`px-4 py-3 whitespace-nowrap text-sm text-blue-300 font-mono${stickyTdClass}`} style={stickyTdStyle}>
                                     {formatCurrency(row.rentalIncome)}
                                 </td>
                                 {considerOffsetIncome && (
-                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-purple-300 font-mono">
+                                    <td className={`px-4 py-3 whitespace-nowrap text-sm text-purple-300 font-mono${stickyTdClass}`} style={stickyTdStyle}>
                                         {formatCurrency(row.offsetIncome)}
                                     </td>
                                 )}
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-green-300 font-medium font-mono">
+                                <td className={`px-4 py-3 whitespace-nowrap text-sm text-green-300 font-medium font-mono${stickyTdClass}`} style={stickyTdStyle}>
                                     {formatCurrency(row.totalIncoming)}
                                 </td>
-                                <td className="px-4 py-3 whitespace-nowrap text-sm text-orange-300 font-mono">
+                                <td className={`px-4 py-3 whitespace-nowrap text-sm text-orange-300 font-mono${stickyTdClass}`} style={stickyTdStyle}>
                                     {formatCurrency(row.totalOutgoing)}
                                 </td>
                                 <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium font-mono ${
                                     row.totalShortfall < 0 ? 'text-red-300' : 'text-green-300'
-                                }`}>
+                                }${stickyTdClass}`} style={stickyTdStyle}>
                                     {formatCurrency(row.totalShortfall)}
                                 </td>
                             </tr>

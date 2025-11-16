@@ -29,6 +29,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
         netIncome, setNetIncome,
         actualMonthlyRepayment,
         calculateOptimalExpenditure,
+        calculateOptimalWorkingYears,
     } = calculator;
 
     // Snap interest rate to discrete 0.25% steps within [4, 8]
@@ -240,12 +241,18 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                 )}
             </div>
 
-            <div className="mt-8">
+            <div className="mt-8 space-y-4">
                 <button
                     onClick={calculateOptimalExpenditure}
                     className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
                 >
                     Calculate Optimal Expenditure
+                </button>
+                <button
+                    onClick={calculateOptimalWorkingYears}
+                    className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors"
+                >
+                    Calculate Optimal Working Years
                 </button>
             </div>
         </div>

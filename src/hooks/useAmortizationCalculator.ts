@@ -65,10 +65,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
             const schedule = calculateAmortizationSchedule({ ...inputs, monthlyExpenditure: mid });
             const finalOffsetBalance = schedule[schedule.length - 1].offsetBalance;
 
-            // Check if offset is depleted at any point before the target date
-            const isDepletedEarly = schedule.some(row => row.offsetBalance < 0);
-
-            if (isDepletedEarly || finalOffsetBalance < 0) {
+            if (finalOffsetBalance < 0) {
                 high = mid;
             } else {
                 optimalExpenditure = mid;
@@ -77,6 +74,35 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         }
 
         setMonthlyExpenditure(optimalExpenditure);
+    };
+
+    const calculateOptimalWorkingYears = () => {
+        const inputs = {
+            interestRate,
+            principal,
+            monthlyRepayment,
+            initialRentalIncome,
+            initialOffsetBalance,
+            monthlyExpenditure,
+            monthlyExpenditurePre2031,
+            rentalGrowthRate,
+            isRefinanced,
+            considerOffsetIncome,
+            offsetIncomeRate,
+            continueWorking: true, // Calculation assumes working
+            yearsWorking,
+            netIncome,
+        };
+
+        for (let years = 0; years <= 10; years++) {
+            const schedule = calculateAmortizationSchedule({ ...inputs, yearsWorking: years });
+            const finalOffsetBalance = schedule[schedule.length - 1].offsetBalance;
+            if (finalOffsetBalance >= 0) {
+                setYearsWorking(years);
+                return;
+            }
+        }
+        // If no solution found within 10 years, do nothing or set to max
     };
 
     const actualMonthlyRepayment = useMemo(() => {
@@ -177,5 +203,6 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         triggerScrollToFirstDepletedOffset,
         clearScrollToFirstDepletedOffset,
         calculateOptimalExpenditure,
+        calculateOptimalWorkingYears,
     };
 }

@@ -96,11 +96,11 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                             <InputGroup
                                 label="CGT Discount"
                                 id="cgtDiscount"
-                                value={String(state.cgtDiscountRate)}
+                                value={state.cgtDiscountRate}
+                                onChange={(v) => dispatch({ type: 'SET_CGT_DISCOUNT_RATE', payload: v })}
                                 symbol="%"
                                 symbolPosition="right"
-                                step={0.1}
-                                onChange={(e) => dispatch({ type: 'SET_CGT_DISCOUNT_RATE', payload: Number(e.target.value) })}
+                                step="0.1"
                                 disabled={true}
                             />
                         </div>

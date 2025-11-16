@@ -166,9 +166,9 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                     <InputGroup
                                         label="Offset Income Rate"
                                         id="offsetIncomeRate"
-                                        step={0.1}
-                                        value={String(offsetIncomeRate)}
-                                        onChange={(e) => dispatch({ type: 'SET_OFFSET_INCOME_RATE', payload: parseFloat(e.target.value) || 0 })}
+                                        value={offsetIncomeRate}
+                                        onChange={(v) => dispatch({ type: 'SET_OFFSET_INCOME_RATE', payload: v })}
+                                        step="0.1"
                                         symbol="%"
                                         symbolPosition="right"
                                     />

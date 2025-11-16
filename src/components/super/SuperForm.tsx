@@ -63,12 +63,12 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 {calcMode === 'balance' && (
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Contribution Frequency</label>
-                        <div className="mt-1 flex w-full gap-1 rounded-full bg-indigo-200 p-1 shadow-inner">
+                        <div className="mt-1 flex w-full gap-1 rounded-full bg-teal-50 p-1 shadow-inner">
                             <button
                                 type="button"
                                 onClick={() => setContributionFrequency('monthly')}
-                                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 ${
-                                    isMonthly ? 'bg-white text-indigo-800 shadow-sm' : 'bg-transparent text-gray-700 hover:bg-indigo-100'
+                                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                                    isMonthly ? 'bg-teal-600 text-white border-teal-600 shadow-sm' : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'
                                 }`}
                             >
                                 Monthly
@@ -76,8 +76,8 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             <button
                                 type="button"
                                 onClick={() => setContributionFrequency('yearly')}
-                                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 ${
-                                    !isMonthly ? 'bg-white text-indigo-800 shadow-sm' : 'bg-transparent text-gray-700 hover:bg-indigo-100'
+                                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                                    !isMonthly ? 'bg-teal-600 text-white border-teal-600 shadow-sm' : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'
                                 }`}
                             >
                                 Yearly
@@ -116,8 +116,8 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                 <RangeSlider label="Current Super" value={Number(mySuper)} min={380000} max={450000} step={5000} onChange={(n) => setMySuper(String(n))} formatValue={(v) => formatCurrency(v)} />
                                 {calcMode === 'balance' && (
                                     <>
-                                        <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Pre-50)`} value={Number(myContributionPre50)} min={isMonthly ? 300 : 3600} max={isMonthly ? 1500 : 18000} step={isMonthly ? 100 : 1200} onChange={(n) => setMyContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                        <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Post-50)`} value={Number(myContributionPost50)} min={0} max={isMonthly ? 1000 : 12000} step={isMonthly ? 100 : 1200} onChange={(n) => setMyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Pre-50)`} value={Number(myContributionPre50)} min={isMonthly ? 300 : 3500} max={isMonthly ? 1500 : 18000} step={isMonthly ? 100 : 500} onChange={(n) => setMyContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Post-50)`} value={Number(myContributionPost50)} min={0} max={isMonthly ? 1000 : 12000} step={isMonthly ? 100 : 500} onChange={(n) => setMyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
                                     </>
                                 )}
                             </>
@@ -129,8 +129,8 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                 <RangeSlider label="Current Super" value={Number(wifeSuper)} min={100000} max={150000} step={5000} onChange={(n) => setWifeSuper(String(n))} formatValue={(v) => formatCurrency(v)} />
                                 {calcMode === 'balance' && (
                                     <>
-                                        <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Pre-50)`} value={Number(wifeContributionPre50)} min={0} max={isMonthly ? 1500 : 18000} step={isMonthly ? 100 : 1200} onChange={(n) => setWifeContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                        <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Post-50)`} value={Number(wifeContributionPost50)} min={0} max={isMonthly ? 1000 : 12000} step={isMonthly ? 100 : 1200} onChange={(n) => setWifeContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Pre-50)`} value={Number(wifeContributionPre50)} min={0} max={isMonthly ? 1500 : 18000} step={isMonthly ? 100 : 500} onChange={(n) => setWifeContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Post-50)`} value={Number(wifeContributionPost50)} min={0} max={isMonthly ? 1000 : 12000} step={isMonthly ? 100 : 500} onChange={(n) => setWifeContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
                                     </>
                                 )}
                             </>

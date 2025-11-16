@@ -21,7 +21,7 @@ const defaultState = {
     // Yearly defaults
     myYearlyContribution: '6000',
     myYearlyContributionPost50: '0',
-    wifeYearlyContribution: '2400',
+    wifeYearlyContribution: '2500', // Adjusted from 2400 to align with 500 step
     wifeYearlyContributionPost50: '0',
 };
 

@@ -14,7 +14,8 @@ function calculateFutureValue(
     contributionPost50: number,
     extraYearlyContribution: number,
     monthlyRate: number,
-    frequency: ContributionFrequency
+    frequency: ContributionFrequency,
+    makeExtraContribution: boolean
 ): { finalBalance: number; breakdown: SuperBreakdownRow[] } {
     const yearsToGrow = targetAge - startAge;
     if (yearsToGrow <= 0) {
@@ -38,8 +39,8 @@ function calculateFutureValue(
             runningBalance += contribution;
         }
 
-        // Add extra yearly contribution at the end of the year
-        if (i % 12 === 0) {
+        // Add extra yearly contribution at the end of the year if toggled
+        if (makeExtraContribution && i % 12 === 0) {
             runningBalance += extraYearlyContribution;
         }
 
@@ -73,6 +74,8 @@ export function calculateSuper(
         myExtraYearlyContribution,
         wifeExtraYearlyContribution,
         contributionFrequency,
+        myMakeExtraContribution,
+        wifeMakeExtraContribution,
     } = inputs;
 
     // Validation
@@ -124,14 +127,14 @@ export function calculateSuper(
             target: targetBalance,
         };
 
-        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, requiredMonthlyPMT, requiredMonthlyPMT, myExtraYearlyContribution!, monthlyRate, 'monthly');
-        const wifeFinal = calculateFutureValue(wifeAge, targetAge, wifeSuper, requiredMonthlyPMT, requiredMonthlyPMT, wifeExtraYearlyContribution!, monthlyRate, 'monthly');
+        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, requiredMonthlyPMT, requiredMonthlyPMT, myExtraYearlyContribution!, monthlyRate, 'monthly', myMakeExtraContribution);
+        const wifeFinal = calculateFutureValue(wifeAge, targetAge, wifeSuper, requiredMonthlyPMT, requiredMonthlyPMT, wifeExtraYearlyContribution!, monthlyRate, 'monthly', wifeMakeExtraContribution);
         finalBalance = myFinal.finalBalance + wifeFinal.finalBalance;
         combinedBreakdown = myFinal.breakdown;
 
     } else { // 'balance' mode
-        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, myContributionPre50!, myContributionPost50!, myExtraYearlyContribution!, monthlyRate, contributionFrequency);
-        const wifeFinal = calculateFutureValue(wifeAge, targetAge, wifeSuper, wifeContributionPre50!, wifeContributionPost50!, wifeExtraYearlyContribution!, monthlyRate, contributionFrequency);
+        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, myContributionPre50!, myContributionPost50!, myExtraYearlyContribution!, monthlyRate, contributionFrequency, myMakeExtraContribution);
+        const wifeFinal = calculateFutureValue(wifeAge, targetAge, wifeSuper, wifeContributionPre50!, wifeContributionPost50!, wifeExtraYearlyContribution!, monthlyRate, contributionFrequency, wifeMakeExtraContribution);
 
         finalBalance = myFinal.finalBalance + wifeFinal.finalBalance;
         fvOfCurrentSuper = (mySuper + wifeSuper) * Math.pow(1 + monthlyRate, (targetAge - myAge) * 12); // Approx for display

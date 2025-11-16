@@ -10,6 +10,8 @@ export interface SuperInputs {
     targetAge: number;
     netReturn: number;
     contributionFrequency: ContributionFrequency;
+    myMakeExtraContribution: boolean;
+    wifeMakeExtraContribution: boolean;
 
     // For 'contribution' mode
     targetBalance?: number;
@@ -67,6 +69,12 @@ export interface SuperCalculatorState {
 
     contributionFrequency: ContributionFrequency;
     setContributionFrequency: (freq: ContributionFrequency) => void;
+
+    // Toggles for extra contributions
+    myMakeExtraContribution: boolean;
+    setMyMakeExtraContribution: (value: boolean) => void;
+    wifeMakeExtraContribution: boolean;
+    setWifeMakeExtraContribution: (value: boolean) => void;
 
     // Contributions for self
     myContributionPre50: string;

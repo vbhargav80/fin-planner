@@ -3,6 +3,7 @@ import { RangeSlider } from '../common/RangeSlider';
 import PersonTabsPanel from '../PersonTabsPanel';
 import { formatCurrency } from '../../utils/formatters';
 import type { SuperCalculatorState } from '../../types/super.types';
+import { ToggleSwitch } from '../common/ToggleSwitch';
 
 interface SuperFormProps {
     calculator: SuperCalculatorState;
@@ -25,6 +26,8 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         netReturn, setNetReturn,
         calcMode, setCalcMode,
         contributionFrequency, setContributionFrequency,
+        myMakeExtraContribution, setMyMakeExtraContribution,
+        wifeMakeExtraContribution, setWifeMakeExtraContribution,
         error
     } = calculator;
 
@@ -127,8 +130,13 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                         </>
                                     )}
                                     <div className="sm:col-span-2">
-                                        <RangeSlider label="Extra Concessional Contribution" value={Number(myExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <ToggleSwitch label="Make Concessional Contributions" checked={myMakeExtraContribution} onChange={setMyMakeExtraContribution} />
                                     </div>
+                                    {myMakeExtraContribution && (
+                                        <div className="sm:col-span-2">
+                                            <RangeSlider label="Extra End-of-Year Contribution" value={Number(myExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        </div>
+                                    )}
                                 </>
                             )}
 
@@ -143,8 +151,13 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                         </>
                                     )}
                                     <div className="sm:col-span-2">
-                                        <RangeSlider label="Extra Concessional Contribution" value={Number(wifeExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <ToggleSwitch label="Make Concessional Contributions" checked={wifeMakeExtraContribution} onChange={setWifeMakeExtraContribution} />
                                     </div>
+                                    {wifeMakeExtraContribution && (
+                                        <div className="sm:col-span-2">
+                                            <RangeSlider label="Extra End-of-Year Contribution" value={Number(wifeExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        </div>
+                                    )}
                                 </>
                             )}
                         </div>

@@ -13,6 +13,8 @@ const defaultState = {
     netReturn: '7',
     calcMode: 'contribution' as CalcMode,
     contributionFrequency: 'monthly' as ContributionFrequency,
+    myMakeExtraContribution: false,
+    wifeMakeExtraContribution: false,
     // Monthly defaults
     myMonthlyContribution: '500',
     myMonthlyContributionPost50: '0',
@@ -24,8 +26,8 @@ const defaultState = {
     wifeYearlyContribution: '2500',
     wifeYearlyContributionPost50: '0',
     // Extra yearly
-    myExtraYearlyContribution: '0',
-    wifeExtraYearlyContribution: '0',
+    myExtraYearlyContribution: '2000',
+    wifeExtraYearlyContribution: '2000',
 };
 
 export function useSuperCalculator(): SuperCalculatorState {
@@ -45,6 +47,8 @@ export function useSuperCalculator(): SuperCalculatorState {
     const [netReturn, setNetReturn] = useState(defaultState.netReturn);
     const [calcMode, setCalcMode] = useState<CalcMode>(defaultState.calcMode);
     const [contributionFrequency, _setContributionFrequency] = useState<ContributionFrequency>(defaultState.contributionFrequency);
+    const [myMakeExtraContribution, setMyMakeExtraContribution] = useState(defaultState.myMakeExtraContribution);
+    const [wifeMakeExtraContribution, setWifeMakeExtraContribution] = useState(defaultState.wifeMakeExtraContribution);
 
     // Custom setter for frequency to adjust contribution values
     const setContributionFrequency = useCallback((freq: ContributionFrequency) => {
@@ -79,6 +83,8 @@ export function useSuperCalculator(): SuperCalculatorState {
             wifeExtraYearlyContribution: parseFloat(defaultState.wifeExtraYearlyContribution),
             netReturn: parseFloat(defaultState.netReturn),
             contributionFrequency: defaultState.contributionFrequency,
+            myMakeExtraContribution: defaultState.myMakeExtraContribution,
+            wifeMakeExtraContribution: defaultState.wifeMakeExtraContribution,
         };
         return calculateSuper(inputs, defaultState.calcMode);
     })();
@@ -103,6 +109,8 @@ export function useSuperCalculator(): SuperCalculatorState {
             wifeExtraYearlyContribution: parseFloat(wifeExtraYearlyContribution),
             netReturn: parseFloat(netReturn),
             contributionFrequency,
+            myMakeExtraContribution,
+            wifeMakeExtraContribution,
         };
 
         const result = calculateSuper(inputs, calcMode);
@@ -111,7 +119,7 @@ export function useSuperCalculator(): SuperCalculatorState {
         setBreakdownData(result.breakdown);
         setError(result.error || '');
 
-    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50, myExtraYearlyContribution, wifeExtraYearlyContribution, netReturn, calcMode, contributionFrequency]);
+    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50, myExtraYearlyContribution, wifeExtraYearlyContribution, netReturn, calcMode, contributionFrequency, myMakeExtraContribution, wifeMakeExtraContribution]);
 
     return {
         myAge, setMyAge,
@@ -126,6 +134,8 @@ export function useSuperCalculator(): SuperCalculatorState {
         error,
         breakdownData,
         contributionFrequency, setContributionFrequency,
+        myMakeExtraContribution, setMyMakeExtraContribution,
+        wifeMakeExtraContribution, setWifeMakeExtraContribution,
         myContributionPre50, setMyContributionPre50,
         myContributionPost50, setMyContributionPost50,
         myExtraYearlyContribution, setMyExtraYearlyContribution,

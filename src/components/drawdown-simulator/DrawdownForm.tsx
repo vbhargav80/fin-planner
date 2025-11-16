@@ -4,6 +4,7 @@ import { InputGroup } from '../common/InputGroup';
 import { RangeSlider } from '../common/RangeSlider';
 import { MonthYearPicker } from '../common/MonthYearPicker';
 import { Tabs } from '../common/Tabs';
+import * as DrawdownConstants from '../../constants/drawdown';
 import type { SaleDrawdownState } from '../../types/drawdown.types';
 
 interface Props { model: SaleDrawdownState }
@@ -37,18 +38,18 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                             <RangeSlider
                                 label="Asset Sale Price"
                                 value={model.salePrice}
-                                min={700_000}
-                                max={1_500_000}
-                                step={50_000}
+                                min={DrawdownConstants.SALE_PRICE.MIN}
+                                max={DrawdownConstants.SALE_PRICE.MAX}
+                                step={DrawdownConstants.SALE_PRICE.STEP}
                                 onChange={model.setSalePrice}
                                 formatValue={(v) => fmtCurrency(v)}
                             />
                             <RangeSlider
                                 label="Cost Base"
                                 value={model.costBase}
-                                min={300_000}
-                                max={500_000}
-                                step={10_000}
+                                min={DrawdownConstants.COST_BASE.MIN}
+                                max={DrawdownConstants.COST_BASE.MAX}
+                                step={DrawdownConstants.COST_BASE.STEP}
                                 onChange={model.setCostBase}
                                 formatValue={(v) => fmtCurrency(v)}
                             />
@@ -58,18 +59,18 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                                 <RangeSlider
                                     label="Depreciation Claimed"
                                     value={model.depreciationClaimed}
-                                    min={30_000}
-                                    max={100_000}
-                                    step={10_000}
+                                    min={DrawdownConstants.DEPRECIATION_CLAIMED.MIN}
+                                    max={DrawdownConstants.DEPRECIATION_CLAIMED.MAX}
+                                    step={DrawdownConstants.DEPRECIATION_CLAIMED.STEP}
                                     onChange={model.setDepreciationClaimed}
                                     formatValue={(v) => fmtCurrency(v)}
                                 />
                                 <RangeSlider
                                     label="Selling Costs"
                                     value={model.sellingCosts}
-                                    min={30_000}
-                                    max={100_000}
-                                    step={10_000}
+                                    min={DrawdownConstants.SELLING_COSTS.MIN}
+                                    max={DrawdownConstants.SELLING_COSTS.MAX}
+                                    step={DrawdownConstants.SELLING_COSTS.STEP}
                                     onChange={model.setSellingCosts}
                                     formatValue={(v) => fmtCurrency(v)}
                                 />
@@ -118,36 +119,36 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                             <RangeSlider
                                 label="Net Monthly Rent"
                                 value={model.netMonthlyRent}
-                                min={800}
-                                max={1200}
-                                step={25}
+                                min={DrawdownConstants.NET_MONTHLY_RENT.MIN}
+                                max={DrawdownConstants.NET_MONTHLY_RENT.MAX}
+                                step={DrawdownConstants.NET_MONTHLY_RENT.STEP}
                                 onChange={model.setNetMonthlyRent}
                                 formatValue={(v) => fmtCurrency(v)}
                             />
                             <RangeSlider
                                 label="Net Monthly Rent Growth Rate (%)"
                                 value={model.netRentGrowthRate}
-                                min={1}
-                                max={5}
-                                step={0.25}
+                                min={DrawdownConstants.NET_RENT_GROWTH_RATE.MIN}
+                                max={DrawdownConstants.NET_RENT_GROWTH_RATE.MAX}
+                                step={DrawdownConstants.NET_RENT_GROWTH_RATE.STEP}
                                 onChange={model.setNetRentGrowthRate}
                                 formatValue={(v) => `${v.toFixed(2)}%`}
                             />
                             <RangeSlider
                                 label="Est. Annual Interest Rate (%)"
                                 value={model.annualInterestRate}
-                                min={1}
-                                max={6}
-                                step={0.25}
+                                min={DrawdownConstants.ANNUAL_INTEREST_RATE.MIN}
+                                max={DrawdownConstants.ANNUAL_INTEREST_RATE.MAX}
+                                step={DrawdownConstants.ANNUAL_INTEREST_RATE.STEP}
                                 onChange={model.setAnnualInterestRate}
                                 formatValue={(v) => `${v.toFixed(2)}%`}
                             />
                             <RangeSlider
                                 label="Monthly Drawdown"
                                 value={model.monthlyDrawdown}
-                                min={5_000}
-                                max={15_000}
-                                step={1_000}
+                                min={DrawdownConstants.MONTHLY_DRAWDOWN.MIN}
+                                max={DrawdownConstants.MONTHLY_DRAWDOWN.MAX}
+                                step={DrawdownConstants.MONTHLY_DRAWDOWN.STEP}
                                 onChange={model.setMonthlyDrawdown}
                                 formatValue={(v) => fmtCurrency(v)}
                             />

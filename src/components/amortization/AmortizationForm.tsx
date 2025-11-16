@@ -5,6 +5,7 @@ import { ToggleSwitch } from '../common/ToggleSwitch';
 import { RangeSlider } from '../common/RangeSlider';
 import { Tabs } from '../common/Tabs';
 import type { AmortizationCalculatorState } from '../../types/amortization.types';
+import * as AmortizationConstants from '../../constants/amortization';
 import { Briefcase, Wallet } from 'lucide-react';
 
 interface AmortizationFormProps {
@@ -33,9 +34,9 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
     const handleInterestRateChange = React.useCallback((v: number) => {
         const step = 0.25;
         const min = 4;
-        const max = 8;
+        const max = AmortizationConstants.INTEREST_RATE.MAX;
         const snapped = Math.min(max, Math.max(min, Math.round(v / step) * step));
-        dispatch({ type: 'SET_INTEREST_RATE', payload: Number(snapped.toFixed(2)) });
+        dispatch({ type: 'SET_INTEREST_RATE', payload: Number(snapped.toFixed(2))});
     }, [dispatch]);
 
     return (
@@ -59,25 +60,25 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                             <RangeSlider
                                 label="Starting Loan"
                                 value={principal}
-                                min={800000}
-                                max={1100000}
-                                step={25000}
+                                min={AmortizationConstants.PRINCIPAL.MIN}
+                                max={AmortizationConstants.PRINCIPAL.MAX}
+                                step={AmortizationConstants.PRINCIPAL.STEP}
                                 onChange={(v) => dispatch({ type: 'SET_PRINCIPAL', payload: v })}
                             />
                             <RangeSlider
                                 label="Starting Offset"
                                 value={initialOffsetBalance}
-                                min={800000}
-                                max={1000000}
-                                step={50000}
+                                min={AmortizationConstants.OFFSET_BALANCE.MIN}
+                                max={AmortizationConstants.OFFSET_BALANCE.MAX}
+                                step={AmortizationConstants.OFFSET_BALANCE.STEP}
                                 onChange={(v) => dispatch({ type: 'SET_INITIAL_OFFSET_BALANCE', payload: v })}
                             />
                             <RangeSlider
                                 label="Interest Rate"
                                 value={interestRate}
-                                min={4}
-                                max={8}
-                                step={0.25}
+                                min={AmortizationConstants.INTEREST_RATE.MIN}
+                                max={AmortizationConstants.INTEREST_RATE.MAX}
+                                step={AmortizationConstants.INTEREST_RATE.STEP}
                                 onChange={handleInterestRateChange}
                             />
                         </div>
@@ -94,17 +95,17 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                     <RangeSlider
                                         label="Net Rent"
                                         value={initialRentalIncome}
-                                        min={4000}
-                                        max={5000}
-                                        step={100}
+                                        min={AmortizationConstants.INITIAL_RENTAL_INCOME.MIN}
+                                        max={AmortizationConstants.INITIAL_RENTAL_INCOME.MAX}
+                                        step={AmortizationConstants.INITIAL_RENTAL_INCOME.STEP}
                                         onChange={(v) => dispatch({ type: 'SET_INITIAL_RENTAL_INCOME', payload: v })}
                                     />
                                     <RangeSlider
                                         label="Net Income (while working)"
                                         value={netIncome}
-                                        min={5000}
-                                        max={15000}
-                                        step={1000}
+                                        min={AmortizationConstants.NET_INCOME.MIN}
+                                        max={AmortizationConstants.NET_INCOME.MAX}
+                                        step={AmortizationConstants.NET_INCOME.STEP}
                                         onChange={(v) => dispatch({ type: 'SET_NET_INCOME', payload: v })}
                                         disabled={!continueWorking}
                                     />
@@ -118,25 +119,25 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                     <RangeSlider
                                         label="Monthly Expenditure"
                                         value={monthlyExpenditure}
-                                        min={5000}
-                                        max={15000}
-                                        step={1000}
+                                        min={AmortizationConstants.MONTHLY_EXPENDITURE.MIN}
+                                        max={AmortizationConstants.MONTHLY_EXPENDITURE.MAX}
+                                        step={AmortizationConstants.MONTHLY_EXPENDITURE.STEP}
                                         onChange={(v) => dispatch({ type: 'SET_MONTHLY_EXPENDITURE', payload: v })}
                                     />
                                     <RangeSlider
                                         label="Monthly Expenditure Pre 2031"
                                         value={monthlyExpenditurePre2031}
-                                        min={0}
-                                        max={5000}
-                                        step={500}
+                                        min={AmortizationConstants.MONTHLY_EXPENDITURE_PRE_2031.MIN}
+                                        max={AmortizationConstants.MONTHLY_EXPENDITURE_PRE_2031.MAX}
+                                        step={AmortizationConstants.MONTHLY_EXPENDITURE_PRE_2031.STEP}
                                         onChange={(v) => dispatch({ type: 'SET_MONTHLY_EXPENDITURE_PRE_2031', payload: v })}
                                     />
                                     <RangeSlider
                                         label="Monthly Repayment"
                                         value={isRefinanced ? actualMonthlyRepayment : monthlyRepayment}
-                                        min={5500}
-                                        max={7000}
-                                        step={50}
+                                        min={AmortizationConstants.MONTHLY_REPAYMENT.MIN}
+                                        max={AmortizationConstants.MONTHLY_REPAYMENT.MAX}
+                                        step={AmortizationConstants.MONTHLY_REPAYMENT.STEP}
                                         onChange={(v) => dispatch({ type: 'SET_MONTHLY_REPAYMENT', payload: v })}
                                         disabled={isRefinanced}
                                     />
@@ -153,9 +154,9 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                 <RangeSlider
                                     label="Annual Rental Growth"
                                     value={rentalGrowthRate}
-                                    min={1}
-                                    max={4}
-                                    step={0.25}
+                                    min={AmortizationConstants.RENTAL_GROWTH_RATE.MIN}
+                                    max={AmortizationConstants.RENTAL_GROWTH_RATE.MAX}
+                                    step={AmortizationConstants.RENTAL_GROWTH_RATE.STEP}
                                     onChange={(v) => dispatch({ type: 'SET_RENTAL_GROWTH_RATE', payload: v })}
                                 />
                                 <ToggleSwitch
@@ -192,9 +193,9 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                     <RangeSlider
                                         label="Number of years"
                                         value={yearsWorking}
-                                        min={0}
-                                        max={10}
-                                        step={1}
+                                        min={AmortizationConstants.YEARS_WORKING.MIN}
+                                        max={AmortizationConstants.YEARS_WORKING.MAX}
+                                        step={AmortizationConstants.YEARS_WORKING.STEP}
                                         onChange={(v) => dispatch({ type: 'SET_YEARS_WORKING', payload: v })}
                                         disabled={!continueWorking}
                                     />

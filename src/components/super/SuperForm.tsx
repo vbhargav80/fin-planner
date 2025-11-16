@@ -1,6 +1,8 @@
 import React from 'react';
 import { InputGroup } from '../common/InputGroup';
+import { RangeSlider } from '../common/RangeSlider';
 import PersonTabsPanel from '../PersonTabsPanel';
+import { formatCurrency } from '../../utils/formatters';
 import type { SuperCalculatorState } from '../../types/super.types';
 
 interface SuperFormProps {
@@ -67,7 +69,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 </div>
 
                 {/* Person tabs panel (using reusable component) */}
-                <PersonTabsPanel title="Person">
+                <PersonTabsPanel>
                     <div className="flex w-full gap-1 rounded-full bg-indigo-50 p-1 shadow-inner">
                         <button
                             type="button"
@@ -96,38 +98,44 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                         {activePersonTab === 'self' && (
                             <>
-                                <InputGroup
-                                    label="Your Current Age"
-                                    id="myAge"
-                                    value={myAge}
-                                    onChange={(e) => setMyAge(e.target.value)}
+                                <RangeSlider
+                                    label="Current Age"
+                                    value={Number(myAge)}
+                                    min={45}
+                                    max={60}
+                                    step={1}
+                                    onChange={(n) => setMyAge(String(n))}
                                 />
-                                <InputGroup
-                                    label="Your Current Super"
-                                    id="mySuper"
-                                    value={mySuper}
-                                    onChange={(e) => setMySuper(e.target.value)}
-                                    symbol="$"
-                                    symbolPosition="left"
+                                <RangeSlider
+                                    label="Current Super"
+                                    value={Number(mySuper)}
+                                    min={380000}
+                                    max={450000}
+                                    step={5000}
+                                    onChange={(n) => setMySuper(String(n))}
+                                    formatValue={(v) => formatCurrency(v)}
                                 />
                             </>
                         )}
 
                         {activePersonTab === 'spouse' && (
                             <>
-                                <InputGroup
-                                    label="Spouse's Current Age"
-                                    id="wifeAge"
-                                    value={wifeAge}
-                                    onChange={(e) => setWifeAge(e.target.value)}
+                                <RangeSlider
+                                    label="Current Age"
+                                    value={Number(wifeAge)}
+                                    min={42}
+                                    max={60}
+                                    step={1}
+                                    onChange={(n) => setWifeAge(String(n))}
                                 />
-                                <InputGroup
-                                    label="Spouse's Current Super"
-                                    id="wifeSuper"
-                                    value={wifeSuper}
-                                    onChange={(e) => setWifeSuper(e.target.value)}
-                                    symbol="$"
-                                    symbolPosition="left"
+                                <RangeSlider
+                                    label="Current Super"
+                                    value={Number(wifeSuper)}
+                                    min={100000}
+                                    max={150000}
+                                    step={5000}
+                                    onChange={(n) => setWifeSuper(String(n))}
+                                    formatValue={(v) => formatCurrency(v)}
                                 />
                             </>
                         )}

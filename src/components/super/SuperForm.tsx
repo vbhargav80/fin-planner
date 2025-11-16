@@ -1,5 +1,4 @@
 import React from 'react';
-import { InputGroup } from '../common/InputGroup';
 import { RangeSlider } from '../common/RangeSlider';
 import PersonTabsPanel from '../PersonTabsPanel';
 import { formatCurrency } from '../../utils/formatters';

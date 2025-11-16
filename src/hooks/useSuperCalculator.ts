@@ -30,17 +30,19 @@ export function useSuperCalculator(): SuperCalculatorState {
             netReturn: parseFloat(netReturn),
         };
 
+        // Use the 'calcMode' from state directly in the callback
         const result = calculateSuper(inputs, calcMode);
 
         setResults(result.results);
         setBreakdownData(result.breakdown);
         setError(result.error || '');
     }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance,
-        monthlyContribution, monthlyContributionPost50, netReturn, calcMode]);
+        monthlyContribution, monthlyContributionPost50, netReturn, calcMode]); // Add calcMode to the dependency array
 
     useEffect(() => {
+        // This effect now correctly re-runs whenever the 'calculate' function is recreated
         calculate();
-    }, [calculate, calcMode]);
+    }, [calculate]);
 
     return {
         myAge, setMyAge,
@@ -52,7 +54,8 @@ export function useSuperCalculator(): SuperCalculatorState {
         monthlyContribution, setMonthlyContribution,
         monthlyContributionPost50, setMonthlyContributionPost50,
         netReturn, setNetReturn,
-        calcMode, setCalcMode,
+        calcMode,
+        setCalcMode, // Return the standard state setter
         results,
         error,
         breakdownData,

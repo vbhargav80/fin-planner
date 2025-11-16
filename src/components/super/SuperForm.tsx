@@ -89,12 +89,12 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 )}
 
                 {/* Person Card with Full-Width Tabs */}
-                <div className="bg-white border border-gray-200 rounded-lg shadow">
+                <div className="bg-white border-l-4 border-indigo-500 rounded-r-lg shadow-sm border border-gray-200">
                     <div className="flex">
                         <button
                             type="button"
                             onClick={() => setActivePersonTab('self')}
-                            className={`w-1/2 p-4 text-center font-medium rounded-tl-lg transition-colors duration-150 ${
+                            className={`w-1/2 p-4 text-center font-medium transition-colors duration-150 ${
                                 activePersonTab === 'self'
                                     ? 'bg-indigo-600 text-white'
                                     : 'bg-gray-50 text-gray-600 hover:bg-gray-100'

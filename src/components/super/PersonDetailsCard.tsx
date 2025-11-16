@@ -3,6 +3,7 @@ import { RangeSlider } from '../common/RangeSlider';
 import { formatCurrency } from '../../utils/formatters';
 import type { SuperCalculatorState } from '../../types/super.types';
 import PersonTabsPanel from '../PersonTabsPanel';
+import * as SuperConstants from '../../constants/super';
 
 interface PersonDetailsCardProps extends SuperCalculatorState {
     isBalanceMode: boolean;
@@ -52,26 +53,26 @@ export const PersonDetailsCard: React.FC<PersonDetailsCardProps> = (props) => {
             {activeTab === 'me' && (
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 border-t border-gray-200">
                     <div className="sm:col-span-1">
-                        <RangeSlider label="Current Age" value={myAge} min={30} max={55} step={1} onChange={setMyAge} />
+                        <RangeSlider label="Current Age" value={myAge} min={SuperConstants.CURRENT_AGE.MIN} max={SuperConstants.CURRENT_AGE.MAX} step={SuperConstants.CURRENT_AGE.STEP} onChange={setMyAge} />
                     </div>
                     <div className="sm:col-span-1">
-                        <RangeSlider label="Current Super" value={mySuper} min={0} max={1000000} step={10000} onChange={setMySuper} formatValue={(v) => formatCurrency(v)} />
+                        <RangeSlider label="Current Super" value={mySuper} min={SuperConstants.CURRENT_SUPER.MIN} max={SuperConstants.CURRENT_SUPER.MAX} step={SuperConstants.CURRENT_SUPER.STEP} onChange={setMySuper} formatValue={(v) => formatCurrency(v)} />
                     </div>
                     {isBalanceMode && (
                         <>
                             <div className="sm:col-span-1">
-                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Pre 50)`} value={myContributionPre50} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={setMyContributionPre50} formatValue={(v) => formatCurrency(v)} />
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Pre 50)`} value={myContributionPre50} min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN} max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX} step={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.STEP : SuperConstants.YEARLY_CONTRIBUTION.STEP} onChange={setMyContributionPre50} formatValue={(v) => formatCurrency(v)} />
                             </div>
                             <div className="sm:col-span-1">
-                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Post 50)`} value={myContributionPost50} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={setMyContributionPost50} formatValue={(v) => formatCurrency(v)} />
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Post 50)`} value={myContributionPost50} min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN} max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX} step={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.STEP : SuperConstants.YEARLY_CONTRIBUTION.STEP} onChange={setMyContributionPost50} formatValue={(v) => formatCurrency(v)} />
                             </div>
                             {makeExtraContribution && (
                                 <>
                                     <div className="sm:col-span-1">
-                                        <RangeSlider label="Extra Yearly Cont." value={myExtraYearlyContribution} min={0} max={27500} step={500} onChange={setMyExtraYearlyContribution} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label="Extra Yearly Cont." value={myExtraYearlyContribution} min={SuperConstants.EXTRA_YEARLY_CONTRIBUTION.MIN} max={SuperConstants.EXTRA_YEARLY_CONTRIBUTION.MAX} step={SuperConstants.EXTRA_YEARLY_CONTRIBUTION.STEP} onChange={setMyExtraYearlyContribution} formatValue={(v) => formatCurrency(v)} />
                                     </div>
                                     <div className="sm:col-span-1">
-                                        <RangeSlider label="For How Many Years" value={myExtraContributionYears} min={0} max={15} step={1} onChange={setMyExtraContributionYears} formatValue={(v) => `${v} yrs`} />
+                                        <RangeSlider label="For How Many Years" value={myExtraContributionYears} min={SuperConstants.EXTRA_CONTRIBUTION_YEARS.MIN} max={SuperConstants.EXTRA_CONTRIBUTION_YEARS.MAX} step={SuperConstants.EXTRA_CONTRIBUTION_YEARS.STEP} onChange={setMyExtraContributionYears} formatValue={(v) => `${v} yrs`} />
                                     </div>
                                 </>
                             )}
@@ -83,26 +84,26 @@ export const PersonDetailsCard: React.FC<PersonDetailsCardProps> = (props) => {
             {activeTab === 'spouse' && (
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 border-t border-gray-200">
                     <div className="sm:col-span-1">
-                        <RangeSlider label="Current Age" value={wifeAge} min={30} max={55} step={1} onChange={setWifeAge} />
+                        <RangeSlider label="Current Age" value={wifeAge} min={SuperConstants.CURRENT_AGE.MIN} max={SuperConstants.CURRENT_AGE.MAX} step={SuperConstants.CURRENT_AGE.STEP} onChange={setWifeAge} />
                     </div>
                     <div className="sm:col-span-1">
-                        <RangeSlider label="Current Super" value={wifeSuper} min={0} max={1000000} step={10000} onChange={setWifeSuper} formatValue={(v) => formatCurrency(v)} />
+                        <RangeSlider label="Current Super" value={wifeSuper} min={SuperConstants.CURRENT_SUPER.MIN} max={SuperConstants.CURRENT_SUPER.MAX} step={SuperConstants.CURRENT_SUPER.STEP} onChange={setWifeSuper} formatValue={(v) => formatCurrency(v)} />
                     </div>
                     {isBalanceMode && (
                         <>
                             <div className="sm:col-span-1">
-                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Pre 50)`} value={wifeContributionPre50} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={setWifeContributionPre50} formatValue={(v) => formatCurrency(v)} />
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Pre 50)`} value={wifeContributionPre50} min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN} max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX} step={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.STEP : SuperConstants.YEARLY_CONTRIBUTION.STEP} onChange={setWifeContributionPre50} formatValue={(v) => formatCurrency(v)} />
                             </div>
                             <div className="sm:col-span-1">
-                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Post 50)`} value={wifeContributionPost50} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={setWifeContributionPost50} formatValue={(v) => formatCurrency(v)} />
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Post 50)`} value={wifeContributionPost50} min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN} max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX} step={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.STEP : SuperConstants.YEARLY_CONTRIBUTION.STEP} onChange={setWifeContributionPost50} formatValue={(v) => formatCurrency(v)} />
                             </div>
                             {makeExtraContribution && (
                                 <>
                                     <div className="sm:col-span-1">
-                                        <RangeSlider label="Extra Yearly Cont." value={wifeExtraYearlyContribution} min={0} max={27500} step={500} onChange={setWifeExtraYearlyContribution} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label="Extra Yearly Cont." value={wifeExtraYearlyContribution} min={SuperConstants.EXTRA_YEARLY_CONTRIBUTION.MIN} max={SuperConstants.EXTRA_YEARLY_CONTRIBUTION.MAX} step={SuperConstants.EXTRA_YEARLY_CONTRIBUTION.STEP} onChange={setWifeExtraYearlyContribution} formatValue={(v) => formatCurrency(v)} />
                                     </div>
                                     <div className="sm:col-span-1">
-                                        <RangeSlider label="For How Many Years" value={wifeExtraContributionYears} min={0} max={15} step={1} onChange={setWifeExtraContributionYears} formatValue={(v) => `${v} yrs`} />
+                                        <RangeSlider label="For How Many Years" value={wifeExtraContributionYears} min={SuperConstants.EXTRA_CONTRIBUTION_YEARS.MIN} max={SuperConstants.EXTRA_CONTRIBUTION_YEARS.MAX} step={SuperConstants.EXTRA_CONTRIBUTION_YEARS.STEP} onChange={setWifeExtraContributionYears} formatValue={(v) => `${v} yrs`} />
                                     </div>
                                 </>
                             )}

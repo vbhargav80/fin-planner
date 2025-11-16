@@ -18,8 +18,10 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         targetBalance, setTargetBalance,
         myContributionPre50, setMyContributionPre50,
         myContributionPost50, setMyContributionPost50,
+        myExtraYearlyContribution, setMyExtraYearlyContribution,
         wifeContributionPre50, setWifeContributionPre50,
         wifeContributionPost50, setWifeContributionPost50,
+        wifeExtraYearlyContribution, setWifeExtraYearlyContribution,
         netReturn, setNetReturn,
         calcMode, setCalcMode,
         contributionFrequency, setContributionFrequency,
@@ -120,6 +122,9 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                         <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Post-50)`} value={Number(myContributionPost50)} min={0} max={isMonthly ? 1000 : 12000} step={isMonthly ? 100 : 500} onChange={(n) => setMyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
                                     </>
                                 )}
+                                <div className="sm:col-span-2">
+                                    <RangeSlider label="Extra Concessional Contribution" value={Number(myExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                </div>
                             </>
                         )}
 
@@ -133,6 +138,9 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                         <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Post-50)`} value={Number(wifeContributionPost50)} min={0} max={isMonthly ? 1000 : 12000} step={isMonthly ? 100 : 500} onChange={(n) => setWifeContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
                                     </>
                                 )}
+                                <div className="sm:col-span-2">
+                                    <RangeSlider label="Extra Concessional Contribution" value={Number(wifeExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                </div>
                             </>
                         )}
                     </div>

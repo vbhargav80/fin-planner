@@ -19,6 +19,10 @@ export interface SuperInputs {
     myContributionPost50?: number;
     wifeContributionPre50?: number;
     wifeContributionPost50?: number;
+
+    // Extra yearly contributions
+    myExtraYearlyContribution?: number;
+    wifeExtraYearlyContribution?: number;
 }
 
 export interface SuperResultData {
@@ -69,10 +73,14 @@ export interface SuperCalculatorState {
     setMyContributionPre50: (value: string) => void;
     myContributionPost50: string;
     setMyContributionPost50: (value: string) => void;
+    myExtraYearlyContribution: string;
+    setMyExtraYearlyContribution: (value: string) => void;
 
     // Contributions for spouse
     wifeContributionPre50: string;
     setWifeContributionPre50: (value: string) => void;
     wifeContributionPost50: string;
     setWifeContributionPost50: (value: string) => void;
+    wifeExtraYearlyContribution: string;
+    setWifeExtraYearlyContribution: (value: string) => void;
 }

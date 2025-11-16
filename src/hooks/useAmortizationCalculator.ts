@@ -1,7 +1,7 @@
 // File: `src/hooks/useAmortizationCalculator.ts`
-import { useState, useEffect, useMemo, useReducer } from 'react';
+import { useState, useEffect, useReducer } from 'react';
 import type { AmortizationRow, AmortizationCalculatorState, State, Action } from '../types/amortization.types';
-import { calculateAmortizationSchedule, calculateRefiMonthlyPayment } from '../utils/calculations/amortizationCalculations';
+import { calculateAmortizationSchedule } from '../utils/calculations/amortizationCalculations';
 import * as AmortizationConstants from '../constants/amortization';
 
 const initialState: State = {
@@ -50,6 +50,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [state, dispatch] = useReducer(reducer, initialState);
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
     const [scrollTo2031, setScrollTo2031] = useState(0);
+    const [actualMonthlyRepayment, setActualMonthlyRepayment] = useState(initialState.monthlyRepayment);
     const [scrollToFirstDepletedOffset, setScrollToFirstDepletedOffset] = useState(0);
     const [hasDepletedOffsetRows, setHasDepletedOffsetRows] = useState(false);
 
@@ -78,8 +79,8 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
 
         for (let i = 0; i < 30; i++) { // 30 iterations for precision
             const mid = (low + high) / 2;
-            const schedule = calculateAmortizationSchedule({ ...inputs, monthlyExpenditure: mid });
-            const finalOffsetBalance = schedule[schedule.length - 1].offsetBalance;
+            const { schedule } = calculateAmortizationSchedule({ ...inputs, monthlyExpenditure: mid });
+            const finalOffsetBalance = schedule.length > 0 ? schedule[schedule.length - 1].offsetBalance : 0;
 
             if (finalOffsetBalance < 0) {
                 high = mid;
@@ -98,8 +99,8 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
 
         let optimalYears = -1;
         for (let years = 0; years <= 10; years++) {
-            const schedule = calculateAmortizationSchedule({ ...inputs, yearsWorking: years });
-            const finalOffsetBalance = schedule[schedule.length - 1].offsetBalance;
+            const { schedule } = calculateAmortizationSchedule({ ...inputs, yearsWorking: years });
+            const finalOffsetBalance = schedule.length > 0 ? schedule[schedule.length - 1].offsetBalance : 0;
             if (finalOffsetBalance >= 0) {
                 optimalYears = years;
                 break;
@@ -114,8 +115,8 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
 
         for (let i = 0; i < 30; i++) { // 30 iterations for precision
             const mid = (low + high) / 2;
-            const schedule = calculateAmortizationSchedule({ ...inputs, yearsWorking: finalYears, netIncome: mid });
-            const finalOffsetBalance = schedule[schedule.length - 1].offsetBalance;
+            const { schedule } = calculateAmortizationSchedule({ ...inputs, yearsWorking: finalYears, netIncome: mid });
+            const finalOffsetBalance = schedule.length > 0 ? schedule[schedule.length - 1].offsetBalance : 0;
 
             if (finalOffsetBalance < 0) {
                 low = mid;
@@ -129,17 +130,11 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         dispatch({ type: 'SET_NET_INCOME', payload: optimalIncome });
     };
 
-    const actualMonthlyRepayment = useMemo(() => {
-        if (state.isRefinanced) {
-            return calculateRefiMonthlyPayment(state);
-        }
-        return state.monthlyRepayment;
-    }, [state]);
-
     useEffect(() => {
-        const data = calculateAmortizationSchedule(state);
-        setAmortizationData(data);
-        const hasDepleted = data.some(row => row.offsetBalance <= 0);
+        const { schedule, actualMonthlyRepayment: calculatedRepayment } = calculateAmortizationSchedule(state);
+        setAmortizationData(schedule);
+        setActualMonthlyRepayment(calculatedRepayment);
+        const hasDepleted = schedule.some(row => row.offsetBalance <= 0);
         setHasDepletedOffsetRows(hasDepleted);
     }, [state]);
 

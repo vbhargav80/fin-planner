@@ -27,75 +27,9 @@ export function calculateMonthlyRepayment(
     return principal * (numerator / denominator);
 }
 
-// Helper: compute the fixed refinance repayment from the Dec 2030 ending balance
-export function calculateRefiMonthlyPayment(inputs: AmortizationInputs): number {
-    const monthlyInterestRate = inputs.interestRate / 100 / 12;
-    const annualRentalGrowthDecimal = inputs.rentalGrowthRate / 100;
-    const monthlyOffsetIncomeRate = inputs.offsetIncomeRate / 100 / 12;
-
-    let currentLoanBalance = inputs.principal;
-    let currentOffsetBalance = inputs.initialOffsetBalance;
-    let currentMonthlyRental = inputs.initialRentalIncome;
-
-    const currentDate = new Date(LOAN_DETAILS.startDate);
-    // Working window starts in 2031; so for this pre-2031 loop, working income is never applied
-    const workingStartDate = new Date(WORKING_START_DATE);
-    const workingEndDate = new Date(workingStartDate);
-    workingEndDate.setFullYear(workingEndDate.getFullYear() + inputs.yearsWorking);
-
-    // Process months up to and including Dec 2030 (robust to time-of-day)
-    while (currentDate.getFullYear() < 2031) {
-        // Apply annual rental growth at the start of each year
-        if (currentDate.getMonth() === 0 && currentDate.getFullYear() > LOAN_DETAILS.startDate.getFullYear()) {
-            currentMonthlyRental *= (1 + annualRentalGrowthDecimal);
-        }
-
-        const beginningBalance = currentLoanBalance;
-        let repaymentForMonth = 0;
-        let endingBalance = beginningBalance;
-
-        const excessOffset = Math.max(0, currentOffsetBalance - beginningBalance);
-        const offsetIncome = inputs.considerOffsetIncome ? excessOffset * monthlyOffsetIncomeRate : 0;
-
-        if (beginningBalance > 0) {
-            const effectiveBalanceForInterest = Math.max(0, beginningBalance - currentOffsetBalance);
-            const interestCharged = effectiveBalanceForInterest * monthlyInterestRate;
-
-            // Up to Dec 2030; use user-provided repayment
-            const targetMonthlyRepayment = inputs.monthlyRepayment;
-
-            repaymentForMonth = Math.min(targetMonthlyRepayment, beginningBalance + interestCharged);
-            const principalPaid = repaymentForMonth - interestCharged;
-            endingBalance = beginningBalance - principalPaid;
-        }
-
-        // Working income only starts from Jan 2031, so it's 0 in this loop
-        const workingIncomeEligible =
-            inputs.continueWorking &&
-            currentDate >= workingStartDate &&
-            currentDate < workingEndDate;
-        const workingIncome = workingIncomeEligible ? inputs.netIncome : 0;
-
-        const isPre2031 = currentDate.getFullYear() < 2031;
-        const monthlyExpenditureForMonth = isPre2031 ? inputs.monthlyExpenditurePre2031 : inputs.monthlyExpenditure;
-        const totalIncoming = currentMonthlyRental + workingIncome + offsetIncome;
-        const totalOutgoing = repaymentForMonth + monthlyExpenditureForMonth;
-        const newOffsetBalance = currentOffsetBalance + totalIncoming - totalOutgoing;
-
-        currentLoanBalance = Math.max(0, endingBalance);
-        currentOffsetBalance = newOffsetBalance;
-
-        // next month
-        currentDate.setMonth(currentDate.getMonth() + 1);
-    }
-
-    const dec2030EndingBalance = Math.max(0, currentLoanBalance);
-    return calculateMonthlyRepayment(dec2030EndingBalance, inputs.interestRate);
-}
-
 export function calculateAmortizationSchedule(
     inputs: AmortizationInputs
-): AmortizationRow[] {
+): { schedule: AmortizationRow[], actualMonthlyRepayment: number } {
     const data: AmortizationRow[] = [];
     let currentLoanBalance = inputs.principal;
     let currentOffsetBalance = inputs.initialOffsetBalance;
@@ -187,5 +121,11 @@ export function calculateAmortizationSchedule(
         }
     }
 
-    return data;
+    let finalRepayment = inputs.monthlyRepayment;
+    if (inputs.isRefinanced) {
+        // refiMonthlyPayment is calculated and set inside the loop
+        finalRepayment = refiMonthlyPayment ?? inputs.monthlyRepayment;
+    }
+
+    return { schedule: data, actualMonthlyRepayment: finalRepayment };
 }

@@ -1,5 +1,6 @@
 
 export type CalcMode = 'contribution' | 'balance';
+export type ContributionFrequency = 'monthly' | 'yearly';
 
 export interface SuperInputs {
     myAge: number;
@@ -8,16 +9,16 @@ export interface SuperInputs {
     wifeSuper: number;
     targetAge: number;
     netReturn: number;
+    contributionFrequency: ContributionFrequency;
+
     // For 'contribution' mode
     targetBalance?: number;
+
     // For 'balance' mode
-    myMonthlyContribution?: number;
-    myMonthlyContributionPost50?: number;
-    wifeMonthlyContribution?: number;
-    wifeMonthlyContributionPost50?: number;
-    // This is for the old combined calculation
-    monthlyContribution?: number;
-    monthlyContributionPost50?: number;
+    myContributionPre50?: number;
+    myContributionPost50?: number;
+    wifeContributionPre50?: number;
+    wifeContributionPost50?: number;
 }
 
 export interface SuperResultData {
@@ -60,21 +61,18 @@ export interface SuperCalculatorState {
     error: string;
     breakdownData: SuperBreakdownRow[];
 
+    contributionFrequency: ContributionFrequency;
+    setContributionFrequency: (freq: ContributionFrequency) => void;
+
     // Contributions for self
-    myMonthlyContribution: string;
-    setMyMonthlyContribution: (value: string) => void;
-    myMonthlyContributionPost50: string;
-    setMyMonthlyContributionPost50: (value: string) => void;
+    myContributionPre50: string;
+    setMyContributionPre50: (value: string) => void;
+    myContributionPost50: string;
+    setMyContributionPost50: (value: string) => void;
 
     // Contributions for spouse
-    wifeMonthlyContribution: string;
-    setWifeMonthlyContribution: (value: string) => void;
-    wifeMonthlyContributionPost50: string;
-    setWifeMonthlyContributionPost50: (value: string) => void;
-
-    // Legacy combined contributions
-    monthlyContribution: string;
-    setMonthlyContribution: (value: string) => void;
-    monthlyContributionPost50: string;
-    setMonthlyContributionPost50: (value: string) => void;
+    wifeContributionPre50: string;
+    setWifeContributionPre50: (value: string) => void;
+    wifeContributionPost50: string;
+    setWifeContributionPost50: (value: string) => void;
 }

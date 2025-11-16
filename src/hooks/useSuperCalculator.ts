@@ -1,24 +1,31 @@
-import { useState, useEffect } from 'react';
-import type { SuperResultData, SuperBreakdownRow, CalcMode, SuperCalculatorState } from '../types/super.types';
+import { useState, useEffect, useCallback } from 'react';
+import type { SuperResultData, SuperBreakdownRow, CalcMode, SuperCalculatorState, ContributionFrequency } from '../types/super.types';
 import { calculateSuper } from '../utils/calculations/superCalculations';
 
-export function useSuperCalculator(): SuperCalculatorState {
-    // Default values
-    const defaultState = {
-        myAge: '45',
-        wifeAge: '42',
-        mySuper: '400000',
-        wifeSuper: '110000',
-        targetAge: '60',
-        targetBalance: '1500000',
-        myMonthlyContribution: '500',
-        myMonthlyContributionPost50: '0',
-        wifeMonthlyContribution: '200',
-        wifeMonthlyContributionPost50: '0',
-        netReturn: '7',
-        calcMode: 'contribution' as CalcMode,
-    };
+// Define defaults in a single place
+const defaultState = {
+    myAge: '45',
+    wifeAge: '42',
+    mySuper: '400000',
+    wifeSuper: '110000',
+    targetAge: '60',
+    targetBalance: '1500000',
+    netReturn: '7',
+    calcMode: 'contribution' as CalcMode,
+    contributionFrequency: 'monthly' as ContributionFrequency,
+    // Monthly defaults
+    myMonthlyContribution: '500',
+    myMonthlyContributionPost50: '0',
+    wifeMonthlyContribution: '200',
+    wifeMonthlyContributionPost50: '0',
+    // Yearly defaults
+    myYearlyContribution: '6000',
+    myYearlyContributionPost50: '0',
+    wifeYearlyContribution: '2400',
+    wifeYearlyContributionPost50: '0',
+};
 
+export function useSuperCalculator(): SuperCalculatorState {
     // Form state
     const [myAge, setMyAge] = useState(defaultState.myAge);
     const [wifeAge, setWifeAge] = useState(defaultState.wifeAge);
@@ -26,12 +33,29 @@ export function useSuperCalculator(): SuperCalculatorState {
     const [wifeSuper, setWifeSuper] = useState(defaultState.wifeSuper);
     const [targetAge, setTargetAge] = useState(defaultState.targetAge);
     const [targetBalance, setTargetBalance] = useState(defaultState.targetBalance);
-    const [myMonthlyContribution, setMyMonthlyContribution] = useState(defaultState.myMonthlyContribution);
-    const [myMonthlyContributionPost50, setMyMonthlyContributionPost50] = useState(defaultState.myMonthlyContributionPost50);
-    const [wifeMonthlyContribution, setWifeMonthlyContribution] = useState(defaultState.wifeMonthlyContribution);
-    const [wifeMonthlyContributionPost50, setWifeMonthlyContributionPost50] = useState(defaultState.wifeMonthlyContributionPost50);
+    const [myContributionPre50, setMyContributionPre50] = useState(defaultState.myMonthlyContribution);
+    const [myContributionPost50, setMyContributionPost50] = useState(defaultState.myMonthlyContributionPost50);
+    const [wifeContributionPre50, setWifeContributionPre50] = useState(defaultState.wifeMonthlyContribution);
+    const [wifeContributionPost50, setWifeContributionPost50] = useState(defaultState.wifeMonthlyContributionPost50);
     const [netReturn, setNetReturn] = useState(defaultState.netReturn);
     const [calcMode, setCalcMode] = useState<CalcMode>(defaultState.calcMode);
+    const [contributionFrequency, _setContributionFrequency] = useState<ContributionFrequency>(defaultState.contributionFrequency);
+
+    // Custom setter for frequency to adjust contribution values
+    const setContributionFrequency = useCallback((freq: ContributionFrequency) => {
+        _setContributionFrequency(freq);
+        if (freq === 'yearly') {
+            setMyContributionPre50(defaultState.myYearlyContribution);
+            setMyContributionPost50(defaultState.myYearlyContributionPost50);
+            setWifeContributionPre50(defaultState.wifeYearlyContribution);
+            setWifeContributionPost50(defaultState.wifeYearlyContributionPost50);
+        } else { // monthly
+            setMyContributionPre50(defaultState.myMonthlyContribution);
+            setMyContributionPost50(defaultState.myMonthlyContributionPost50);
+            setWifeContributionPre50(defaultState.wifeMonthlyContribution);
+            setWifeContributionPost50(defaultState.wifeMonthlyContributionPost50);
+        }
+    }, []);
 
     // Compute initial results synchronously
     const initialComputation = (() => {
@@ -42,11 +66,12 @@ export function useSuperCalculator(): SuperCalculatorState {
             wifeSuper: parseFloat(defaultState.wifeSuper),
             targetAge: parseFloat(defaultState.targetAge),
             targetBalance: parseFloat(defaultState.targetBalance),
-            myMonthlyContribution: parseFloat(defaultState.myMonthlyContribution),
-            myMonthlyContributionPost50: parseFloat(defaultState.myMonthlyContributionPost50),
-            wifeMonthlyContribution: parseFloat(defaultState.wifeMonthlyContribution),
-            wifeMonthlyContributionPost50: parseFloat(defaultState.wifeMonthlyContributionPost50),
+            myContributionPre50: parseFloat(defaultState.myMonthlyContribution),
+            myContributionPost50: parseFloat(defaultState.myMonthlyContributionPost50),
+            wifeContributionPre50: parseFloat(defaultState.wifeMonthlyContribution),
+            wifeContributionPost50: parseFloat(defaultState.wifeMonthlyContributionPost50),
             netReturn: parseFloat(defaultState.netReturn),
+            contributionFrequency: defaultState.contributionFrequency,
         };
         return calculateSuper(inputs, defaultState.calcMode);
     })();
@@ -63,11 +88,12 @@ export function useSuperCalculator(): SuperCalculatorState {
             wifeSuper: parseFloat(wifeSuper),
             targetAge: parseFloat(targetAge),
             targetBalance: parseFloat(targetBalance),
-            myMonthlyContribution: parseFloat(myMonthlyContribution),
-            myMonthlyContributionPost50: parseFloat(myMonthlyContributionPost50),
-            wifeMonthlyContribution: parseFloat(wifeMonthlyContribution),
-            wifeMonthlyContributionPost50: parseFloat(wifeMonthlyContributionPost50),
+            myContributionPre50: parseFloat(myContributionPre50),
+            myContributionPost50: parseFloat(myContributionPost50),
+            wifeContributionPre50: parseFloat(wifeContributionPre50),
+            wifeContributionPost50: parseFloat(wifeContributionPost50),
             netReturn: parseFloat(netReturn),
+            contributionFrequency,
         };
 
         const result = calculateSuper(inputs, calcMode);
@@ -76,7 +102,7 @@ export function useSuperCalculator(): SuperCalculatorState {
         setBreakdownData(result.breakdown);
         setError(result.error || '');
 
-    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance, myMonthlyContribution, myMonthlyContributionPost50, wifeMonthlyContribution, wifeMonthlyContributionPost50, netReturn, calcMode]);
+    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50, netReturn, calcMode, contributionFrequency]);
 
     return {
         myAge, setMyAge,
@@ -90,14 +116,10 @@ export function useSuperCalculator(): SuperCalculatorState {
         results,
         error,
         breakdownData,
-        myMonthlyContribution, setMyMonthlyContribution,
-        myMonthlyContributionPost50, setMyMonthlyContributionPost50,
-        wifeMonthlyContribution, setWifeMonthlyContribution,
-        wifeMonthlyContributionPost50, setWifeMonthlyContributionPost50,
-        // Legacy - can be removed later
-        monthlyContribution: myMonthlyContribution,
-        setMonthlyContribution: setMyMonthlyContribution,
-        monthlyContributionPost50: myMonthlyContributionPost50,
-        setMonthlyContributionPost50: setMyMonthlyContributionPost50,
+        contributionFrequency, setContributionFrequency,
+        myContributionPre50, setMyContributionPre50,
+        myContributionPost50, setMyContributionPost50,
+        wifeContributionPre50, setWifeContributionPre50,
+        wifeContributionPost50, setWifeContributionPost50,
     };
 }

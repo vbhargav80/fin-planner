@@ -107,7 +107,7 @@ export function useSuperCalculator(): SuperCalculatorState {
         setBreakdownData(result.breakdown);
         setError(result.error || '');
 
-    }, [state]);
+    }, [state, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50]);
 
     return {
         state,

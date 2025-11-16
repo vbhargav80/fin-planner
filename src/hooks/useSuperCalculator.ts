@@ -13,17 +13,16 @@ const defaultState = {
     netReturn: '7',
     calcMode: 'contribution' as CalcMode,
     contributionFrequency: 'monthly' as ContributionFrequency,
-    myMakeExtraContribution: false,
-    wifeMakeExtraContribution: false,
+    makeExtraContribution: false,
     // Monthly defaults
-    myMonthlyContribution: '500',
+    myMonthlyContribution: '100',
     myMonthlyContributionPost50: '0',
-    wifeMonthlyContribution: '200',
+    wifeMonthlyContribution: '50',
     wifeMonthlyContributionPost50: '0',
     // Yearly defaults
-    myYearlyContribution: '6000',
+    myYearlyContribution: '1500',
     myYearlyContributionPost50: '0',
-    wifeYearlyContribution: '2500',
+    wifeYearlyContribution: '1500',
     wifeYearlyContributionPost50: '0',
     // Extra yearly
     myExtraYearlyContribution: '2000',
@@ -47,8 +46,7 @@ export function useSuperCalculator(): SuperCalculatorState {
     const [netReturn, setNetReturn] = useState(defaultState.netReturn);
     const [calcMode, setCalcMode] = useState<CalcMode>(defaultState.calcMode);
     const [contributionFrequency, _setContributionFrequency] = useState<ContributionFrequency>(defaultState.contributionFrequency);
-    const [myMakeExtraContribution, setMyMakeExtraContribution] = useState(defaultState.myMakeExtraContribution);
-    const [wifeMakeExtraContribution, setWifeMakeExtraContribution] = useState(defaultState.wifeMakeExtraContribution);
+    const [makeExtraContribution, setMakeExtraContribution] = useState(defaultState.makeExtraContribution);
 
     // Custom setter for frequency to adjust contribution values
     const setContributionFrequency = useCallback((freq: ContributionFrequency) => {
@@ -83,8 +81,7 @@ export function useSuperCalculator(): SuperCalculatorState {
             wifeExtraYearlyContribution: parseFloat(defaultState.wifeExtraYearlyContribution),
             netReturn: parseFloat(defaultState.netReturn),
             contributionFrequency: defaultState.contributionFrequency,
-            myMakeExtraContribution: defaultState.myMakeExtraContribution,
-            wifeMakeExtraContribution: defaultState.wifeMakeExtraContribution,
+            makeExtraContribution: defaultState.makeExtraContribution,
         };
         return calculateSuper(inputs, defaultState.calcMode);
     })();
@@ -109,8 +106,7 @@ export function useSuperCalculator(): SuperCalculatorState {
             wifeExtraYearlyContribution: parseFloat(wifeExtraYearlyContribution),
             netReturn: parseFloat(netReturn),
             contributionFrequency,
-            myMakeExtraContribution,
-            wifeMakeExtraContribution,
+            makeExtraContribution,
         };
 
         const result = calculateSuper(inputs, calcMode);
@@ -119,7 +115,7 @@ export function useSuperCalculator(): SuperCalculatorState {
         setBreakdownData(result.breakdown);
         setError(result.error || '');
 
-    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50, myExtraYearlyContribution, wifeExtraYearlyContribution, netReturn, calcMode, contributionFrequency, myMakeExtraContribution, wifeMakeExtraContribution]);
+    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50, myExtraYearlyContribution, wifeExtraYearlyContribution, netReturn, calcMode, contributionFrequency, makeExtraContribution]);
 
     return {
         myAge, setMyAge,
@@ -134,8 +130,7 @@ export function useSuperCalculator(): SuperCalculatorState {
         error,
         breakdownData,
         contributionFrequency, setContributionFrequency,
-        myMakeExtraContribution, setMyMakeExtraContribution,
-        wifeMakeExtraContribution, setWifeMakeExtraContribution,
+        makeExtraContribution, setMakeExtraContribution,
         myContributionPre50, setMyContributionPre50,
         myContributionPost50, setMyContributionPost50,
         myExtraYearlyContribution, setMyExtraYearlyContribution,

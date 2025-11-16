@@ -4,6 +4,7 @@ import PersonTabsPanel from '../PersonTabsPanel';
 import { formatCurrency } from '../../utils/formatters';
 import type { SuperCalculatorState } from '../../types/super.types';
 import { ToggleSwitch } from '../common/ToggleSwitch';
+import { PersonDetailsCard } from './PersonDetailsCard';
 
 interface SuperFormProps {
     calculator: SuperCalculatorState;
@@ -11,35 +12,24 @@ interface SuperFormProps {
 
 export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
     const {
-        myAge, setMyAge,
-        wifeAge, setWifeAge,
-        mySuper, setMySuper,
-        wifeSuper, setWifeSuper,
         targetAge, setTargetAge,
         targetBalance, setTargetBalance,
-        myContributionPre50, setMyContributionPre50,
-        myContributionPost50, setMyContributionPost50,
-        myExtraYearlyContribution, setMyExtraYearlyContribution,
-        wifeContributionPre50, setWifeContributionPre50,
-        wifeContributionPost50, setWifeContributionPost50,
-        wifeExtraYearlyContribution, setWifeExtraYearlyContribution,
         netReturn, setNetReturn,
         calcMode, setCalcMode,
         contributionFrequency, setContributionFrequency,
-        myMakeExtraContribution, setMyMakeExtraContribution,
-        wifeMakeExtraContribution, setWifeMakeExtraContribution,
+        makeExtraContribution, setMakeExtraContribution,
         error
     } = calculator;
 
-    const [activePersonTab, setActivePersonTab] = React.useState<'self' | 'spouse'>('self');
     const isMonthly = contributionFrequency === 'monthly';
+    const isBalanceMode = calcMode === 'balance';
 
     return (
-        <div className="md:w-[35%] p-6 sm:p-8 overflow-y-auto">
+        <div className="md:w-[45%] p-6 sm:p-8 overflow-y-auto">
             <h2 className="text-3xl font-bold text-gray-900">Superannuation Goal Calculator</h2>
             <p className="mt-2 text-gray-600">Enter your details below to see your projection. The results will update automatically.</p>
 
-            <div className="mt-8 space-y-5">
+            <div className="mt-8 space-y-6">
                 {/* Calculation type toggle */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Calculation Type</label>
@@ -65,123 +55,44 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                     </div>
                 </div>
 
-                {calcMode === 'balance' && (
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Contribution Frequency</label>
-                        <div className="mt-1 flex w-full gap-1 rounded-full bg-teal-50 p-1 shadow-inner">
-                            <button
-                                type="button"
-                                onClick={() => setContributionFrequency('monthly')}
-                                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
-                                    isMonthly ? 'bg-teal-600 text-white border-teal-600 shadow-sm' : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'
-                                }`}
-                            >
-                                Monthly
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setContributionFrequency('yearly')}
-                                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
-                                    !isMonthly ? 'bg-teal-600 text-white border-teal-600 shadow-sm' : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'
-                                }`}
-                            >
-                                Yearly
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Person Card with Full-Width Tabs */}
-                <div className="bg-white border-l-4 border-indigo-500 rounded-lg shadow-lg">
-                    <div className="flex">
-                        <button
-                            type="button"
-                            onClick={() => setActivePersonTab('self')}
-                            className={`w-1/2 p-4 text-center font-medium transition-colors duration-150 rounded-tl-lg ${
-                                activePersonTab === 'self'
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                            }`}
-                        >
-                            You
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActivePersonTab('spouse')}
-                            className={`w-1/2 p-4 text-center font-medium rounded-tr-lg transition-colors duration-150 ${
-                                activePersonTab === 'spouse'
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                            }`}
-                        >
-                            Spouse
-                        </button>
-                    </div>
-                    <div className="p-4 border-t border-gray-200">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                            {activePersonTab === 'self' && (
-                                <>
-                                    <RangeSlider label="Current Age" value={Number(myAge)} min={45} max={60} step={1} onChange={(n) => setMyAge(String(n))} />
-                                    <RangeSlider label="Current Super" value={Number(mySuper)} min={380000} max={450000} step={5000} onChange={(n) => setMySuper(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                    {calcMode === 'balance' && (
-                                        <>
-                                            <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Pre-50)`} value={Number(myContributionPre50)} min={isMonthly ? 300 : 3500} max={isMonthly ? 1500 : 18000} step={isMonthly ? 100 : 500} onChange={(n) => setMyContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                            <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Post-50)`} value={Number(myContributionPost50)} min={0} max={isMonthly ? 1000 : 12000} step={isMonthly ? 100 : 500} onChange={(n) => setMyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                        </>
-                                    )}
-                                    <div className="sm:col-span-2">
-                                        <ToggleSwitch label="Make Concessional Contributions" checked={myMakeExtraContribution} onChange={setMyMakeExtraContribution} />
-                                    </div>
-                                    {myMakeExtraContribution && (
-                                        <div className="sm:col-span-2">
-                                            <RangeSlider label="Extra End-of-Year Contribution" value={Number(myExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                        </div>
-                                    )}
-                                </>
-                            )}
-
-                            {activePersonTab === 'spouse' && (
-                                <>
-                                    <RangeSlider label="Current Age" value={Number(wifeAge)} min={42} max={60} step={1} onChange={(n) => setWifeAge(String(n))} />
-                                    <RangeSlider label="Current Super" value={Number(wifeSuper)} min={100000} max={150000} step={5000} onChange={(n) => setWifeSuper(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                    {calcMode === 'balance' && (
-                                        <>
-                                            <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Pre-50)`} value={Number(wifeContributionPre50)} min={0} max={isMonthly ? 1500 : 18000} step={isMonthly ? 100 : 500} onChange={(n) => setWifeContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                            <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Contribution (Post-50)`} value={Number(wifeContributionPost50)} min={0} max={isMonthly ? 1000 : 12000} step={isMonthly ? 100 : 500} onChange={(n) => setWifeContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                        </>
-                                    )}
-                                    <div className="sm:col-span-2">
-                                        <ToggleSwitch label="Make Concessional Contributions" checked={wifeMakeExtraContribution} onChange={setWifeMakeExtraContribution} />
-                                    </div>
-                                    {wifeMakeExtraContribution && (
-                                        <div className="sm:col-span-2">
-                                            <RangeSlider label="Extra End-of-Year Contribution" value={Number(wifeExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Shared goal & contribution inputs (with sliders) */}
+                {/* Goals & Assumptions Panel */}
                 <PersonTabsPanel>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Goals & Assumptions</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                         <div className="sm:col-span-2">
                             <RangeSlider label="Target Retirement Age" value={Number(targetAge)} min={58} max={65} step={1} onChange={(n) => setTargetAge(String(n))} />
                         </div>
-
-                        <div className={calcMode === 'contribution' ? 'sm:col-span-2' : 'sm:col-span-2'}>
-                            <RangeSlider label="Est. Annual Net Return (after fees)" value={Number(netReturn)} min={5} max={8} step={0.1} onChange={(n) => setNetReturn(String(Number(n.toFixed(1))))} formatValue={(v) => `${v}%`} />
-                        </div>
-
                         {calcMode === 'contribution' && (
                             <div className="sm:col-span-2">
                                 <RangeSlider label="Target Combined Balance" value={Number(targetBalance)} min={1400000} max={1700000} step={50000} onChange={(n) => setTargetBalance(String(n))} formatValue={(v) => formatCurrency(v)} />
                             </div>
                         )}
+                        <div className="sm:col-span-2">
+                            <RangeSlider label="Est. Annual Net Return (after fees)" value={Number(netReturn)} min={5} max={8} step={0.1} onChange={(n) => setNetReturn(String(Number(n.toFixed(1))))} formatValue={(v) => `${v}%`} />
+                        </div>
+                        {isBalanceMode && (
+                            <>
+                                <div className="sm:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700">Contribution Frequency</label>
+                                    <div className="mt-1 flex w-full gap-1 rounded-full bg-teal-50 p-1 shadow-inner">
+                                        <button type="button" onClick={() => setContributionFrequency('monthly')} className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${isMonthly ? 'bg-teal-600 text-white border-teal-600 shadow-sm' : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'}`}>Monthly</button>
+                                        <button type="button" onClick={() => setContributionFrequency('yearly')} className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${!isMonthly ? 'bg-teal-600 text-white border-teal-600 shadow-sm' : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'}`}>Yearly</button>
+                                    </div>
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <ToggleSwitch label="Make Concessional Contributions" checked={makeExtraContribution} onChange={setMakeExtraContribution} />
+                                </div>
+                            </>
+                        )}
                     </div>
                 </PersonTabsPanel>
+
+                {/* Personal Details Section */}
+                <PersonDetailsCard
+                    {...calculator}
+                    isBalanceMode={isBalanceMode}
+                    isMonthly={isMonthly}
+                />
 
                 {error && (
                     <div className="mt-4 text-center text-red-600 font-medium">{error}</div>

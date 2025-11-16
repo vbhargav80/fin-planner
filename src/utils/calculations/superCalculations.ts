@@ -1,5 +1,7 @@
 import type { SuperInputs, SuperResultData, SuperBreakdownRow, CalcMode, ContributionFrequency } from '../../types/super.types';
 
+const CONTRIBUTION_TAX_RATE = 0.15;
+
 export interface CalculationResult {
     results: SuperResultData | null;
     breakdown: SuperBreakdownRow[];
@@ -31,17 +33,18 @@ function calculateFutureValue(
         runningBalance += interestEarned;
 
         const currentAge = startAge + Math.floor((i - 1) / 12);
-        const contribution = currentAge < 50 ? contributionPre50 : contributionPost50;
+        const grossContribution = currentAge < 50 ? contributionPre50 : contributionPost50;
+        const netContribution = grossContribution * (1 - CONTRIBUTION_TAX_RATE);
 
         if (frequency === 'monthly') {
-            runningBalance += contribution;
+            runningBalance += netContribution;
         } else if (frequency === 'yearly' && i % 12 === 0) {
-            runningBalance += contribution;
+            runningBalance += netContribution;
         }
 
-        // Add extra yearly contribution at the end of the year if toggled
         if (makeExtraContribution && i % 12 === 0) {
-            runningBalance += extraYearlyContribution;
+            const netExtraContribution = extraYearlyContribution * (1 - CONTRIBUTION_TAX_RATE);
+            runningBalance += netExtraContribution;
         }
 
         const displayMonth = ((i - 1) % 12) + 1;
@@ -74,8 +77,7 @@ export function calculateSuper(
         myExtraYearlyContribution,
         wifeExtraYearlyContribution,
         contributionFrequency,
-        myMakeExtraContribution,
-        wifeMakeExtraContribution,
+        makeExtraContribution,
     } = inputs;
 
     // Validation
@@ -97,6 +99,7 @@ export function calculateSuper(
 
     const monthlyRate = (netReturn / 100) / 12;
     const combinedStartBalance = mySuper + wifeSuper;
+    const yearsToGrow = targetAge - myAge;
 
     let finalBalance = 0;
     let fvOfCurrentSuper = 0;
@@ -104,40 +107,51 @@ export function calculateSuper(
     let combinedBreakdown: SuperBreakdownRow[] = [];
 
     if (calcMode === 'contribution') {
-        // This mode is complex with extra yearly contributions, so we'll assume monthly for now.
-        const myYearsToGrow = targetAge - myAge;
-        const wifeYearsToGrow = targetAge - wifeAge;
+        const n_months = yearsToGrow > 0 ? yearsToGrow * 12 : 0;
 
-        const my_n_months = myYearsToGrow * 12;
-        const wife_n_months = wifeYearsToGrow * 12;
-
-        const fvMySuper = mySuper * Math.pow(1 + monthlyRate, my_n_months);
-        const fvWifeSuper = wifeSuper * Math.pow(1 + monthlyRate, wife_n_months);
+        const fvMySuper = mySuper * Math.pow(1 + monthlyRate, n_months);
+        const fvWifeSuper = wifeSuper * Math.pow(1 + monthlyRate, n_months);
         fvOfCurrentSuper = fvMySuper + fvWifeSuper;
 
-        const myAnnuityFactor = (Math.pow(1 + monthlyRate, my_n_months) - 1) / monthlyRate;
-        const wifeAnnuityFactor = (Math.pow(1 + monthlyRate, wife_n_months) - 1) / monthlyRate;
-        const combinedAnnuityFactor = myAnnuityFactor + wifeAnnuityFactor;
-
+        const annuityFactor = n_months > 0 ? (Math.pow(1 + monthlyRate, n_months) - 1) / monthlyRate : 0;
+        
         const shortfall = targetBalance! - fvOfCurrentSuper;
-        const requiredMonthlyPMT = shortfall > 0 ? shortfall / combinedAnnuityFactor : 0;
+        
+        // This is the required NET amount that needs to be invested
+        const requiredNetTotalPMT = (shortfall > 0 && annuityFactor > 0) ? shortfall / (annuityFactor * 2) : 0;
+        
+        // This is the GROSS amount the user needs to contribute (before tax)
+        const requiredGrossTotalPMT = requiredNetTotalPMT / (1 - CONTRIBUTION_TAX_RATE);
 
         finalResults = {
-            pmt: requiredMonthlyPMT,
+            pmt: requiredGrossTotalPMT * 2, // Display the total combined gross payment
             target: targetBalance,
         };
 
-        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, requiredMonthlyPMT, requiredMonthlyPMT, myExtraYearlyContribution!, monthlyRate, 'monthly', myMakeExtraContribution);
-        const wifeFinal = calculateFutureValue(wifeAge, targetAge, wifeSuper, requiredMonthlyPMT, requiredMonthlyPMT, wifeExtraYearlyContribution!, monthlyRate, 'monthly', wifeMakeExtraContribution);
+        // The breakdown simulation uses the per-person NET payment
+        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, requiredGrossTotalPMT, requiredGrossTotalPMT, 0, monthlyRate, 'monthly', false);
+        const wifeRetirementAge = wifeAge + yearsToGrow;
+        const wifeFinal = calculateFutureValue(wifeAge, wifeRetirementAge, wifeSuper, requiredGrossTotalPMT, requiredGrossTotalPMT, 0, monthlyRate, 'monthly', false);
         finalBalance = myFinal.finalBalance + wifeFinal.finalBalance;
-        combinedBreakdown = myFinal.breakdown;
+        
+        const longerBreakdown = myFinal.breakdown.length > wifeFinal.breakdown.length ? myFinal.breakdown : wifeFinal.breakdown;
+        const shorterBreakdown = myFinal.breakdown.length > wifeFinal.breakdown.length ? wifeFinal.breakdown : myFinal.breakdown;
+
+        combinedBreakdown = longerBreakdown.map((row, i) => {
+            const otherBalance = i < shorterBreakdown.length ? shorterBreakdown[i].balance : (shorterBreakdown.length > 0 ? shorterBreakdown[shorterBreakdown.length - 1].balance : 0);
+            return {
+                ...row,
+                balance: row.balance + otherBalance,
+            };
+        });
 
     } else { // 'balance' mode
-        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, myContributionPre50!, myContributionPost50!, myExtraYearlyContribution!, monthlyRate, contributionFrequency, myMakeExtraContribution);
-        const wifeFinal = calculateFutureValue(wifeAge, targetAge, wifeSuper, wifeContributionPre50!, wifeContributionPost50!, wifeExtraYearlyContribution!, monthlyRate, contributionFrequency, wifeMakeExtraContribution);
+        const wifeRetirementAge = wifeAge + yearsToGrow;
+        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, myContributionPre50!, myContributionPost50!, myExtraYearlyContribution!, monthlyRate, contributionFrequency, makeExtraContribution);
+        const wifeFinal = calculateFutureValue(wifeAge, wifeRetirementAge, wifeSuper, wifeContributionPre50!, wifeContributionPost50!, wifeExtraYearlyContribution!, monthlyRate, contributionFrequency, makeExtraContribution);
 
         finalBalance = myFinal.finalBalance + wifeFinal.finalBalance;
-        fvOfCurrentSuper = (mySuper + wifeSuper) * Math.pow(1 + monthlyRate, (targetAge - myAge) * 12); // Approx for display
+        fvOfCurrentSuper = (mySuper + wifeSuper) * Math.pow(1 + monthlyRate, yearsToGrow * 12);
 
         finalResults = {
             projectedBalance: finalBalance,
@@ -149,7 +163,7 @@ export function calculateSuper(
         const shorterBreakdown = myFinal.breakdown.length > wifeFinal.breakdown.length ? wifeFinal.breakdown : myFinal.breakdown;
 
         combinedBreakdown = longerBreakdown.map((row, i) => {
-            const otherBalance = i < shorterBreakdown.length ? shorterBreakdown[i].balance : shorterBreakdown[shorterBreakdown.length - 1].balance;
+            const otherBalance = i < shorterBreakdown.length ? shorterBreakdown[i].balance : (shorterBreakdown.length > 0 ? shorterBreakdown[shorterBreakdown.length - 1].balance : 0);
             return {
                 ...row,
                 balance: row.balance + otherBalance,
@@ -160,7 +174,7 @@ export function calculateSuper(
     const results: SuperResultData = {
         ...finalResults,
         calcMode,
-        years: targetAge - myAge, // Use primary person's timeline for display
+        years: yearsToGrow,
         start: combinedStartBalance,
         rate: netReturn,
         fvStart: fvOfCurrentSuper,

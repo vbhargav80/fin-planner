@@ -62,7 +62,7 @@ export function buildDrawdownSchedule(
     const monthlyDraw = Math.max(0, plan.monthlyDrawdown);
     const startDate = parseMonthString(plan.startMonth);
 
-    const ANNUAL_RENT_GROWTH = 0.025;
+    const annualRentGrowthDecimal = Math.max(0, plan.netRentGrowthRate) / 100;
     let currentRentLost = clampNonNegative(plan.netMonthlyRent);
 
     const schedule: DrawdownRow[] = [];
@@ -78,7 +78,7 @@ export function buildDrawdownSchedule(
         const date = addMonthsUTC(startDate, months);
 
         if (months > 0 && date.getUTCMonth() === 0) {
-            currentRentLost *= (1 + ANNUAL_RENT_GROWTH);
+            currentRentLost *= (1 + annualRentGrowthDecimal);
         }
 
         const startBalance = balance;

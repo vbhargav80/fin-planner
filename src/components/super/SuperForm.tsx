@@ -28,28 +28,19 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
 
     return (
         <div className="md:w-[35%] p-6 sm:p-8 overflow-y-auto">
-            <h2 className="text-3xl font-bold text-gray-900">
-                Superannuation Goal Calculator
-            </h2>
-            <p className="mt-2 text-gray-600">
-                Enter your details below to see your projection. The results
-                will update automatically.
-            </p>
+            <h2 className="text-3xl font-bold text-gray-900">Superannuation Goal Calculator</h2>
+            <p className="mt-2 text-gray-600">Enter your details below to see your projection. The results will update automatically.</p>
 
             <div className="mt-8 space-y-5">
                 {/* Calculation type toggle */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                        Calculation Type
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700">Calculation Type</label>
                     <div className="mt-1 flex rounded-lg p-1 bg-gray-200">
                         <button
                             type="button"
                             onClick={() => setCalcMode('contribution')}
                             className={`w-1/2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                                calcMode === 'contribution'
-                                    ? 'bg-white text-gray-900 shadow'
-                                    : 'text-gray-600 hover:bg-gray-300'
+                                calcMode === 'contribution' ? 'bg-white text-gray-900 shadow' : 'text-gray-600 hover:bg-gray-300'
                             }`}
                         >
                             Calculate Contribution
@@ -58,9 +49,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             type="button"
                             onClick={() => setCalcMode('balance')}
                             className={`w-1/2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                                calcMode === 'balance'
-                                    ? 'bg-white text-gray-900 shadow'
-                                    : 'text-gray-600 hover:bg-gray-300'
+                                calcMode === 'balance' ? 'bg-white text-gray-900 shadow' : 'text-gray-600 hover:bg-gray-300'
                             }`}
                         >
                             Calculate Balance
@@ -75,9 +64,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             type="button"
                             onClick={() => setActivePersonTab('self')}
                             className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
-                                activePersonTab === 'self'
-                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                                    : 'bg-transparent text-indigo-700 border-transparent hover:bg-indigo-100'
+                                activePersonTab === 'self' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-transparent text-indigo-700 border-transparent hover:bg-indigo-100'
                             }`}
                         >
                             You
@@ -86,9 +73,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             type="button"
                             onClick={() => setActivePersonTab('spouse')}
                             className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
-                                activePersonTab === 'spouse'
-                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                                    : 'bg-transparent text-indigo-700 border-transparent hover:bg-indigo-100'
+                                activePersonTab === 'spouse' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-transparent text-indigo-700 border-transparent hover:bg-indigo-100'
                             }`}
                         >
                             Spouse
@@ -98,113 +83,45 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                         {activePersonTab === 'self' && (
                             <>
-                                <RangeSlider
-                                    label="Current Age"
-                                    value={Number(myAge)}
-                                    min={45}
-                                    max={60}
-                                    step={1}
-                                    onChange={(n) => setMyAge(String(n))}
-                                />
-                                <RangeSlider
-                                    label="Current Super"
-                                    value={Number(mySuper)}
-                                    min={380000}
-                                    max={450000}
-                                    step={5000}
-                                    onChange={(n) => setMySuper(String(n))}
-                                    formatValue={(v) => formatCurrency(v)}
-                                />
+                                <RangeSlider label="Current Age" value={Number(myAge)} min={45} max={60} step={1} onChange={(n) => setMyAge(String(n))} />
+                                <RangeSlider label="Current Super" value={Number(mySuper)} min={380000} max={450000} step={5000} onChange={(n) => setMySuper(String(n))} formatValue={(v) => formatCurrency(v)} />
                             </>
                         )}
 
                         {activePersonTab === 'spouse' && (
                             <>
-                                <RangeSlider
-                                    label="Current Age"
-                                    value={Number(wifeAge)}
-                                    min={42}
-                                    max={60}
-                                    step={1}
-                                    onChange={(n) => setWifeAge(String(n))}
-                                />
-                                <RangeSlider
-                                    label="Current Super"
-                                    value={Number(wifeSuper)}
-                                    min={100000}
-                                    max={150000}
-                                    step={5000}
-                                    onChange={(n) => setWifeSuper(String(n))}
-                                    formatValue={(v) => formatCurrency(v)}
-                                />
+                                <RangeSlider label="Current Age" value={Number(wifeAge)} min={42} max={60} step={1} onChange={(n) => setWifeAge(String(n))} />
+                                <RangeSlider label="Current Super" value={Number(wifeSuper)} min={100000} max={150000} step={5000} onChange={(n) => setWifeSuper(String(n))} formatValue={(v) => formatCurrency(v)} />
                             </>
                         )}
                     </div>
                 </PersonTabsPanel>
 
-                {/* Shared goal & contribution inputs */}
+                {/* Shared goal & contribution inputs (with sliders) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                    <InputGroup
-                        label="Your Target Retirement Age"
-                        id="targetAge"
-                        value={targetAge}
-                        onChange={(e) => setTargetAge(e.target.value)}
-                    />
-
+                    <RangeSlider label="Target Retirement Age" value={Number(targetAge)} min={58} max={65} step={1} onChange={(n) => setTargetAge(String(n))} />
 
                     {calcMode === 'balance' && (
                         <>
-                            <InputGroup
-                                label="Monthly Contribution (Pre-50)"
-                                id="monthlyContribution"
-                                value={monthlyContribution}
-                                onChange={(e) => setMonthlyContribution(e.target.value)}
-                                symbol="$"
-                                symbolPosition="left"
-                                step={100}
-                            />
-                            <InputGroup
-                                label="Monthly Contribution (Post-50)"
-                                id="monthlyContributionPost50"
-                                value={monthlyContributionPost50}
-                                onChange={(e) => setMonthlyContributionPost50(e.target.value)}
-                                symbol="$"
-                                symbolPosition="left"
-                                step={100}
-                            />
+                            <InputGroup label="Monthly Contribution (Pre-50)" id="monthlyContribution" value={monthlyContribution} onChange={(e) => setMonthlyContribution(e.target.value)} symbol="$" symbolPosition="left" step={100} />
+                            <InputGroup label="Monthly Contribution (Post-50)" id="monthlyContributionPost50" value={monthlyContributionPost50} onChange={(e) => setMonthlyContributionPost50(e.target.value)} symbol="$" symbolPosition="left" step={100} />
                         </>
                     )}
 
                     <div className={calcMode === 'contribution' ? 'sm:col-span-1' : 'sm:col-span-2'}>
-                        <InputGroup
-                            label="Est. Annual Net Return (after fees)"
-                            id="netReturn"
-                            value={netReturn}
-                            onChange={(e) => setNetReturn(e.target.value)}
-                            symbol="%"
-                            symbolPosition="right"
-                        />
+                        <RangeSlider label="Est. Annual Net Return (after fees)" value={Number(netReturn)} min={5} max={8} step={0.1} onChange={(n) => setNetReturn(String(Number(n.toFixed(1))))} formatValue={(v) => `${v}%`} />
                     </div>
                 </div>
 
                 {/* Move Target Combined Balance to the bottom of the form for better flow */}
                 {calcMode === 'contribution' && (
                     <div>
-                        <InputGroup
-                            label="Target Combined Balance"
-                            id="targetBalance"
-                            value={targetBalance}
-                            onChange={(e) => setTargetBalance(e.target.value)}
-                            symbol="$"
-                            symbolPosition="left"
-                        />
+                        <RangeSlider label="Target Combined Balance" value={Number(targetBalance)} min={1400000} max={1700000} step={250000} onChange={(n) => setTargetBalance(String(n))} formatValue={(v) => formatCurrency(v)} />
                     </div>
                 )}
 
                 {error && (
-                    <div className="mt-4 text-center text-red-600 font-medium">
-                        {error}
-                    </div>
+                    <div className="mt-4 text-center text-red-600 font-medium">{error}</div>
                 )}
             </div>
         </div>

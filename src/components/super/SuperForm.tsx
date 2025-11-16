@@ -98,26 +98,29 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 </PersonTabsPanel>
 
                 {/* Shared goal & contribution inputs (with sliders) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                    <RangeSlider label="Target Retirement Age" value={Number(targetAge)} min={58} max={65} step={1} onChange={(n) => setTargetAge(String(n))} />
+                <PersonTabsPanel>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                        <RangeSlider label="Target Retirement Age" value={Number(targetAge)} min={58} max={65} step={1} onChange={(n) => setTargetAge(String(n))} />
 
-                    {calcMode === 'balance' && (
-                        <>
-                            <InputGroup label="Monthly Contribution (Pre-50)" id="monthlyContribution" value={monthlyContribution} onChange={(e) => setMonthlyContribution(e.target.value)} symbol="$" symbolPosition="left" step={100} />
-                            <InputGroup label="Monthly Contribution (Post-50)" id="monthlyContributionPost50" value={monthlyContributionPost50} onChange={(e) => setMonthlyContributionPost50(e.target.value)} symbol="$" symbolPosition="left" step={100} />
-                        </>
-                    )}
+                        {calcMode === 'balance' && (
+                            <>
+                                <InputGroup label="Monthly Contribution (Pre-50)" id="monthlyContribution" value={monthlyContribution} onChange={(e) => setMonthlyContribution(e.target.value)} symbol="$" symbolPosition="left" step={100} />
+                                <InputGroup label="Monthly Contribution (Post-50)" id="monthlyContributionPost50" value={monthlyContributionPost50} onChange={(e) => setMonthlyContributionPost50(e.target.value)} symbol="$" symbolPosition="left" step={100} />
+                            </>
+                        )}
 
-                    <div className={calcMode === 'contribution' ? 'sm:col-span-1' : 'sm:col-span-2'}>
-                        <RangeSlider label="Est. Annual Net Return (after fees)" value={Number(netReturn)} min={5} max={8} step={0.1} onChange={(n) => setNetReturn(String(Number(n.toFixed(1))))} formatValue={(v) => `${v}%`} />
+                        <div className={calcMode === 'contribution' ? 'sm:col-span-1' : 'sm:col-span-2'}>
+                            <RangeSlider label="Est. Annual Net Return (after fees)" value={Number(netReturn)} min={5} max={8} step={0.1} onChange={(n) => setNetReturn(String(Number(n.toFixed(1))))} formatValue={(v) => `${v}%`} />
+                        </div>
                     </div>
-                </div>
+                </PersonTabsPanel>
+
 
                 {/* Move Target Combined Balance to the bottom of the form for better flow */}
                 {calcMode === 'contribution' && (
-                    <div>
-                        <RangeSlider label="Target Combined Balance" value={Number(targetBalance)} min={1400000} max={1700000} step={250000} onChange={(n) => setTargetBalance(String(n))} formatValue={(v) => formatCurrency(v)} />
-                    </div>
+                    <PersonTabsPanel>
+                        <RangeSlider label="Target Combined Balance" value={Number(targetBalance)} min={1400000} max={1700000} step={50000} onChange={(n) => setTargetBalance(String(n))} formatValue={(v) => formatCurrency(v)} />
+                    </PersonTabsPanel>
                 )}
 
                 {error && (

@@ -38,34 +38,52 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
 
         const id = window.setInterval(measure, 300);
         return () => window.clearInterval(id);
-    }, [amortizationData, headerHeight]);
+    }, [headerHeight]);
 
-    // Scroll to Jan 2031 row when requested (replaced implementation)
+    // Scroll to Jan 2031 row when explicitly requested via button
     useEffect(() => {
-        if (scrollTo2031 === 0) return;
+        if (!scrollTo2031) return; // only react when counter is non-zero and changes
 
         const index = amortizationData.findIndex((row) => row.date === 'Jan 2031');
-        if (index === -1) return;
+        if (index === -1) {
+            console.warn('[AmortizationTable] Jan 2031 row not found');
+            return;
+        }
 
         const container = scrollContainerRef.current;
         const rowEl = rowRefs.current[index];
-        if (!container || !rowEl) return;
+        if (!container || !rowEl) {
+            console.warn('[AmortizationTable] Missing container or row element for Jan 2031');
+            return;
+        }
 
         const extraPadding = 8;
+        let raf1 = 0;
+        let raf2 = 0;
 
-        const scrollNow = () => {
+        const doScroll = () => {
             const containerRect = container.getBoundingClientRect();
             const rowRect = rowEl.getBoundingClientRect();
             const rowTopInContainer = rowRect.top - containerRect.top;
 
-            const targetTop = rowTopInContainer + container.scrollTop - headerHeight - extraPadding;
+            const targetTop = Math.max(
+                0,
+                container.scrollTop + rowTopInContainer - headerHeight - extraPadding,
+            );
+
             container.scrollTo({ top: targetTop, behavior: 'smooth' });
         };
 
-        // Defer until after layout so header height and row positions are correct
-        const raf = requestAnimationFrame(scrollNow);
-        return () => cancelAnimationFrame(raf);
-    }, [scrollTo2031, headerHeight, amortizationData]);
+        // Double RAF to ensure layout & sticky header are fully applied
+        raf1 = requestAnimationFrame(() => {
+            raf2 = requestAnimationFrame(doScroll);
+        });
+
+        return () => {
+            if (raf1) cancelAnimationFrame(raf1);
+            if (raf2) cancelAnimationFrame(raf2);
+        };
+    }, [scrollTo2031, amortizationData, headerHeight]);
 
     // Scroll-driven sticky behavior for Jan 2031 row
     useEffect(() => {

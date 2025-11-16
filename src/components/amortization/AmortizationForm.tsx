@@ -3,6 +3,7 @@ import React from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { ToggleSwitch } from '../common/ToggleSwitch';
 import { RangeSlider } from '../common/RangeSlider';
+import { Tabs } from '../common/Tabs';
 import type { AmortizationCalculatorState } from '../../types/amortization.types';
 import { Briefcase, Wallet } from 'lucide-react';
 
@@ -12,6 +13,11 @@ interface AmortizationFormProps {
 
 export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }) => {
     const [activeTab, setActiveTab] = React.useState<'loan' | 'cashflow' | 'assumptions'>('loan');
+    const TABS = [
+        { id: 'loan', label: 'Loan Details' },
+        { id: 'cashflow', label: 'Monthly Cashflow' },
+        { id: 'assumptions', label: 'Assumptions & Actions' },
+    ];
 
     const {
         state,
@@ -44,40 +50,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
             </p>
 
             {/* Tabs */}
-            <div className="mt-6">
-                <div className="flex space-x-1">
-                    <button
-                        onClick={() => setActiveTab('loan')}
-                        className={`flex-1 py-2 px-3 rounded-t-md font-medium text-sm transition-colors ${
-                            activeTab === 'loan'
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                        }`}
-                    >
-                        Loan Details
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('cashflow')}
-                        className={`flex-1 py-2 px-3 rounded-t-md font-medium text-sm transition-colors ${
-                            activeTab === 'cashflow'
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                        }`}
-                    >
-                        Monthly Cashflow
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('assumptions')}
-                        className={`flex-1 py-2 px-3 rounded-t-md font-medium text-sm transition-colors ${
-                            activeTab === 'assumptions'
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                        }`}
-                    >
-                        Assumptions &amp; Actions
-                    </button>
-                </div>
-            </div>
+            <Tabs tabs={TABS} activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} className="mt-6" />
 
             <div className="mt-8 space-y-6">
                 {activeTab === 'loan' && (

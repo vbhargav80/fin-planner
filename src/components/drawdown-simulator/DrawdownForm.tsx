@@ -3,12 +3,17 @@ import React, { useState } from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { RangeSlider } from '../common/RangeSlider';
 import { MonthYearPicker } from '../common/MonthYearPicker';
+import { Tabs } from '../common/Tabs';
 import type { SaleDrawdownState } from '../../types/drawdown.types';
 
 interface Props { model: SaleDrawdownState }
 
 export const DrawdownForm: React.FC<Props> = ({ model }) => {
     const [activeTab, setActiveTab] = useState<'sale' | 'plan'>('sale');
+    const TABS = [
+        { id: 'sale', label: 'Sale Calculation' },
+        { id: 'plan', label: 'Drawdown Plan' },
+    ];
 
     const fmtCurrency = (n: number) => `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
     const TAX_RATES = [16, 30, 37, 45] as const;
@@ -22,30 +27,7 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
             <p className="mt-2 text-gray-600">Net sale proceeds calculator with monthly drawdown plan.</p>
 
             {/* Tabs */}
-            <div className="mt-6 border-b border-gray-200">
-                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-                    <button
-                        onClick={() => setActiveTab('sale')}
-                        className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium ${
-                            activeTab === 'sale'
-                                ? 'border-indigo-600 text-indigo-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        }`}
-                    >
-                        Sale Calculation
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('plan')}
-                        className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium ${
-                            activeTab === 'plan'
-                                ? 'border-indigo-600 text-indigo-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        }`}
-                    >
-                        Drawdown Plan
-                    </button>
-                </nav>
-            </div>
+            <Tabs tabs={TABS} activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} variant="underline" className="mt-6" />
 
             <div className="mt-6">
                 {activeTab === 'sale' && (

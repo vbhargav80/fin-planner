@@ -1,71 +1,58 @@
-import { useMemo, useState } from 'react';
-import type { SaleDrawdownState } from '../types/drawdown.types';
+import { useMemo, useReducer } from 'react';
+import type { SaleDrawdownState, State, Action } from '../types/drawdown.types';
 import { computeSaleDrawdownDerived } from '../utils/calculations/drawdownCalculations';
 
-export function useSaleDrawdownCalculator(): SaleDrawdownState {
-    // Sale Calculation (defaults)
-    const [salePrice, setSalePrice] = useState<number>(1_000_000);
-    const [costBase, setCostBase] = useState<number>(350_000);
-    const [depreciationClaimed, setDepreciationClaimed] = useState<number>(50_000);
-    const [sellingCosts, setSellingCosts] = useState<number>(50_000);
-    const [person1TaxRate, setPerson1TaxRate] = useState<number>(45);
-    const [person2TaxRate, setPerson2TaxRate] = useState<number>(37);
-    const [cgtDiscountRate, setCgtDiscountRate] = useState<number>(50);
-
+const initialState: State = {
+    // Sale Calculation
+    salePrice: 1_000_000,
+    costBase: 350_000,
+    depreciationClaimed: 50_000,
+    sellingCosts: 50_000,
+    person1TaxRate: 45,
+    person2TaxRate: 37,
+    cgtDiscountRate: 50,
     // Drawdown Plan
-    const [annualInterestRate, setAnnualInterestRate] = useState<number>(2);
-    const [monthlyDrawdown, setMonthlyDrawdown] = useState<number>(10_000);
-    const [startMonth, setStartMonth] = useState<string>('2031-01');
-    const [netMonthlyRent, setNetMonthlyRent] = useState<number>(1000); // UPDATED default
-    const [netRentGrowthRate, setNetRentGrowthRate] = useState<number>(2);
+    annualInterestRate: 2,
+    monthlyDrawdown: 10_000,
+    startMonth: '2031-01',
+    netMonthlyRent: 1000,
+    netRentGrowthRate: 2,
+};
+
+function reducer(state: State, action: Action): State {
+    switch (action.type) {
+        case 'SET_SALE_PRICE': return { ...state, salePrice: action.payload };
+        case 'SET_COST_BASE': return { ...state, costBase: action.payload };
+        case 'SET_DEPRECIATION_CLAIMED': return { ...state, depreciationClaimed: action.payload };
+        case 'SET_SELLING_COSTS': return { ...state, sellingCosts: action.payload };
+        case 'SET_PERSON_1_TAX_RATE': return { ...state, person1TaxRate: action.payload };
+        case 'SET_PERSON_2_TAX_RATE': return { ...state, person2TaxRate: action.payload };
+        case 'SET_CGT_DISCOUNT_RATE': return { ...state, cgtDiscountRate: action.payload };
+        case 'SET_ANNUAL_INTEREST_RATE': return { ...state, annualInterestRate: action.payload };
+        case 'SET_MONTHLY_DRAWDOWN': return { ...state, monthlyDrawdown: action.payload };
+        case 'SET_START_MONTH': return { ...state, startMonth: action.payload };
+        case 'SET_NET_MONTHLY_RENT': return { ...state, netMonthlyRent: action.payload };
+        case 'SET_NET_RENT_GROWTH_RATE': return { ...state, netRentGrowthRate: action.payload };
+        default: return state;
+    }
+}
+
+export function useSaleDrawdownCalculator(): SaleDrawdownState {
+    const [state, dispatch] = useReducer(reducer, initialState);
 
     const derived = useMemo(
         () =>
             computeSaleDrawdownDerived(
-                { salePrice, costBase, depreciationClaimed, sellingCosts, person1TaxRate, person2TaxRate, cgtDiscountRate },
-                { annualInterestRate, monthlyDrawdown, startMonth, netMonthlyRent, netRentGrowthRate }
+                // The calculation function expects two objects, so we split the state
+                { salePrice: state.salePrice, costBase: state.costBase, depreciationClaimed: state.depreciationClaimed, sellingCosts: state.sellingCosts, person1TaxRate: state.person1TaxRate, person2TaxRate: state.person2TaxRate, cgtDiscountRate: state.cgtDiscountRate },
+                { annualInterestRate: state.annualInterestRate, monthlyDrawdown: state.monthlyDrawdown, startMonth: state.startMonth, netMonthlyRent: state.netMonthlyRent, netRentGrowthRate: state.netRentGrowthRate }
             ),
-        [
-            salePrice,
-            costBase,
-            depreciationClaimed,
-            sellingCosts,
-            person1TaxRate,
-            person2TaxRate,
-            cgtDiscountRate,
-            annualInterestRate,
-            monthlyDrawdown,
-            startMonth,
-            netMonthlyRent,
-            netRentGrowthRate,
-        ]
+        [state]
     );
 
     return {
-        salePrice,
-        costBase,
-        depreciationClaimed,
-        sellingCosts,
-        person1TaxRate,
-        person2TaxRate,
-        cgtDiscountRate,
-        annualInterestRate,
-        monthlyDrawdown,
-        startMonth,
-        netMonthlyRent,
-        netRentGrowthRate,
-        setSalePrice,
-        setCostBase,
-        setDepreciationClaimed,
-        setSellingCosts,
-        setPerson1TaxRate,
-        setPerson2TaxRate,
-        setCgtDiscountRate,
-        setAnnualInterestRate,
-        setMonthlyDrawdown,
-        setStartMonth,
-        setNetMonthlyRent,
-        setNetRentGrowthRate,
+        state,
+        dispatch,
         taxableGain: derived.taxableGain,
         person1Tax: derived.person1Tax,
         person2Tax: derived.person2Tax,

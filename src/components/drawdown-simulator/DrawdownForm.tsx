@@ -17,6 +17,7 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
         { id: 'plan', label: 'Drawdown Plan' },
     ];
 
+    const { state, dispatch } = model;
     const fmtCurrency = (n: number) => `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
     const TAX_RATES = [16, 30, 37, 45] as const;
 
@@ -35,20 +36,20 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                         <div className="grid grid-cols-1 gap-4">
                             <RangeSlider
                                 label="Asset Sale Price"
-                                value={model.salePrice}
+                                value={state.salePrice}
                                 min={DrawdownConstants.SALE_PRICE.MIN}
                                 max={DrawdownConstants.SALE_PRICE.MAX}
                                 step={DrawdownConstants.SALE_PRICE.STEP}
-                                onChange={model.setSalePrice}
+                                onChange={(v) => dispatch({ type: 'SET_SALE_PRICE', payload: v })}
                                 formatValue={(v) => fmtCurrency(v)}
                             />
                             <RangeSlider
                                 label="Cost Base"
-                                value={model.costBase}
+                                value={state.costBase}
                                 min={DrawdownConstants.COST_BASE.MIN}
                                 max={DrawdownConstants.COST_BASE.MAX}
                                 step={DrawdownConstants.COST_BASE.STEP}
-                                onChange={model.setCostBase}
+                                onChange={(v) => dispatch({ type: 'SET_COST_BASE', payload: v })}
                                 formatValue={(v) => fmtCurrency(v)}
                             />
 
@@ -56,20 +57,20 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <RangeSlider
                                     label="Depreciation Claimed"
-                                    value={model.depreciationClaimed}
+                                    value={state.depreciationClaimed}
                                     min={DrawdownConstants.DEPRECIATION_CLAIMED.MIN}
                                     max={DrawdownConstants.DEPRECIATION_CLAIMED.MAX}
                                     step={DrawdownConstants.DEPRECIATION_CLAIMED.STEP}
-                                    onChange={model.setDepreciationClaimed}
+                                    onChange={(v) => dispatch({ type: 'SET_DEPRECIATION_CLAIMED', payload: v })}
                                     formatValue={(v) => fmtCurrency(v)}
                                 />
                                 <RangeSlider
                                     label="Selling Costs"
-                                    value={model.sellingCosts}
+                                    value={state.sellingCosts}
                                     min={DrawdownConstants.SELLING_COSTS.MIN}
                                     max={DrawdownConstants.SELLING_COSTS.MAX}
                                     step={DrawdownConstants.SELLING_COSTS.STEP}
-                                    onChange={model.setSellingCosts}
+                                    onChange={(v) => dispatch({ type: 'SET_SELLING_COSTS', payload: v })}
                                     formatValue={(v) => fmtCurrency(v)}
                                 />
                             </div>
@@ -79,15 +80,15 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                                 <SegmentedControl
                                     label="Person 1 Tax Rate"
                                     options={TAX_RATES}
-                                    value={model.person1TaxRate as (typeof TAX_RATES)[number]}
-                                    onChange={(rate) => model.setPerson1TaxRate(rate)}
+                                    value={state.person1TaxRate as (typeof TAX_RATES)[number]}
+                                    onChange={(rate) => dispatch({ type: 'SET_PERSON_1_TAX_RATE', payload: rate })}
                                     formatLabel={(r) => `${r}%`}
                                 />
                                 <SegmentedControl
                                     label="Person 2 Tax Rate"
                                     options={TAX_RATES}
-                                    value={model.person2TaxRate as (typeof TAX_RATES)[number]}
-                                    onChange={(rate) => model.setPerson2TaxRate(rate)}
+                                    value={state.person2TaxRate as (typeof TAX_RATES)[number]}
+                                    onChange={(rate) => dispatch({ type: 'SET_PERSON_2_TAX_RATE', payload: rate })}
                                     formatLabel={(r) => `${r}%`}
                                 />
                             </div>
@@ -95,11 +96,11 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                             <InputGroup
                                 label="CGT Discount"
                                 id="cgtDiscount"
-                                value={String(model.cgtDiscountRate)}
+                                value={String(state.cgtDiscountRate)}
                                 symbol="%"
                                 symbolPosition="right"
                                 step={0.1}
-                                onChange={(e) => model.setCgtDiscountRate(Number(e.target.value))}
+                                onChange={(e) => dispatch({ type: 'SET_CGT_DISCOUNT_RATE', payload: Number(e.target.value) })}
                                 disabled={true}
                             />
                         </div>
@@ -112,45 +113,45 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                         <div className="grid grid-cols-1 gap-4">
                             <RangeSlider
                                 label="Net Monthly Rent"
-                                value={model.netMonthlyRent}
+                                value={state.netMonthlyRent}
                                 min={DrawdownConstants.NET_MONTHLY_RENT.MIN}
                                 max={DrawdownConstants.NET_MONTHLY_RENT.MAX}
                                 step={DrawdownConstants.NET_MONTHLY_RENT.STEP}
-                                onChange={model.setNetMonthlyRent}
+                                onChange={(v) => dispatch({ type: 'SET_NET_MONTHLY_RENT', payload: v })}
                                 formatValue={(v) => fmtCurrency(v)}
                             />
                             <RangeSlider
                                 label="Net Monthly Rent Growth Rate (%)"
-                                value={model.netRentGrowthRate}
+                                value={state.netRentGrowthRate}
                                 min={DrawdownConstants.NET_RENT_GROWTH_RATE.MIN}
                                 max={DrawdownConstants.NET_RENT_GROWTH_RATE.MAX}
                                 step={DrawdownConstants.NET_RENT_GROWTH_RATE.STEP}
-                                onChange={model.setNetRentGrowthRate}
+                                onChange={(v) => dispatch({ type: 'SET_NET_RENT_GROWTH_RATE', payload: v })}
                                 formatValue={(v) => `${v.toFixed(2)}%`}
                             />
                             <RangeSlider
                                 label="Est. Annual Interest Rate (%)"
-                                value={model.annualInterestRate}
+                                value={state.annualInterestRate}
                                 min={DrawdownConstants.ANNUAL_INTEREST_RATE.MIN}
                                 max={DrawdownConstants.ANNUAL_INTEREST_RATE.MAX}
                                 step={DrawdownConstants.ANNUAL_INTEREST_RATE.STEP}
-                                onChange={model.setAnnualInterestRate}
+                                onChange={(v) => dispatch({ type: 'SET_ANNUAL_INTEREST_RATE', payload: v })}
                                 formatValue={(v) => `${v.toFixed(2)}%`}
                             />
                             <RangeSlider
                                 label="Monthly Drawdown"
-                                value={model.monthlyDrawdown}
+                                value={state.monthlyDrawdown}
                                 min={DrawdownConstants.MONTHLY_DRAWDOWN.MIN}
                                 max={DrawdownConstants.MONTHLY_DRAWDOWN.MAX}
                                 step={DrawdownConstants.MONTHLY_DRAWDOWN.STEP}
-                                onChange={model.setMonthlyDrawdown}
+                                onChange={(v) => dispatch({ type: 'SET_MONTHLY_DRAWDOWN', payload: v })}
                                 formatValue={(v) => fmtCurrency(v)}
                             />
                             <MonthYearPicker
                                 id="startMonth"
                                 label="Drawdown Start Date"
-                                value={model.startMonth}
-                                onChange={model.setStartMonth}
+                                value={state.startMonth}
+                                onChange={(v) => dispatch({ type: 'SET_START_MONTH', payload: v })}
                                 minYear={2000}
                                 maxYear={2100}
                             />

@@ -1,24 +1,5 @@
-export interface SaleCalculationInputs {
-    salePrice: number;
-    costBase: number;
-    depreciationClaimed: number;
-    sellingCosts: number;
-    person1TaxRate: number;
-    person2TaxRate: number;
-    cgtDiscountRate: number;
-}
+import type { Dispatch } from 'react';
 
-export type SaleInputs = SaleCalculationInputs; // alias for consumers expecting `SaleInputs`
-
-export interface DrawdownPlanInputs {
-    annualInterestRate: number;
-    monthlyDrawdown: number;
-    startMonth: string; // YYYY-MM
-    netMonthlyRent: number;
-    netRentGrowthRate: number;
-}
-
-// Row shape rendered by DrawdownResults
 export interface DrawdownRow {
     dateLabel: string;
     startBalance: number;
@@ -28,20 +9,7 @@ export interface DrawdownRow {
     rentLost: number;
 }
 
-export interface SaleDrawdownDerived {
-    taxableGain: number;
-    person1Tax: number;
-    person2Tax: number;
-    totalTax: number;
-    netProceeds: number;
-    schedule: DrawdownRow[];
-    monthsToDeplete: number | null;       // allow null when it does not deplete
-    depletionDateLabel: string | null;    // allow null when it does not deplete
-    durationLabel: string;
-}
-
-export interface SaleDrawdownState {
-    // sale inputs
+export interface SaleInputs {
     salePrice: number;
     costBase: number;
     depreciationClaimed: number;
@@ -49,37 +17,45 @@ export interface SaleDrawdownState {
     person1TaxRate: number;
     person2TaxRate: number;
     cgtDiscountRate: number;
+}
 
-    // drawdown plan inputs
+export interface DrawdownPlanInputs {
     annualInterestRate: number;
     monthlyDrawdown: number;
     startMonth: string;
     netMonthlyRent: number;
     netRentGrowthRate: number;
+}
 
-    // setters
-    setSalePrice: (value: number) => void;
-    setCostBase: (value: number) => void;
-    setDepreciationClaimed: (value: number) => void;
-    setSellingCosts: (value: number) => void;
-    setPerson1TaxRate: (value: number) => void;
-    setPerson2TaxRate: (value: number) => void;
-    setCgtDiscountRate: (value: number) => void;
+export type State = SaleInputs & DrawdownPlanInputs;
 
-    setAnnualInterestRate: (value: number) => void;
-    setMonthlyDrawdown: (value: number) => void;
-    setStartMonth: (value: string) => void;
-    setNetMonthlyRent: (value: number) => void;
-    setNetRentGrowthRate: (value: number) => void;
+export type Action =
+    | { type: 'SET_SALE_PRICE'; payload: number }
+    | { type: 'SET_COST_BASE'; payload: number }
+    | { type: 'SET_DEPRECIATION_CLAIMED'; payload: number }
+    | { type: 'SET_SELLING_COSTS'; payload: number }
+    | { type: 'SET_PERSON_1_TAX_RATE'; payload: number }
+    | { type: 'SET_PERSON_2_TAX_RATE'; payload: number }
+    | { type: 'SET_CGT_DISCOUNT_RATE'; payload: number }
+    | { type: 'SET_ANNUAL_INTEREST_RATE'; payload: number }
+    | { type: 'SET_MONTHLY_DRAWDOWN'; payload: number }
+    | { type: 'SET_START_MONTH'; payload: string }
+    | { type: 'SET_NET_MONTHLY_RENT'; payload: number }
+    | { type: 'SET_NET_RENT_GROWTH_RATE'; payload: number };
 
-    // derived outputs
+export interface SaleDrawdownDerived {
     taxableGain: number;
     person1Tax: number;
     person2Tax: number;
     totalTax: number;
     netProceeds: number;
     schedule: DrawdownRow[];
-    monthsToDeplete: number | null;       // match calculation nullability
-    depletionDateLabel: string | null;    // match calculation nullability
+    monthsToDeplete: number | null;
+    depletionDateLabel: string | null;
     durationLabel: string;
+}
+
+export interface SaleDrawdownState extends SaleDrawdownDerived {
+    state: State;
+    dispatch: Dispatch<Action>;
 }

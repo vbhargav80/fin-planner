@@ -15,9 +15,9 @@ const defaultState = {
     contributionFrequency: 'monthly' as ContributionFrequency,
     makeExtraContribution: false,
     // Monthly defaults
-    myMonthlyContribution: '100',
+    myMonthlyContribution: '1000',
     myMonthlyContributionPost50: '0',
-    wifeMonthlyContribution: '50',
+    wifeMonthlyContribution: '200',
     wifeMonthlyContributionPost50: '0',
     // Yearly defaults
     myYearlyContribution: '1500',

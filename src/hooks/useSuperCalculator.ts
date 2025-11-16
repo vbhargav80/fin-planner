@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { SuperResultData, SuperBreakdownRow, CalcMode, SuperCalculatorState, ContributionFrequency } from '../types/super.types';
+import { useEffect, useReducer, useState } from 'react';
+import type { SuperResultData, SuperBreakdownRow, SuperCalculatorState, State, Action } from '../types/super.types';
 import { calculateSuper } from '../utils/calculations/superCalculations';
 
 // Define defaults in a single place
-const defaultState = {
+const initialState: State = {
     myAge: 45,
     wifeAge: 42,
     mySuper: 400000,
@@ -11,18 +11,18 @@ const defaultState = {
     targetAge: 60,
     targetBalance: 1500000,
     netReturn: 7,
-    calcMode: 'contribution' as CalcMode,
-    contributionFrequency: 'monthly' as ContributionFrequency,
+    calcMode: 'contribution',
+    contributionFrequency: 'monthly',
     makeExtraContribution: false,
     // Monthly defaults
-    myMonthlyContribution: 1000,
+    myMonthlyContributionPre50: 1000,
     myMonthlyContributionPost50: 0,
-    wifeMonthlyContribution: 200,
+    wifeMonthlyContributionPre50: 200,
     wifeMonthlyContributionPost50: 0,
     // Yearly defaults
-    myYearlyContribution: 1500,
+    myYearlyContributionPre50: 1500,
     myYearlyContributionPost50: 0,
-    wifeYearlyContribution: 1500,
+    wifeYearlyContributionPre50: 1500,
     wifeYearlyContributionPost50: 0,
     // Extra yearly
     myExtraYearlyContribution: 2000,
@@ -31,63 +31,55 @@ const defaultState = {
     wifeExtraContributionYears: 1,
 };
 
+function reducer(state: State, action: Action): State {
+    switch (action.type) {
+        case 'SET_MY_AGE': return { ...state, myAge: action.payload };
+        case 'SET_WIFE_AGE': return { ...state, wifeAge: action.payload };
+        case 'SET_MY_SUPER': return { ...state, mySuper: action.payload };
+        case 'SET_WIFE_SUPER': return { ...state, wifeSuper: action.payload };
+        case 'SET_TARGET_AGE': return { ...state, targetAge: action.payload };
+        case 'SET_TARGET_BALANCE': return { ...state, targetBalance: action.payload };
+        case 'SET_NET_RETURN': return { ...state, netReturn: action.payload };
+        case 'SET_CALC_MODE': return { ...state, calcMode: action.payload };
+        case 'SET_CONTRIBUTION_FREQUENCY': return { ...state, contributionFrequency: action.payload };
+        case 'SET_MAKE_EXTRA_CONTRIBUTION': return { ...state, makeExtraContribution: action.payload };
+        case 'SET_MY_EXTRA_YEARLY_CONTRIBUTION': return { ...state, myExtraYearlyContribution: action.payload };
+        case 'SET_MY_EXTRA_CONTRIBUTION_YEARS': return { ...state, myExtraContributionYears: action.payload };
+        case 'SET_WIFE_EXTRA_YEARLY_CONTRIBUTION': return { ...state, wifeExtraYearlyContribution: action.payload };
+        case 'SET_WIFE_EXTRA_CONTRIBUTION_YEARS': return { ...state, wifeExtraContributionYears: action.payload };
+        case 'SET_MY_CONTRIBUTION_PRE_50':
+            return state.contributionFrequency === 'monthly'
+                ? { ...state, myMonthlyContributionPre50: action.payload }
+                : { ...state, myYearlyContributionPre50: action.payload };
+        case 'SET_MY_CONTRIBUTION_POST_50':
+            return state.contributionFrequency === 'monthly'
+                ? { ...state, myMonthlyContributionPost50: action.payload }
+                : { ...state, myYearlyContributionPost50: action.payload };
+        case 'SET_WIFE_CONTRIBUTION_PRE_50':
+            return state.contributionFrequency === 'monthly'
+                ? { ...state, wifeMonthlyContributionPre50: action.payload }
+                : { ...state, wifeYearlyContributionPre50: action.payload };
+        case 'SET_WIFE_CONTRIBUTION_POST_50':
+            return state.contributionFrequency === 'monthly'
+                ? { ...state, wifeMonthlyContributionPost50: action.payload }
+                : { ...state, wifeYearlyContributionPost50: action.payload };
+        default: return state;
+    }
+}
+
 export function useSuperCalculator(): SuperCalculatorState {
-    // Form state
-    const [myAge, setMyAge] = useState(defaultState.myAge);
-    const [wifeAge, setWifeAge] = useState(defaultState.wifeAge);
-    const [mySuper, setMySuper] = useState(defaultState.mySuper);
-    const [wifeSuper, setWifeSuper] = useState(defaultState.wifeSuper);
-    const [targetAge, setTargetAge] = useState(defaultState.targetAge);
-    const [targetBalance, setTargetBalance] = useState(defaultState.targetBalance);
-    const [netReturn, setNetReturn] = useState(defaultState.netReturn);
-    const [calcMode, setCalcMode] = useState<CalcMode>(defaultState.calcMode);
-    const [contributionFrequency, _setContributionFrequency] = useState<ContributionFrequency>(defaultState.contributionFrequency);
-    const [makeExtraContribution, setMakeExtraContribution] = useState(defaultState.makeExtraContribution);
-
-    // State to store user inputs for both frequencies
-    const [myMonthlyContributionPre50, setMyMonthlyContributionPre50] = useState(defaultState.myMonthlyContribution);
-    const [myMonthlyContributionPost50, setMyMonthlyContributionPost50] = useState(defaultState.myMonthlyContributionPost50);
-    const [wifeMonthlyContributionPre50, setWifeMonthlyContributionPre50] = useState(defaultState.wifeMonthlyContribution);
-    const [wifeMonthlyContributionPost50, setWifeMonthlyContributionPost50] = useState(defaultState.wifeMonthlyContributionPost50);
-    const [myYearlyContributionPre50, setMyYearlyContributionPre50] = useState(defaultState.myYearlyContribution);
-    const [myYearlyContributionPost50, setMyYearlyContributionPost50] = useState(defaultState.myYearlyContributionPost50);
-    const [wifeYearlyContributionPre50, setWifeYearlyContributionPre50] = useState(defaultState.wifeYearlyContribution);
-    const [wifeYearlyContributionPost50, setWifeYearlyContributionPost50] = useState(defaultState.wifeYearlyContributionPost50);
-
-    // Active contribution values based on frequency
-    const myContributionPre50 = contributionFrequency === 'monthly' ? myMonthlyContributionPre50 : myYearlyContributionPre50;
-    const myContributionPost50 = contributionFrequency === 'monthly' ? myMonthlyContributionPost50 : myYearlyContributionPost50;
-    const wifeContributionPre50 = contributionFrequency === 'monthly' ? wifeMonthlyContributionPre50 : wifeYearlyContributionPre50;
-    const wifeContributionPost50 = contributionFrequency === 'monthly' ? wifeMonthlyContributionPost50 : wifeYearlyContributionPost50;
-
-    // Setters for active contribution values
-    const setMyContributionPre50 = (val: number) => contributionFrequency === 'monthly' ? setMyMonthlyContributionPre50(val) : setMyYearlyContributionPre50(val);
-    const setMyContributionPost50 = (val: number) => contributionFrequency === 'monthly' ? setMyMonthlyContributionPost50(val) : setMyYearlyContributionPost50(val);
-    const setWifeContributionPre50 = (val: number) => contributionFrequency === 'monthly' ? setWifeMonthlyContributionPre50(val) : setWifeYearlyContributionPre50(val);
-    const setWifeContributionPost50 = (val: number) => contributionFrequency === 'monthly' ? setWifeMonthlyContributionPost50(val) : setWifeYearlyContributionPost50(val);
-
-    const [myExtraContributionYears, setMyExtraContributionYears] = useState(defaultState.myExtraContributionYears);
-    const [wifeExtraContributionYears, setWifeExtraContributionYears] = useState(defaultState.wifeExtraContributionYears);
-    const [myExtraYearlyContribution, setMyExtraYearlyContribution] = useState(defaultState.myExtraYearlyContribution);
-    const [wifeExtraYearlyContribution, setWifeExtraYearlyContribution] = useState(defaultState.wifeExtraYearlyContribution);
-
-    // Custom setter for frequency to only toggle the frequency state
-    const setContributionFrequency = useCallback((freq: ContributionFrequency) => {
-        _setContributionFrequency(freq);
-    }, []);
+    const [state, dispatch] = useReducer(reducer, initialState);
 
     // Compute initial results synchronously
     const initialComputation = (() => {
         const inputs = {
-            ...defaultState,
-            myContributionPre50: defaultState.myMonthlyContribution,
-            myContributionPost50: defaultState.myMonthlyContributionPost50,
-            wifeContributionPre50: defaultState.wifeMonthlyContribution,
-            wifeContributionPost50: defaultState.wifeMonthlyContributionPost50,
-            contributionFrequency: defaultState.contributionFrequency,
-            makeExtraContribution: defaultState.makeExtraContribution,
+            ...initialState,
+            myContributionPre50: initialState.myMonthlyContributionPre50,
+            myContributionPost50: initialState.myMonthlyContributionPost50,
+            wifeContributionPre50: initialState.wifeMonthlyContributionPre50,
+            wifeContributionPost50: initialState.wifeMonthlyContributionPost50,
         };
-        return calculateSuper(inputs, defaultState.calcMode);
+        return calculateSuper(inputs, initialState.calcMode);
     })();
 
     const [results, setResults] = useState<SuperResultData | null>(initialComputation.results);
@@ -95,55 +87,36 @@ export function useSuperCalculator(): SuperCalculatorState {
     const [breakdownData, setBreakdownData] = useState<SuperBreakdownRow[]>(initialComputation.breakdown);
 
     useEffect(() => {
+        const myContributionPre50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPre50 : state.myYearlyContributionPre50;
+        const myContributionPost50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPost50 : state.myYearlyContributionPost50;
+        const wifeContributionPre50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPre50 : state.wifeYearlyContributionPre50;
+        const wifeContributionPost50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPost50 : state.wifeYearlyContributionPost50;
+
         const inputs = {
-            myAge,
-            wifeAge,
-            mySuper,
-            wifeSuper,
-            targetAge,
-            targetBalance,
+            ...state,
             myContributionPre50,
             myContributionPost50,
             wifeContributionPre50,
             wifeContributionPost50,
-            myExtraYearlyContribution,
-            wifeExtraYearlyContribution,
-            myExtraContributionYears,
-            wifeExtraContributionYears,
-            netReturn,
-            contributionFrequency,
-            makeExtraContribution,
         };
 
-        const result = calculateSuper(inputs, calcMode);
+        const result = calculateSuper(inputs, state.calcMode);
 
         setResults(result.results);
         setBreakdownData(result.breakdown);
         setError(result.error || '');
 
-    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50, myExtraYearlyContribution, wifeExtraYearlyContribution, myExtraContributionYears, wifeExtraContributionYears, netReturn, calcMode, contributionFrequency, makeExtraContribution]);
+    }, [state]);
 
     return {
-        myAge, setMyAge,
-        wifeAge, setWifeAge,
-        mySuper, setMySuper,
-        wifeSuper, setWifeSuper,
-        targetAge, setTargetAge,
-        targetBalance, setTargetBalance,
-        netReturn, setNetReturn,
-        calcMode, setCalcMode,
+        state,
+        dispatch,
         results,
         error,
         breakdownData,
-        contributionFrequency, setContributionFrequency,
-        makeExtraContribution, setMakeExtraContribution,
-        myContributionPre50, setMyContributionPre50,
-        myContributionPost50, setMyContributionPost50,
-        myExtraYearlyContribution, setMyExtraYearlyContribution,
-        myExtraContributionYears, setMyExtraContributionYears,
-        wifeContributionPre50, setWifeContributionPre50,
-        wifeContributionPost50, setWifeContributionPost50,
-        wifeExtraYearlyContribution, setWifeExtraYearlyContribution,
-        wifeExtraContributionYears, setWifeExtraContributionYears,
+        myContributionPre50: state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPre50 : state.myYearlyContributionPre50,
+        myContributionPost50: state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPost50 : state.myYearlyContributionPost50,
+        wifeContributionPre50: state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPre50 : state.wifeYearlyContributionPre50,
+        wifeContributionPost50: state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPost50 : state.wifeYearlyContributionPost50,
     };
 }

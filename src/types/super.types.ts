@@ -48,20 +48,20 @@ export interface SuperBreakdownRow {
 }
 
 export interface SuperCalculatorState {
-    myAge: string;
-    setMyAge: (value: string) => void;
-    wifeAge: string;
-    setWifeAge: (value: string) => void;
-    mySuper: string;
-    setMySuper: (value: string) => void;
-    wifeSuper: string;
-    setWifeSuper: (value: string) => void;
-    targetAge: string;
-    setTargetAge: (value: string) => void;
-    targetBalance: string;
-    setTargetBalance: (value: string) => void;
-    netReturn: string;
-    setNetReturn: (value: string) => void;
+    myAge: number;
+    setMyAge: (value: number) => void;
+    wifeAge: number;
+    setWifeAge: (value: number) => void;
+    mySuper: number;
+    setMySuper: (value: number) => void;
+    wifeSuper: number;
+    setWifeSuper: (value: number) => void;
+    targetAge: number;
+    setTargetAge: (value: number) => void;
+    targetBalance: number;
+    setTargetBalance: (value: number) => void;
+    netReturn: number;
+    setNetReturn: (value: number) => void;
     calcMode: CalcMode;
     setCalcMode: (mode: CalcMode) => void;
     results: SuperResultData | null;
@@ -75,22 +75,22 @@ export interface SuperCalculatorState {
     setMakeExtraContribution: (value: boolean) => void;
 
     // Contributions for self
-    myContributionPre50: string;
-    setMyContributionPre50: (value: string) => void;
-    myContributionPost50: string;
-    setMyContributionPost50: (value: string) => void;
-    myExtraYearlyContribution: string;
-    setMyExtraYearlyContribution: (value: string) => void;
-    myExtraContributionYears: string;
-    setMyExtraContributionYears: (value: string) => void;
+    myContributionPre50: number;
+    setMyContributionPre50: (value: number) => void;
+    myContributionPost50: number;
+    setMyContributionPost50: (value: number) => void;
+    myExtraYearlyContribution: number;
+    setMyExtraYearlyContribution: (value: number) => void;
+    myExtraContributionYears: number;
+    setMyExtraContributionYears: (value: number) => void;
 
     // Contributions for spouse
-    wifeContributionPre50: string;
-    setWifeContributionPre50: (value: string) => void;
-    wifeContributionPost50: string;
-    setWifeContributionPost50: (value: string) => void;
-    wifeExtraYearlyContribution: string;
-    setWifeExtraYearlyContribution: (value: string) => void;
-    wifeExtraContributionYears: string;
-    setWifeExtraContributionYears: (value: string) => void;
+    wifeContributionPre50: number;
+    setWifeContributionPre50: (value: number) => void;
+    wifeContributionPost50: number;
+    setWifeContributionPost50: (value: number) => void;
+    wifeExtraYearlyContribution: number;
+    setWifeExtraYearlyContribution: (value: number) => void;
+    wifeExtraContributionYears: number;
+    setWifeExtraContributionYears: (value: number) => void;
 }

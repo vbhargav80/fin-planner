@@ -60,15 +60,15 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Goals & Assumptions</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                         <div className="sm:col-span-2">
-                            <RangeSlider label="Target Retirement Age" value={Number(targetAge)} min={58} max={65} step={1} onChange={(n) => setTargetAge(String(n))} />
+                            <RangeSlider label="Target Retirement Age" value={targetAge} min={58} max={65} step={1} onChange={setTargetAge} />
                         </div>
                         {calcMode === 'contribution' && (
                             <div className="sm:col-span-2">
-                                <RangeSlider label="Target Combined Balance" value={Number(targetBalance)} min={1400000} max={1700000} step={50000} onChange={(n) => setTargetBalance(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                <RangeSlider label="Target Combined Balance" value={targetBalance} min={1400000} max={1700000} step={50000} onChange={setTargetBalance} formatValue={(v) => formatCurrency(v)} />
                             </div>
                         )}
                         <div className="sm:col-span-2">
-                            <RangeSlider label="Est. Annual Net Return (after fees)" value={Number(netReturn)} min={5} max={8} step={0.1} onChange={(n) => setNetReturn(String(Number(n.toFixed(1))))} formatValue={(v) => `${v}%`} />
+                            <RangeSlider label="Est. Annual Net Return (after fees)" value={netReturn} min={5} max={8} step={0.1} onChange={setNetReturn} formatValue={(v) => `${v.toFixed(1)}%`} />
                         </div>
                         {isBalanceMode && (
                             <>

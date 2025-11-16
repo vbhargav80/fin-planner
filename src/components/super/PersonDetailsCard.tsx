@@ -52,26 +52,26 @@ export const PersonDetailsCard: React.FC<PersonDetailsCardProps> = (props) => {
             {activeTab === 'me' && (
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 border-t border-gray-200">
                     <div className="sm:col-span-1">
-                        <RangeSlider label="Current Age" value={Number(myAge)} min={30} max={55} step={1} onChange={(n) => setMyAge(String(n))} />
+                        <RangeSlider label="Current Age" value={myAge} min={30} max={55} step={1} onChange={setMyAge} />
                     </div>
                     <div className="sm:col-span-1">
-                        <RangeSlider label="Current Super" value={Number(mySuper)} min={0} max={1000000} step={10000} onChange={(n) => setMySuper(String(n))} formatValue={(v) => formatCurrency(v)} />
+                        <RangeSlider label="Current Super" value={mySuper} min={0} max={1000000} step={10000} onChange={setMySuper} formatValue={(v) => formatCurrency(v)} />
                     </div>
                     {isBalanceMode && (
                         <>
                             <div className="sm:col-span-1">
-                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Pre 50)`} value={Number(myContributionPre50)} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={(n) => setMyContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Pre 50)`} value={myContributionPre50} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={setMyContributionPre50} formatValue={(v) => formatCurrency(v)} />
                             </div>
                             <div className="sm:col-span-1">
-                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Post 50)`} value={Number(myContributionPost50)} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={(n) => setMyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Post 50)`} value={myContributionPost50} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={setMyContributionPost50} formatValue={(v) => formatCurrency(v)} />
                             </div>
                             {makeExtraContribution && (
                                 <>
                                     <div className="sm:col-span-1">
-                                        <RangeSlider label="Extra Yearly Cont." value={Number(myExtraYearlyContribution)} min={0} max={27500} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label="Extra Yearly Cont." value={myExtraYearlyContribution} min={0} max={27500} step={500} onChange={setMyExtraYearlyContribution} formatValue={(v) => formatCurrency(v)} />
                                     </div>
                                     <div className="sm:col-span-1">
-                                        <RangeSlider label="For How Many Years" value={Number(myExtraContributionYears)} min={0} max={15} step={1} onChange={(n) => setMyExtraContributionYears(String(n))} formatValue={(v) => `${v} yrs`} />
+                                        <RangeSlider label="For How Many Years" value={myExtraContributionYears} min={0} max={15} step={1} onChange={setMyExtraContributionYears} formatValue={(v) => `${v} yrs`} />
                                     </div>
                                 </>
                             )}
@@ -83,26 +83,26 @@ export const PersonDetailsCard: React.FC<PersonDetailsCardProps> = (props) => {
             {activeTab === 'spouse' && (
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 border-t border-gray-200">
                     <div className="sm:col-span-1">
-                        <RangeSlider label="Current Age" value={Number(wifeAge)} min={30} max={55} step={1} onChange={(n) => setWifeAge(String(n))} />
+                        <RangeSlider label="Current Age" value={wifeAge} min={30} max={55} step={1} onChange={setWifeAge} />
                     </div>
                     <div className="sm:col-span-1">
-                        <RangeSlider label="Current Super" value={Number(wifeSuper)} min={0} max={1000000} step={10000} onChange={(n) => setWifeSuper(String(n))} formatValue={(v) => formatCurrency(v)} />
+                        <RangeSlider label="Current Super" value={wifeSuper} min={0} max={1000000} step={10000} onChange={setWifeSuper} formatValue={(v) => formatCurrency(v)} />
                     </div>
                     {isBalanceMode && (
                         <>
                             <div className="sm:col-span-1">
-                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Pre 50)`} value={Number(wifeContributionPre50)} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={(n) => setWifeContributionPre50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Pre 50)`} value={wifeContributionPre50} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={setWifeContributionPre50} formatValue={(v) => formatCurrency(v)} />
                             </div>
                             <div className="sm:col-span-1">
-                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Post 50)`} value={Number(wifeContributionPost50)} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={(n) => setWifeContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                <RangeSlider label={`${isMonthly ? 'Monthly' : 'Yearly'} Cont. (Post 50)`} value={wifeContributionPost50} min={0} max={isMonthly ? 2000 : 24000} step={isMonthly ? 50 : 500} onChange={setWifeContributionPost50} formatValue={(v) => formatCurrency(v)} />
                             </div>
                             {makeExtraContribution && (
                                 <>
                                     <div className="sm:col-span-1">
-                                        <RangeSlider label="Extra Yearly Cont." value={Number(wifeExtraYearlyContribution)} min={0} max={27500} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label="Extra Yearly Cont." value={wifeExtraYearlyContribution} min={0} max={27500} step={500} onChange={setWifeExtraYearlyContribution} formatValue={(v) => formatCurrency(v)} />
                                     </div>
                                     <div className="sm:col-span-1">
-                                        <RangeSlider label="For How Many Years" value={Number(wifeExtraContributionYears)} min={0} max={15} step={1} onChange={(n) => setWifeExtraContributionYears(String(n))} formatValue={(v) => `${v} yrs`} />
+                                        <RangeSlider label="For How Many Years" value={wifeExtraContributionYears} min={0} max={15} step={1} onChange={setWifeExtraContributionYears} formatValue={(v) => `${v} yrs`} />
                                     </div>
                                 </>
                             )}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { InputGroup } from '../common/InputGroup';
+import PersonTabsPanel from '../PersonTabsPanel';
 import type { SuperCalculatorState } from '../../types/super.types';
 
 interface SuperFormProps {
@@ -21,6 +22,8 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         error
     } = calculator;
 
+    const [activePersonTab, setActivePersonTab] = React.useState<'self' | 'spouse'>('self');
+
     return (
         <div className="md:w-[35%] p-6 sm:p-8 overflow-y-auto">
             <h2 className="text-3xl font-bold text-gray-900">
@@ -32,6 +35,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
             </p>
 
             <div className="mt-8 space-y-5">
+                {/* Calculation type toggle */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">
                         Calculation Type
@@ -62,35 +66,76 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                     </div>
                 </div>
 
+                {/* Person tabs panel (using reusable component) */}
+                <PersonTabsPanel title="Person">
+                    <div className="flex w-full gap-1 rounded-full bg-indigo-50 p-1 shadow-inner">
+                        <button
+                            type="button"
+                            onClick={() => setActivePersonTab('self')}
+                            className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                                activePersonTab === 'self'
+                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                    : 'bg-transparent text-indigo-700 border-transparent hover:bg-indigo-100'
+                            }`}
+                        >
+                            You
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setActivePersonTab('spouse')}
+                            className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                                activePersonTab === 'spouse'
+                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                    : 'bg-transparent text-indigo-700 border-transparent hover:bg-indigo-100'
+                            }`}
+                        >
+                            Spouse
+                        </button>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                        {activePersonTab === 'self' && (
+                            <>
+                                <InputGroup
+                                    label="Your Current Age"
+                                    id="myAge"
+                                    value={myAge}
+                                    onChange={(e) => setMyAge(e.target.value)}
+                                />
+                                <InputGroup
+                                    label="Your Current Super"
+                                    id="mySuper"
+                                    value={mySuper}
+                                    onChange={(e) => setMySuper(e.target.value)}
+                                    symbol="$"
+                                    symbolPosition="left"
+                                />
+                            </>
+                        )}
+
+                        {activePersonTab === 'spouse' && (
+                            <>
+                                <InputGroup
+                                    label="Spouse's Current Age"
+                                    id="wifeAge"
+                                    value={wifeAge}
+                                    onChange={(e) => setWifeAge(e.target.value)}
+                                />
+                                <InputGroup
+                                    label="Spouse's Current Super"
+                                    id="wifeSuper"
+                                    value={wifeSuper}
+                                    onChange={(e) => setWifeSuper(e.target.value)}
+                                    symbol="$"
+                                    symbolPosition="left"
+                                />
+                            </>
+                        )}
+                    </div>
+                </PersonTabsPanel>
+
+                {/* Shared goal & contribution inputs */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                    <InputGroup
-                        label="Your Current Age"
-                        id="myAge"
-                        value={myAge}
-                        onChange={(e) => setMyAge(e.target.value)}
-                    />
-                    <InputGroup
-                        label="Spouse's Current Age"
-                        id="wifeAge"
-                        value={wifeAge}
-                        onChange={(e) => setWifeAge(e.target.value)}
-                    />
-                    <InputGroup
-                        label="Your Current Super"
-                        id="mySuper"
-                        value={mySuper}
-                        onChange={(e) => setMySuper(e.target.value)}
-                        symbol="$"
-                        symbolPosition="left"
-                    />
-                    <InputGroup
-                        label="Spouse's Current Super"
-                        id="wifeSuper"
-                        value={wifeSuper}
-                        onChange={(e) => setWifeSuper(e.target.value)}
-                        symbol="$"
-                        symbolPosition="left"
-                    />
                     <InputGroup
                         label="Your Target Retirement Age"
                         id="targetAge"
@@ -98,16 +143,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                         onChange={(e) => setTargetAge(e.target.value)}
                     />
 
-                    {calcMode === 'contribution' && (
-                        <InputGroup
-                            label="Target Combined Balance"
-                            id="targetBalance"
-                            value={targetBalance}
-                            onChange={(e) => setTargetBalance(e.target.value)}
-                            symbol="$"
-                            symbolPosition="left"
-                        />
-                    )}
+
                     {calcMode === 'balance' && (
                         <>
                             <InputGroup
@@ -142,6 +178,20 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                         />
                     </div>
                 </div>
+
+                {/* Move Target Combined Balance to the bottom of the form for better flow */}
+                {calcMode === 'contribution' && (
+                    <div>
+                        <InputGroup
+                            label="Target Combined Balance"
+                            id="targetBalance"
+                            value={targetBalance}
+                            onChange={(e) => setTargetBalance(e.target.value)}
+                            symbol="$"
+                            symbolPosition="left"
+                        />
+                    </div>
+                )}
 
                 {error && (
                     <div className="mt-4 text-center text-red-600 font-medium">

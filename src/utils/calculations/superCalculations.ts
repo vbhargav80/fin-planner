@@ -122,10 +122,10 @@ export function calculateSuper(
         const shortfall = targetBalance! - fvOfCurrentSuper;
         
         // This is the required NET amount that needs to be invested
-        const requiredNetTotalPMT = (shortfall > 0 && annuityFactor > 0) ? shortfall / (annuityFactor * 2) : 0;
+        const requiredNetPerPersonPMT = (shortfall > 0 && annuityFactor > 0) ? shortfall / (annuityFactor * 2) : 0;
         
         // This is the GROSS amount the user needs to contribute (before tax)
-        const requiredGrossTotalPMT = requiredNetTotalPMT / (1 - CONTRIBUTION_TAX_RATE);
+        const requiredGrossTotalPMT = requiredNetPerPersonPMT / (1 - CONTRIBUTION_TAX_RATE);
 
         finalResults = {
             pmt: requiredGrossTotalPMT * 2, // Display the total combined gross payment

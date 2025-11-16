@@ -4,6 +4,7 @@ import { formatCurrency } from '../../utils/formatters';
 import type { State, Action } from '../../types/super.types';
 import PersonTabsPanel from '../PersonTabsPanel';
 import * as SuperConstants from '../../constants/super';
+import { Tabs } from '../common/Tabs';
 
 interface PersonDetailsCardProps {
     state: State;
@@ -30,25 +31,14 @@ export const PersonDetailsCard: React.FC<PersonDetailsCardProps> = (props) => {
     const { myAge, mySuper, myExtraYearlyContribution, myExtraContributionYears, wifeAge, wifeSuper, wifeExtraYearlyContribution, wifeExtraContributionYears, makeExtraContribution } = state;
 
     const [activeTab, setActiveTab] = useState<'me' | 'spouse'>('me');
+    const TABS = [
+        { id: 'me', label: 'You' },
+        { id: 'spouse', label: 'Spouse' },
+    ];
 
     return (
         <PersonTabsPanel className="!p-0">
-            <ul className="flex text-sm font-medium text-center text-gray-500 divide-x divide-gray-200 rounded-t-lg">
-                <li className="w-full">
-                    <button
-                        type="button"
-                        onClick={() => setActiveTab('me')}
-                        className={`inline-block w-full p-4 rounded-tl-lg transition-colors duration-150 focus:outline-none ${activeTab === 'me' ? 'bg-indigo-600 text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'}`}
-                    >You</button>
-                </li>
-                <li className="w-full">
-                    <button
-                        type="button"
-                        onClick={() => setActiveTab('spouse')}
-                        className={`inline-block w-full p-4 rounded-tr-lg transition-colors duration-150 focus:outline-none ${activeTab === 'spouse' ? 'bg-indigo-600 text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'}`}
-                    >Spouse</button>
-                </li>
-            </ul>
+            <Tabs tabs={TABS} activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} variant="full-width" />
 
             {activeTab === 'me' && (
                 <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 border-t border-gray-200">

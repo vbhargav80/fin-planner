@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { SuperCalculatorState } from '../../types/super.types';
 import { SuperSummary } from './SuperSummary';
 import { SuperBreakdown } from './SuperBreakdown';
+import { Tabs } from '../common/Tabs';
 
 interface SuperResultsProps {
     calculator: SuperCalculatorState;
@@ -10,6 +11,10 @@ interface SuperResultsProps {
 export const SuperResults: React.FC<SuperResultsProps> = ({ calculator }) => {
     const { results, breakdownData } = calculator;
     const [activeTab, setActiveTab] = useState<'summary' | 'breakdown'>('summary');
+    const TABS = [
+        { id: 'summary', label: 'Summary' },
+        { id: 'breakdown', label: 'Month-by-Month Breakdown' },
+    ];
 
     return (
         <div className="md:w-[65%] bg-indigo-700 text-white p-6 sm:p-10 flex flex-col overflow-y-auto">
@@ -29,28 +34,7 @@ export const SuperResults: React.FC<SuperResultsProps> = ({ calculator }) => {
 
             {results && (
                 <>
-                    <div className="flex border-b border-indigo-600 mb-4">
-                        <button
-                            onClick={() => setActiveTab('summary')}
-                            className={`py-2 px-4 font-medium rounded-t-lg ${
-                                activeTab === 'summary'
-                                    ? 'bg-indigo-800 text-white'
-                                    : 'text-indigo-300 hover:text-white'
-                            }`}
-                        >
-                            Summary
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('breakdown')}
-                            className={`py-2 px-4 font-medium rounded-t-lg ${
-                                activeTab === 'breakdown'
-                                    ? 'bg-indigo-800 text-white'
-                                    : 'text-indigo-300 hover:text-white'
-                            }`}
-                        >
-                            Month-by-Month Breakdown
-                        </button>
-                    </div>
+                    <Tabs tabs={TABS} activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} variant="dark-underline" className="mb-4" />
 
                     <div className="flex-grow flex flex-col justify-center">
                         {activeTab === 'summary' && <SuperSummary results={results} />}

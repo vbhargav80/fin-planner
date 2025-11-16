@@ -9,7 +9,7 @@ interface TabsProps {
     tabs: Tab[];
     activeTab: string;
     onTabClick: (id: string) => void;
-    variant?: 'button' | 'underline';
+    variant?: 'button' | 'underline' | 'dark-underline' | 'full-width';
     className?: string;
 }
 
@@ -32,6 +32,46 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant
                         </button>
                     ))}
                 </nav>
+            </div>
+        );
+    }
+
+    if (variant === 'full-width') {
+        return (
+            <ul className={`flex text-sm font-medium text-center text-gray-500 divide-x divide-gray-200 rounded-t-lg ${className}`}>
+                {tabs.map((tab, index) => (
+                    <li className="w-full" key={tab.id}>
+                        <button
+                            type="button"
+                            onClick={() => onTabClick(tab.id)}
+                            className={`inline-block w-full p-4 transition-colors duration-150 focus:outline-none ${
+                                activeTab === tab.id ? 'bg-indigo-600 text-white' : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                            } ${index === 0 ? 'rounded-tl-lg' : ''} ${index === tabs.length - 1 ? 'rounded-tr-lg' : ''}`}
+                        >
+                            {tab.label}
+                        </button>
+                    </li>
+                ))}
+            </ul>
+        );
+    }
+
+    if (variant === 'dark-underline') {
+        return (
+            <div className={`flex border-b border-indigo-600 ${className}`}>
+                {tabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => onTabClick(tab.id)}
+                        className={`py-2 px-4 font-medium rounded-t-lg transition-colors ${
+                            activeTab === tab.id
+                                ? 'bg-indigo-800 text-white'
+                                : 'text-indigo-300 hover:text-white'
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
             </div>
         );
     }

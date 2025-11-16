@@ -90,33 +90,31 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
 
                 {/* Person Card with Full-Width Tabs */}
                 <div className="bg-white border border-gray-200 rounded-lg shadow">
-                    <div className="border-b border-gray-200">
-                        <div className="flex -mb-px">
-                            <button
-                                type="button"
-                                onClick={() => setActivePersonTab('self')}
-                                className={`w-1/2 p-4 text-center font-medium border-b-2 ${
-                                    activePersonTab === 'self'
-                                        ? 'text-indigo-600 border-indigo-600'
-                                        : 'text-gray-500 border-transparent hover:text-gray-600 hover:border-gray-300'
-                                }`}
-                            >
-                                You
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setActivePersonTab('spouse')}
-                                className={`w-1/2 p-4 text-center font-medium border-b-2 ${
-                                    activePersonTab === 'spouse'
-                                        ? 'text-indigo-600 border-indigo-600'
-                                        : 'text-gray-500 border-transparent hover:text-gray-600 hover:border-gray-300'
-                                }`}
-                            >
-                                Spouse
-                            </button>
-                        </div>
+                    <div className="flex">
+                        <button
+                            type="button"
+                            onClick={() => setActivePersonTab('self')}
+                            className={`w-1/2 p-4 text-center font-medium rounded-tl-lg transition-colors duration-150 ${
+                                activePersonTab === 'self'
+                                    ? 'bg-indigo-600 text-white'
+                                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                            }`}
+                        >
+                            You
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setActivePersonTab('spouse')}
+                            className={`w-1/2 p-4 text-center font-medium rounded-tr-lg transition-colors duration-150 ${
+                                activePersonTab === 'spouse'
+                                    ? 'bg-indigo-600 text-white'
+                                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                            }`}
+                        >
+                            Spouse
+                        </button>
                     </div>
-                    <div className="p-4">
+                    <div className="p-4 border-t border-gray-200">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                             {activePersonTab === 'self' && (
                                 <>

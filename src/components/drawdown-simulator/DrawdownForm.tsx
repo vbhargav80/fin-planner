@@ -4,6 +4,7 @@ import { InputGroup } from '../common/InputGroup';
 import { RangeSlider } from '../common/RangeSlider';
 import { MonthYearPicker } from '../common/MonthYearPicker';
 import { Tabs } from '../common/Tabs';
+import { SegmentedControl } from '../common/SegmentedControl';
 import * as DrawdownConstants from '../../constants/drawdown';
 import type { SaleDrawdownState } from '../../types/drawdown.types';
 
@@ -18,9 +19,6 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
 
     const fmtCurrency = (n: number) => `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
     const TAX_RATES = [16, 30, 37, 45] as const;
-
-    const p1Idx = Math.max(0, TAX_RATES.indexOf(model.person1TaxRate as (typeof TAX_RATES)[number]));
-    const p2Idx = Math.max(0, TAX_RATES.indexOf(model.person2TaxRate as (typeof TAX_RATES)[number]));
 
     return (
         <div className="w-full md:w-[35%] p-6 sm:p-8">
@@ -78,23 +76,19 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
 
                             {/* Tax rates side-by-side */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <RangeSlider
-                                    label="Person 1 Tax Rate (%)"
-                                    value={p1Idx}
-                                    min={0}
-                                    max={TAX_RATES.length - 1}
-                                    step={1}
-                                    onChange={(idx) => model.setPerson1TaxRate(TAX_RATES[Math.round(idx)] as number)}
-                                    formatValue={(idx) => `${TAX_RATES[Math.round(idx)]}%`}
+                                <SegmentedControl
+                                    label="Person 1 Tax Rate"
+                                    options={TAX_RATES}
+                                    value={model.person1TaxRate as (typeof TAX_RATES)[number]}
+                                    onChange={(rate) => model.setPerson1TaxRate(rate)}
+                                    formatLabel={(r) => `${r}%`}
                                 />
-                                <RangeSlider
-                                    label="Person 2 Tax Rate (%)"
-                                    value={p2Idx}
-                                    min={0}
-                                    max={TAX_RATES.length - 1}
-                                    step={1}
-                                    onChange={(idx) => model.setPerson2TaxRate(TAX_RATES[Math.round(idx)] as number)}
-                                    formatValue={(idx) => `${TAX_RATES[Math.round(idx)]}%`}
+                                <SegmentedControl
+                                    label="Person 2 Tax Rate"
+                                    options={TAX_RATES}
+                                    value={model.person2TaxRate as (typeof TAX_RATES)[number]}
+                                    onChange={(rate) => model.setPerson2TaxRate(rate)}
+                                    formatLabel={(r) => `${r}%`}
                                 />
                             </div>
 

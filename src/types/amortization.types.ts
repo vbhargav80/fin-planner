@@ -62,4 +62,8 @@ export interface AmortizationCalculatorState {
     actualMonthlyRepayment: number;
     scrollTo2031: number;
     triggerScrollTo2031: () => void;
+    clearScrollTo2031: () => void;
+    scrollToFirstDepletedOffset: number;
+    triggerScrollToFirstDepletedOffset: () => void;
+    clearScrollToFirstDepletedOffset: () => void;
 }

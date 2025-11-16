@@ -20,9 +20,22 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [yearsWorking, setYearsWorking] = useState<number>(3);
     const [netIncome, setNetIncome] = useState<number>(10000);
     const [scrollTo2031, setScrollTo2031] = useState(0);
+    const [scrollToFirstDepletedOffset, setScrollToFirstDepletedOffset] = useState(0);
 
     const triggerScrollTo2031 = () => {
         setScrollTo2031(prev => prev + 1);
+    };
+
+    const clearScrollTo2031 = () => {
+        setScrollTo2031(0);
+    };
+
+    const triggerScrollToFirstDepletedOffset = () => {
+        setScrollToFirstDepletedOffset(prev => prev + 1);
+    };
+
+    const clearScrollToFirstDepletedOffset = () => {
+        setScrollToFirstDepletedOffset(0);
     };
 
     const actualMonthlyRepayment = useMemo(() => {
@@ -118,5 +131,9 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         actualMonthlyRepayment,
         scrollTo2031,
         triggerScrollTo2031,
+        clearScrollTo2031,
+        scrollToFirstDepletedOffset,
+        triggerScrollToFirstDepletedOffset,
+        clearScrollToFirstDepletedOffset,
     };
 }

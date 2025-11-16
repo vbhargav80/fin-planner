@@ -7,12 +7,32 @@ interface AmortizationTableProps {
 }
 
 export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator }) => {
-    const { amortizationData, considerOffsetIncome, scrollTo2031, triggerScrollTo2031 } = calculator;
+    const {
+        amortizationData,
+        considerOffsetIncome,
+        scrollTo2031,
+        triggerScrollTo2031,
+        clearScrollTo2031,
+        scrollToFirstDepletedOffset,
+        triggerScrollToFirstDepletedOffset,
+        clearScrollToFirstDepletedOffset,
+    } = calculator;
     const theadRef = useRef<HTMLTableSectionElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [headerHeight, setHeaderHeight] = useState(0);
     const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
     const [isJan2031Pinned, setIsJan2031Pinned] = useState(false);
+
+    const amortizationDataRef = useRef(amortizationData);
+    const headerHeightRef = useRef(headerHeight);
+
+    useEffect(() => {
+        amortizationDataRef.current = amortizationData;
+    }, [amortizationData]);
+
+    useEffect(() => {
+        headerHeightRef.current = headerHeight;
+    }, [headerHeight]);
 
     useLayoutEffect(() => {
         const thead = theadRef.current;
@@ -42,11 +62,13 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
 
     // Scroll to Jan 2031 row when explicitly requested via button
     useEffect(() => {
-        if (!scrollTo2031) return; // only react when counter is non-zero and changes
+        if (!scrollTo2031) return; // only react when counter changes from button click
 
-        const index = amortizationData.findIndex((row) => row.date === 'Jan 2031');
+        const data = amortizationDataRef.current;
+        const index = data.findIndex((row) => row.date === 'Jan 2031');
         if (index === -1) {
             console.warn('[AmortizationTable] Jan 2031 row not found');
+            clearScrollTo2031();
             return;
         }
 
@@ -54,6 +76,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
         const rowEl = rowRefs.current[index];
         if (!container || !rowEl) {
             console.warn('[AmortizationTable] Missing container or row element for Jan 2031');
+            clearScrollTo2031();
             return;
         }
 
@@ -62,16 +85,18 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
         let raf2 = 0;
 
         const doScroll = () => {
+            const currentHeaderHeight = headerHeightRef.current;
             const containerRect = container.getBoundingClientRect();
             const rowRect = rowEl.getBoundingClientRect();
             const rowTopInContainer = rowRect.top - containerRect.top;
 
             const targetTop = Math.max(
                 0,
-                container.scrollTop + rowTopInContainer - headerHeight - extraPadding,
+                container.scrollTop + rowTopInContainer - currentHeaderHeight - extraPadding,
             );
 
             container.scrollTo({ top: targetTop, behavior: 'smooth' });
+            clearScrollTo2031();
         };
 
         // Double RAF to ensure layout & sticky header are fully applied
@@ -83,7 +108,56 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
             if (raf1) cancelAnimationFrame(raf1);
             if (raf2) cancelAnimationFrame(raf2);
         };
-    }, [scrollTo2031, amortizationData, headerHeight]);
+    }, [scrollTo2031, clearScrollTo2031]);
+
+    // Scroll to first depleted-offset row when requested
+    useEffect(() => {
+        if (!scrollToFirstDepletedOffset) return;
+
+        const data = amortizationDataRef.current;
+        const index = data.findIndex((row) => row.offsetBalance <= 0);
+        if (index === -1) {
+            console.warn('[AmortizationTable] No depleted-offset row found');
+            clearScrollToFirstDepletedOffset();
+            return;
+        }
+
+        const container = scrollContainerRef.current;
+        const rowEl = rowRefs.current[index];
+        if (!container || !rowEl) {
+            console.warn('[AmortizationTable] Missing container or row element for depleted-offset row');
+            clearScrollToFirstDepletedOffset();
+            return;
+        }
+
+        const extraPadding = 8;
+        let raf1 = 0;
+        let raf2 = 0;
+
+        const doScroll = () => {
+            const currentHeaderHeight = headerHeightRef.current;
+            const containerRect = container.getBoundingClientRect();
+            const rowRect = rowEl.getBoundingClientRect();
+            const rowTopInContainer = rowRect.top - containerRect.top;
+
+            const targetTop = Math.max(
+                0,
+                container.scrollTop + rowTopInContainer - currentHeaderHeight - extraPadding,
+            );
+
+            container.scrollTo({ top: targetTop, behavior: 'smooth' });
+            clearScrollToFirstDepletedOffset();
+        };
+
+        raf1 = requestAnimationFrame(() => {
+            raf2 = requestAnimationFrame(doScroll);
+        });
+
+        return () => {
+            if (raf1) cancelAnimationFrame(raf1);
+            if (raf2) cancelAnimationFrame(raf2);
+        };
+    }, [scrollToFirstDepletedOffset, clearScrollToFirstDepletedOffset]);
 
     // Scroll-driven sticky behavior for Jan 2031 row
     useEffect(() => {
@@ -243,6 +317,15 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
+                </svg>
+            </button>
+            <button
+                onClick={triggerScrollToFirstDepletedOffset}
+                className="absolute top-10 right-24 z-20 bg-red-600/80 hover:bg-red-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white"
+                aria-label="Scroll to first depleted offset row"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14m0 0l-7-7m7 7l7-7" />
                 </svg>
             </button>
 

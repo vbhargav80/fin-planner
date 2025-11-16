@@ -258,10 +258,10 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                                 ? 'bg-indigo-900'
                                 : 'hover:bg-indigo-700/50';
 
-                        const stickyTdStyle = stickyActive
-                            ? { position: 'sticky' as const, top: `${headerHeight}px`, zIndex: 5, backgroundColor: '#1e293b' }
-                            : undefined;
-                        const stickyTdClass = stickyActive ? ' shadow-[0_1px_0_0_rgba(0,0,0,0.2)]' : '';
+                        const stickyTdStyle = stickyActive ? { position: 'sticky' as const, top: `${headerHeight}px`, zIndex: 5 } : undefined;
+                        const stickyTdClass = stickyActive
+                            ? ' bg-indigo-900 shadow-[0_1px_0_0_rgba(0,0,0,0.2)]'
+                            : '';
 
                         return (
                             <tr

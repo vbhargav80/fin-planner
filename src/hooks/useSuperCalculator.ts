@@ -1,23 +1,56 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import type { SuperResultData, SuperBreakdownRow, CalcMode, SuperCalculatorState } from '../types/super.types';
 import { calculateSuper } from '../utils/calculations/superCalculations';
 
 export function useSuperCalculator(): SuperCalculatorState {
-    const [myAge, setMyAge] = useState('45');
-    const [wifeAge, setWifeAge] = useState('42');
-    const [mySuper, setMySuper] = useState('400000');
-    const [wifeSuper, setWifeSuper] = useState('110000');
-    const [targetAge, setTargetAge] = useState('60');
-    const [targetBalance, setTargetBalance] = useState('1500000');
-    const [monthlyContribution, setMonthlyContribution] = useState('500');
-    const [monthlyContributionPost50, setMonthlyContributionPost50] = useState('0');
-    const [netReturn, setNetReturn] = useState('7');
-    const [calcMode, setCalcMode] = useState<CalcMode>('contribution');
-    const [results, setResults] = useState<SuperResultData | null>(null);
-    const [error, setError] = useState<string>('');
-    const [breakdownData, setBreakdownData] = useState<SuperBreakdownRow[]>([]);
+    // Default values (single source of truth for initial calculation)
+    const defaultState = {
+        myAge: '45',
+        wifeAge: '42',
+        mySuper: '400000',
+        wifeSuper: '110000',
+        targetAge: '60',
+        targetBalance: '1500000',
+        monthlyContribution: '500',
+        monthlyContributionPost50: '0',
+        netReturn: '7' ,
+        calcMode: 'contribution' as CalcMode,
+    };
 
-    const calculate = useCallback(() => {
+    // Form state
+    const [myAge, setMyAge] = useState(defaultState.myAge);
+    const [wifeAge, setWifeAge] = useState(defaultState.wifeAge);
+    const [mySuper, setMySuper] = useState(defaultState.mySuper);
+    const [wifeSuper, setWifeSuper] = useState(defaultState.wifeSuper);
+    const [targetAge, setTargetAge] = useState(defaultState.targetAge);
+    const [targetBalance, setTargetBalance] = useState(defaultState.targetBalance);
+    const [monthlyContribution, setMonthlyContribution] = useState(defaultState.monthlyContribution);
+    const [monthlyContributionPost50, setMonthlyContributionPost50] = useState(defaultState.monthlyContributionPost50);
+    const [netReturn, setNetReturn] = useState(defaultState.netReturn);
+    const [calcMode, setCalcMode] = useState<CalcMode>(defaultState.calcMode);
+
+    // Compute initial results synchronously so the UI shows data immediately on first render
+    const initialComputation = (() => {
+        const inputs = {
+            myAge: parseFloat(defaultState.myAge),
+            wifeAge: parseFloat(defaultState.wifeAge),
+            mySuper: parseFloat(defaultState.mySuper),
+            wifeSuper: parseFloat(defaultState.wifeSuper),
+            targetAge: parseFloat(defaultState.targetAge),
+            targetBalance: parseFloat(defaultState.targetBalance),
+            monthlyContribution: parseFloat(defaultState.monthlyContribution),
+            monthlyContributionPost50: parseFloat(defaultState.monthlyContributionPost50),
+            netReturn: parseFloat(defaultState.netReturn),
+        };
+        return calculateSuper(inputs, defaultState.calcMode);
+    })();
+
+    const [results, setResults] = useState<SuperResultData | null>(initialComputation.results);
+    const [error, setError] = useState<string>(initialComputation.error || '');
+    const [breakdownData, setBreakdownData] = useState<SuperBreakdownRow[]>(initialComputation.breakdown);
+
+    useEffect(() => {
+        // Recalculate whenever any dependency changes (including calcMode)
         const inputs = {
             myAge: parseFloat(myAge),
             wifeAge: parseFloat(wifeAge),
@@ -30,19 +63,13 @@ export function useSuperCalculator(): SuperCalculatorState {
             netReturn: parseFloat(netReturn),
         };
 
-        // Use the 'calcMode' from state directly in the callback
         const result = calculateSuper(inputs, calcMode);
 
         setResults(result.results);
         setBreakdownData(result.breakdown);
         setError(result.error || '');
-    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance,
-        monthlyContribution, monthlyContributionPost50, netReturn, calcMode]); // Add calcMode to the dependency array
 
-    useEffect(() => {
-        // This effect now correctly re-runs whenever the 'calculate' function is recreated
-        calculate();
-    }, [calculate]);
+    }, [myAge, wifeAge, mySuper, wifeSuper, targetAge, targetBalance, monthlyContribution, monthlyContributionPost50, netReturn, calcMode]);
 
     return {
         myAge, setMyAge,
@@ -55,7 +82,7 @@ export function useSuperCalculator(): SuperCalculatorState {
         monthlyContributionPost50, setMonthlyContributionPost50,
         netReturn, setNetReturn,
         calcMode,
-        setCalcMode, // Return the standard state setter
+        setCalcMode,
         results,
         error,
         breakdownData,

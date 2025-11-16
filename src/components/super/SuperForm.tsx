@@ -35,12 +35,12 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 {/* Calculation type toggle */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Calculation Type</label>
-                    <div className="mt-1 flex rounded-lg p-1 bg-gray-200">
+                    <div className="mt-1 flex rounded-lg p-1 bg-indigo-800">
                         <button
                             type="button"
                             onClick={() => setCalcMode('contribution')}
                             className={`w-1/2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                                calcMode === 'contribution' ? 'bg-white text-gray-900 shadow' : 'text-gray-600 hover:bg-gray-300'
+                                calcMode === 'contribution' ? 'bg-white text-gray-900 shadow' : 'text-white hover:bg-indigo-600'
                             }`}
                         >
                             Calculate Contribution
@@ -49,7 +49,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             type="button"
                             onClick={() => setCalcMode('balance')}
                             className={`w-1/2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                                calcMode === 'balance' ? 'bg-white text-gray-900 shadow' : 'text-gray-600 hover:bg-gray-300'
+                                calcMode === 'balance' ? 'bg-white text-gray-900 shadow' : 'text-white hover:bg-indigo-600'
                             }`}
                         >
                             Calculate Balance

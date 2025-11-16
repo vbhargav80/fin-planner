@@ -77,6 +77,8 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     };
 
     const calculateOptimalWorkingYears = () => {
+        setContinueWorking(true);
+
         const inputs = {
             interestRate,
             principal,
@@ -89,20 +91,42 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
             isRefinanced,
             considerOffsetIncome,
             offsetIncomeRate,
-            continueWorking: true, // Calculation assumes working
+            continueWorking: true, // Force true for calculation
             yearsWorking,
             netIncome,
         };
 
+        let optimalYears = -1;
         for (let years = 0; years <= 10; years++) {
             const schedule = calculateAmortizationSchedule({ ...inputs, yearsWorking: years });
             const finalOffsetBalance = schedule[schedule.length - 1].offsetBalance;
             if (finalOffsetBalance >= 0) {
-                setYearsWorking(years);
-                return;
+                optimalYears = years;
+                break;
             }
         }
-        // If no solution found within 10 years, do nothing or set to max
+
+        const finalYears = optimalYears === -1 ? 10 : optimalYears;
+
+        let low = 0;
+        let high = 50000; // Assume income won't exceed this
+        let optimalIncome = netIncome;
+
+        for (let i = 0; i < 30; i++) { // 30 iterations for precision
+            const mid = (low + high) / 2;
+            const schedule = calculateAmortizationSchedule({ ...inputs, yearsWorking: finalYears, netIncome: mid });
+            const finalOffsetBalance = schedule[schedule.length - 1].offsetBalance;
+
+            if (finalOffsetBalance < 0) {
+                low = mid;
+            } else {
+                optimalIncome = mid;
+                high = mid;
+            }
+        }
+
+        setYearsWorking(finalYears);
+        setNetIncome(optimalIncome);
     };
 
     const actualMonthlyRepayment = useMemo(() => {

@@ -250,9 +250,9 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                 </button>
                 <button
                     onClick={calculateOptimalWorkingYears}
-                    className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors"
+                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
                 >
-                    Calculate Optimal Working Years
+                    Calculate Optimal Working Years &amp; Income
                 </button>
             </div>
         </div>

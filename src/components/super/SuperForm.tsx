@@ -90,12 +90,12 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
 
                 {/* Person tabs panel (using reusable component) */}
                 <PersonTabsPanel>
-                    <div className="flex w-full gap-1 rounded-full bg-indigo-50 p-1 shadow-inner">
+                    <div className="flex w-full rounded-lg bg-indigo-50 p-1 shadow-inner">
                         <button
                             type="button"
                             onClick={() => setActivePersonTab('self')}
-                            className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
-                                activePersonTab === 'self' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-transparent text-indigo-700 border-transparent hover:bg-indigo-100'
+                            className={`w-full rounded-md py-1.5 text-sm font-medium text-center transition-colors duration-150 ${
+                                activePersonTab === 'self' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-transparent text-indigo-700'
                             }`}
                         >
                             You
@@ -103,8 +103,8 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                         <button
                             type="button"
                             onClick={() => setActivePersonTab('spouse')}
-                            className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
-                                activePersonTab === 'spouse' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-transparent text-indigo-700 border-transparent hover:bg-indigo-100'
+                            className={`w-full rounded-md py-1.5 text-sm font-medium text-center transition-colors duration-150 ${
+                                activePersonTab === 'spouse' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-transparent text-indigo-700'
                             }`}
                         >
                             Spouse
@@ -123,7 +123,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                     </>
                                 )}
                                 <div className="sm:col-span-2">
-                                    <RangeSlider label="Extra Concessional Contribution" value={Number(myExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                    <RangeSlider label="Extra End-of-Year Contribution" value={Number(myExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
                                 </div>
                             </>
                         )}
@@ -139,7 +139,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                     </>
                                 )}
                                 <div className="sm:col-span-2">
-                                    <RangeSlider label="Extra Concessional Contribution" value={Number(wifeExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                    <RangeSlider label="Extra End-of-Year Contribution" value={Number(wifeExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
                                 </div>
                             </>
                         )}
@@ -156,16 +156,14 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                         <div className={calcMode === 'contribution' ? 'sm:col-span-2' : 'sm:col-span-2'}>
                             <RangeSlider label="Est. Annual Net Return (after fees)" value={Number(netReturn)} min={5} max={8} step={0.1} onChange={(n) => setNetReturn(String(Number(n.toFixed(1))))} formatValue={(v) => `${v}%`} />
                         </div>
+
+                        {calcMode === 'contribution' && (
+                            <div className="sm:col-span-2">
+                                <RangeSlider label="Target Combined Balance" value={Number(targetBalance)} min={1400000} max={1700000} step={50000} onChange={(n) => setTargetBalance(String(n))} formatValue={(v) => formatCurrency(v)} />
+                            </div>
+                        )}
                     </div>
                 </PersonTabsPanel>
-
-
-                {/* Move Target Combined Balance to the bottom of the form for better flow */}
-                {calcMode === 'contribution' && (
-                    <PersonTabsPanel>
-                        <RangeSlider label="Target Combined Balance" value={Number(targetBalance)} min={1400000} max={1700000} step={50000} onChange={(n) => setTargetBalance(String(n))} formatValue={(v) => formatCurrency(v)} />
-                    </PersonTabsPanel>
-                )}
 
                 {error && (
                     <div className="mt-4 text-center text-red-600 font-medium">{error}</div>

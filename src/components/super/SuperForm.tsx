@@ -30,6 +30,10 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         { id: 'contribution', label: 'Calculate Contribution' },
         { id: 'balance', label: 'Calculate Balance' },
     ];
+    const FREQUENCY_TABS = [
+        { id: 'monthly', label: 'Monthly' },
+        { id: 'yearly', label: 'Yearly' },
+    ];
 
     return (
         <div className="md:w-[45%] p-6 sm:p-8 overflow-y-auto">
@@ -62,10 +66,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             <>
                                 <div className="sm:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700">Contribution Frequency</label>
-                                    <div className="mt-1 flex w-full gap-1 rounded-full bg-teal-50 p-1 shadow-inner">
-                                        <button type="button" onClick={() => dispatch({ type: 'SET_CONTRIBUTION_FREQUENCY', payload: 'monthly' })} className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${isMonthly ? 'bg-teal-600 text-white border-teal-600 shadow-sm' : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'}`}>Monthly</button>
-                                        <button type="button" onClick={() => dispatch({ type: 'SET_CONTRIBUTION_FREQUENCY', payload: 'yearly' })} className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${!isMonthly ? 'bg-teal-600 text-white border-teal-600 shadow-sm' : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'}`}>Yearly</button>
-                                    </div>
+                                    <Tabs tabs={FREQUENCY_TABS} activeTab={contributionFrequency} onTabClick={(id) => dispatch({ type: 'SET_CONTRIBUTION_FREQUENCY', payload: id as any })} variant="segmented" className="mt-1" />
                                 </div>
                                 <div className="sm:col-span-2">
                                     <ToggleSwitch label="Make Concessional Contributions" checked={makeExtraContribution} onChange={(v) => dispatch({ type: 'SET_MAKE_EXTRA_CONTRIBUTION', payload: v })} />

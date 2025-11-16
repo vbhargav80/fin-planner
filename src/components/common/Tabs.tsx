@@ -9,7 +9,7 @@ interface TabsProps {
     tabs: Tab[];
     activeTab: string;
     onTabClick: (id: string) => void;
-    variant?: 'button' | 'underline' | 'dark-underline' | 'full-width' | 'pill';
+    variant?: 'button' | 'underline' | 'dark-underline' | 'full-width' | 'pill' | 'segmented';
     className?: string;
 }
 
@@ -88,6 +88,27 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant
                             activeTab === tab.id
                                 ? 'bg-white text-gray-900 border-gray-900 shadow-sm'
                                 : 'bg-transparent text-white border-transparent hover:bg-gray-700'
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+        );
+    }
+
+    if (variant === 'segmented') {
+        return (
+            <div className={`flex w-full gap-1 rounded-full bg-teal-50 p-1 shadow-inner ${className}`}>
+                {tabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => onTabClick(tab.id)}
+                        className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                            activeTab === tab.id
+                                ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
+                                : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'
                         }`}
                     >
                         {tab.label}

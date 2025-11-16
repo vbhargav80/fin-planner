@@ -89,12 +89,12 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 )}
 
                 {/* Person Card with Full-Width Tabs */}
-                <div className="bg-white border-l-4 border-indigo-500 rounded-r-lg shadow-sm border border-gray-200">
+                <div className="bg-white border-l-4 border-indigo-500 rounded-lg shadow-lg">
                     <div className="flex">
                         <button
                             type="button"
                             onClick={() => setActivePersonTab('self')}
-                            className={`w-1/2 p-4 text-center font-medium transition-colors duration-150 ${
+                            className={`w-1/2 p-4 text-center font-medium transition-colors duration-150 rounded-tl-lg ${
                                 activePersonTab === 'self'
                                     ? 'bg-indigo-600 text-white'
                                     : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
@@ -127,7 +127,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                         </>
                                     )}
                                     <div className="sm:col-span-2">
-                                        <RangeSlider label="Extra End-of-Year Contribution" value={Number(myExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label="Extra Concessional Contribution" value={Number(myExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setMyExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
                                     </div>
                                 </>
                             )}
@@ -143,7 +143,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                         </>
                                     )}
                                     <div className="sm:col-span-2">
-                                        <RangeSlider label="Extra End-of-Year Contribution" value={Number(wifeExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label="Extra Concessional Contribution" value={Number(wifeExtraYearlyContribution)} min={0} max={20000} step={500} onChange={(n) => setWifeExtraYearlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
                                     </div>
                                 </>
                             )}

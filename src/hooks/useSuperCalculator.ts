@@ -10,7 +10,7 @@ export function useSuperCalculator(): SuperCalculatorState {
     const [targetAge, setTargetAge] = useState('60');
     const [targetBalance, setTargetBalance] = useState('1500000');
     const [monthlyContribution, setMonthlyContribution] = useState('500');
-    const [monthlyContributionPost50, setMonthlyContributionPost50] = useState('200');
+    const [monthlyContributionPost50, setMonthlyContributionPost50] = useState('0');
     const [netReturn, setNetReturn] = useState('7');
     const [calcMode, setCalcMode] = useState<CalcMode>('contribution');
     const [results, setResults] = useState<SuperResultData | null>(null);

@@ -35,12 +35,12 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 {/* Calculation type toggle */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Calculation Type</label>
-                    <div className="mt-1 flex rounded-lg p-1 bg-indigo-800">
+                    <div className="mt-1 flex w-full gap-1 rounded-full bg-gray-900 p-1 shadow-inner">
                         <button
                             type="button"
                             onClick={() => setCalcMode('contribution')}
-                            className={`w-1/2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                                calcMode === 'contribution' ? 'bg-white text-gray-900 shadow' : 'text-white hover:bg-indigo-600'
+                            className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                                calcMode === 'contribution' ? 'bg-white text-gray-900 border-gray-900 shadow-sm' : 'bg-transparent text-white border-transparent hover:bg-gray-700'
                             }`}
                         >
                             Calculate Contribution
@@ -48,8 +48,8 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                         <button
                             type="button"
                             onClick={() => setCalcMode('balance')}
-                            className={`w-1/2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                                calcMode === 'balance' ? 'bg-white text-gray-900 shadow' : 'text-white hover:bg-indigo-600'
+                            className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                                calcMode === 'balance' ? 'bg-white text-gray-900 border-gray-900 shadow-sm' : 'bg-transparent text-white border-transparent hover:bg-gray-700'
                             }`}
                         >
                             Calculate Balance
@@ -100,16 +100,18 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 {/* Shared goal & contribution inputs (with sliders) */}
                 <PersonTabsPanel>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-                        <RangeSlider label="Target Retirement Age" value={Number(targetAge)} min={58} max={65} step={1} onChange={(n) => setTargetAge(String(n))} />
+                        <div className="sm:col-span-2">
+                            <RangeSlider label="Target Retirement Age" value={Number(targetAge)} min={58} max={65} step={1} onChange={(n) => setTargetAge(String(n))} />
+                        </div>
 
                         {calcMode === 'balance' && (
                             <>
-                                <InputGroup label="Monthly Contribution (Pre-50)" id="monthlyContribution" value={monthlyContribution} onChange={(e) => setMonthlyContribution(e.target.value)} symbol="$" symbolPosition="left" step={100} />
-                                <InputGroup label="Monthly Contribution (Post-50)" id="monthlyContributionPost50" value={monthlyContributionPost50} onChange={(e) => setMonthlyContributionPost50(e.target.value)} symbol="$" symbolPosition="left" step={100} />
+                                <RangeSlider label="Monthly Contribution (Pre-50)" value={Number(monthlyContribution)} min={300} max={1500} step={100} onChange={(n) => setMonthlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                <RangeSlider label="Monthly Contribution (Post-50)" value={Number(monthlyContributionPost50)} min={0} max={1000} step={100} onChange={(n) => setMonthlyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
                             </>
                         )}
 
-                        <div className={calcMode === 'contribution' ? 'sm:col-span-1' : 'sm:col-span-2'}>
+                        <div className={calcMode === 'contribution' ? 'sm:col-span-2' : 'sm:col-span-2'}>
                             <RangeSlider label="Est. Annual Net Return (after fees)" value={Number(netReturn)} min={5} max={8} step={0.1} onChange={(n) => setNetReturn(String(Number(n.toFixed(1))))} formatValue={(v) => `${v}%`} />
                         </div>
                     </div>

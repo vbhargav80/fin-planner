@@ -41,7 +41,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
 
     return (
         <div
-            className="md:w-[35%] p-6 sm:p-8 overflow-y-auto md:overflow-visible md:sticky md:top-0 md:self-start md:h-screen md:max-h-screen bg-white/95 backdrop-blur"
+            className="md:w-[35%] p-6 sm:p-8 bg-white/95 backdrop-blur md:sticky md:top-[4rem] md:self-start md:h-[calc(100vh-4rem)] md:overflow-y-auto"
         >
             <h2 className="text-3xl font-bold text-gray-900">
                 Amortization Calculator

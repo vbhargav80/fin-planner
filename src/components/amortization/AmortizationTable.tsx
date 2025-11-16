@@ -40,49 +40,31 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
         return () => window.clearInterval(id);
     }, [amortizationData, headerHeight]);
 
-    // Scroll to Jan 2031 row when requested
+    // Scroll to Jan 2031 row when requested (replaced implementation)
     useEffect(() => {
-        if (scrollTo2031 === 0) return; // Do not scroll on initial render
+        if (scrollTo2031 === 0) return;
 
         const index = amortizationData.findIndex((row) => row.date === 'Jan 2031');
-        if (index === -1) {
-            console.warn('Jan 2031 row not found in amortizationData');
-            return;
-        }
+        if (index === -1) return;
 
         const container = scrollContainerRef.current;
         const rowEl = rowRefs.current[index];
         if (!container || !rowEl) return;
 
-        const extraPadding = 4;
+        const extraPadding = 8;
 
-        // Use scrollIntoView first to bring the row into view, then adjust for sticky header
-        let raf1 = 0;
-        let raf2 = 0;
-
-        const doScrollWithOffset = () => {
+        const scrollNow = () => {
             const containerRect = container.getBoundingClientRect();
             const rowRect = rowEl.getBoundingClientRect();
-            const rowRelativeTop = rowRect.top - containerRect.top;
+            const rowTopInContainer = rowRect.top - containerRect.top;
 
-            const targetScrollTop = Math.max(
-                0,
-                container.scrollTop + rowRelativeTop - headerHeight - extraPadding
-            );
-
-            container.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+            const targetTop = rowTopInContainer + container.scrollTop - headerHeight - extraPadding;
+            container.scrollTo({ top: targetTop, behavior: 'smooth' });
         };
 
-        raf1 = requestAnimationFrame(() => {
-            // Ensure the element is scrolled roughly into view first
-            rowEl.scrollIntoView({ block: 'start' });
-            raf2 = requestAnimationFrame(doScrollWithOffset);
-        });
-
-        return () => {
-            if (raf1) cancelAnimationFrame(raf1);
-            if (raf2) cancelAnimationFrame(raf2);
-        };
+        // Defer until after layout so header height and row positions are correct
+        const raf = requestAnimationFrame(scrollNow);
+        return () => cancelAnimationFrame(raf);
     }, [scrollTo2031, headerHeight, amortizationData]);
 
     // Scroll-driven sticky behavior for Jan 2031 row
@@ -131,7 +113,10 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                 Amortization Schedule
             </h3>
 
-            <div ref={scrollContainerRef} className="bg-indigo-800 rounded-lg shadow-inner flex-grow overflow-auto">
+            <div
+                ref={scrollContainerRef}
+                className="bg-indigo-800 rounded-lg shadow-inner flex-grow overflow-auto max-h-[70vh] md:max-h-[calc(100vh-8rem)]"
+            >
                 <table className="min-w-full text-left">
                     <thead ref={theadRef} className="bg-indigo-900 sticky top-0 z-10">
                     <tr>

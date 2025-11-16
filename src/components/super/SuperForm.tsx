@@ -16,8 +16,10 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         wifeSuper, setWifeSuper,
         targetAge, setTargetAge,
         targetBalance, setTargetBalance,
-        monthlyContribution, setMonthlyContribution,
-        monthlyContributionPost50, setMonthlyContributionPost50,
+        myMonthlyContribution, setMyMonthlyContribution,
+        myMonthlyContributionPost50, setMyMonthlyContributionPost50,
+        wifeMonthlyContribution, setWifeMonthlyContribution,
+        wifeMonthlyContributionPost50, setWifeMonthlyContributionPost50,
         netReturn, setNetReturn,
         calcMode, setCalcMode,
         error
@@ -84,6 +86,12 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             <>
                                 <RangeSlider label="Current Age" value={Number(myAge)} min={45} max={60} step={1} onChange={(n) => setMyAge(String(n))} />
                                 <RangeSlider label="Current Super" value={Number(mySuper)} min={380000} max={450000} step={5000} onChange={(n) => setMySuper(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                {calcMode === 'balance' && (
+                                    <>
+                                        <RangeSlider label="Monthly Contribution (Pre-50)" value={Number(myMonthlyContribution)} min={300} max={1500} step={100} onChange={(n) => setMyMonthlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label="Monthly Contribution (Post-50)" value={Number(myMonthlyContributionPost50)} min={0} max={1000} step={100} onChange={(n) => setMyMonthlyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                    </>
+                                )}
                             </>
                         )}
 
@@ -91,6 +99,12 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             <>
                                 <RangeSlider label="Current Age" value={Number(wifeAge)} min={42} max={60} step={1} onChange={(n) => setWifeAge(String(n))} />
                                 <RangeSlider label="Current Super" value={Number(wifeSuper)} min={100000} max={150000} step={5000} onChange={(n) => setWifeSuper(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                {calcMode === 'balance' && (
+                                    <>
+                                        <RangeSlider label="Monthly Contribution (Pre-50)" value={Number(wifeMonthlyContribution)} min={0} max={1500} step={100} onChange={(n) => setWifeMonthlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                        <RangeSlider label="Monthly Contribution (Post-50)" value={Number(wifeMonthlyContributionPost50)} min={0} max={1000} step={100} onChange={(n) => setWifeMonthlyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
+                                    </>
+                                )}
                             </>
                         )}
                     </div>
@@ -102,13 +116,6 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                         <div className="sm:col-span-2">
                             <RangeSlider label="Target Retirement Age" value={Number(targetAge)} min={58} max={65} step={1} onChange={(n) => setTargetAge(String(n))} />
                         </div>
-
-                        {calcMode === 'balance' && (
-                            <>
-                                <RangeSlider label="Monthly Contribution (Pre-50)" value={Number(monthlyContribution)} min={300} max={1500} step={100} onChange={(n) => setMonthlyContribution(String(n))} formatValue={(v) => formatCurrency(v)} />
-                                <RangeSlider label="Monthly Contribution (Post-50)" value={Number(monthlyContributionPost50)} min={0} max={1000} step={100} onChange={(n) => setMonthlyContributionPost50(String(n))} formatValue={(v) => formatCurrency(v)} />
-                            </>
-                        )}
 
                         <div className={calcMode === 'contribution' ? 'sm:col-span-2' : 'sm:col-span-2'}>
                             <RangeSlider label="Est. Annual Net Return (after fees)" value={Number(netReturn)} min={5} max={8} step={0.1} onChange={(n) => setNetReturn(String(Number(n.toFixed(1))))} formatValue={(v) => `${v}%`} />

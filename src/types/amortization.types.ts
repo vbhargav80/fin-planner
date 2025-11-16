@@ -1,4 +1,6 @@
 // File: `src/types/amortization.types.ts`
+import type { Dispatch } from 'react';
+
 export interface AmortizationRow {
     date: string;
     beginningBalance: number;
@@ -12,7 +14,7 @@ export interface AmortizationRow {
     offsetBalance: number;
 }
 
-export interface AmortizationInputs {
+export interface State {
     interestRate: number;
     principal: number;
     monthlyRepayment: number;
@@ -29,36 +31,26 @@ export interface AmortizationInputs {
     netIncome: number;
 }
 
+export type Action =
+    | { type: 'SET_INTEREST_RATE'; payload: number }
+    | { type: 'SET_PRINCIPAL'; payload: number }
+    | { type: 'SET_MONTHLY_REPAYMENT'; payload: number }
+    | { type: 'SET_INITIAL_RENTAL_INCOME'; payload: number }
+    | { type: 'SET_INITIAL_OFFSET_BALANCE'; payload: number }
+    | { type: 'SET_MONTHLY_EXPENDITURE'; payload: number }
+    | { type: 'SET_MONTHLY_EXPENDITURE_PRE_2031'; payload: number }
+    | { type: 'SET_RENTAL_GROWTH_RATE'; payload: number }
+    | { type: 'SET_IS_REFINANCED'; payload: boolean }
+    | { type: 'SET_CONSIDER_OFFSET_INCOME'; payload: boolean }
+    | { type: 'SET_OFFSET_INCOME_RATE'; payload: number }
+    | { type: 'SET_CONTINUE_WORKING'; payload: boolean }
+    | { type: 'SET_YEARS_WORKING'; payload: number }
+    | { type: 'SET_NET_INCOME'; payload: number };
+
 export interface AmortizationCalculatorState {
+    state: State;
+    dispatch: Dispatch<Action>;
     amortizationData: AmortizationRow[];
-    interestRate: number;
-    setInterestRate: (value: number) => void;
-    principal: number;
-    setPrincipal: (value: number) => void;
-    monthlyRepayment: number;
-    setMonthlyRepayment: (value: number) => void;
-    initialRentalIncome: number;
-    setInitialRentalIncome: (value: number) => void;
-    initialOffsetBalance: number;
-    setInitialOffsetBalance: (value: number) => void;
-    monthlyExpenditure: number;
-    setMonthlyExpenditure: (value: number) => void;
-    monthlyExpenditurePre2031: number;
-    setMonthlyExpenditurePre2031: (value: number) => void;
-    rentalGrowthRate: number;
-    setRentalGrowthRate: (value: number) => void;
-    isRefinanced: boolean;
-    setIsRefinanced: (value: boolean) => void;
-    considerOffsetIncome: boolean;
-    setConsiderOffsetIncome: (value: boolean) => void;
-    offsetIncomeRate: number;
-    setOffsetIncomeRate: (value: number) => void;
-    continueWorking: boolean;
-    setContinueWorking: (value: boolean) => void;
-    yearsWorking: number;
-    setYearsWorking: (value: number) => void;
-    netIncome: number;
-    setNetIncome: (value: number) => void;
     actualMonthlyRepayment: number;
     scrollTo2031: number;
     triggerScrollTo2031: () => void;

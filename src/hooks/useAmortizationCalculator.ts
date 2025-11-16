@@ -1,24 +1,48 @@
 // File: `src/hooks/useAmortizationCalculator.ts`
-import { useState, useEffect, useMemo } from 'react';
-import type {AmortizationRow, AmortizationCalculatorState} from '../types/amortization.types';
+import { useState, useEffect, useMemo, useReducer } from 'react';
+import type { AmortizationRow, AmortizationCalculatorState, State, Action } from '../types/amortization.types';
 import { calculateAmortizationSchedule, calculateRefiMonthlyPayment } from '../utils/calculations/amortizationCalculations';
 
+const initialState: State = {
+    interestRate: 6,
+    principal: 900000,
+    monthlyRepayment: 6800,
+    initialRentalIncome: 4300,
+    initialOffsetBalance: 1000000,
+    monthlyExpenditure: 10000,
+    monthlyExpenditurePre2031: 1000,
+    rentalGrowthRate: 2.5,
+    isRefinanced: false,
+    considerOffsetIncome: false,
+    offsetIncomeRate: 3,
+    continueWorking: false,
+    yearsWorking: 3,
+    netIncome: 10000,
+};
+
+function reducer(state: State, action: Action): State {
+    switch (action.type) {
+        case 'SET_INTEREST_RATE': return { ...state, interestRate: action.payload };
+        case 'SET_PRINCIPAL': return { ...state, principal: action.payload };
+        case 'SET_MONTHLY_REPAYMENT': return { ...state, monthlyRepayment: action.payload };
+        case 'SET_INITIAL_RENTAL_INCOME': return { ...state, initialRentalIncome: action.payload };
+        case 'SET_INITIAL_OFFSET_BALANCE': return { ...state, initialOffsetBalance: action.payload };
+        case 'SET_MONTHLY_EXPENDITURE': return { ...state, monthlyExpenditure: action.payload };
+        case 'SET_MONTHLY_EXPENDITURE_PRE_2031': return { ...state, monthlyExpenditurePre2031: action.payload };
+        case 'SET_RENTAL_GROWTH_RATE': return { ...state, rentalGrowthRate: action.payload };
+        case 'SET_IS_REFINANCED': return { ...state, isRefinanced: action.payload };
+        case 'SET_CONSIDER_OFFSET_INCOME': return { ...state, considerOffsetIncome: action.payload };
+        case 'SET_OFFSET_INCOME_RATE': return { ...state, offsetIncomeRate: action.payload };
+        case 'SET_CONTINUE_WORKING': return { ...state, continueWorking: action.payload };
+        case 'SET_YEARS_WORKING': return { ...state, yearsWorking: action.payload };
+        case 'SET_NET_INCOME': return { ...state, netIncome: action.payload };
+        default: return state;
+    }
+}
+
 export function useAmortizationCalculator(): AmortizationCalculatorState {
+    const [state, dispatch] = useReducer(reducer, initialState);
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
-    const [interestRate, setInterestRate] = useState<number>(6);
-    const [principal, setPrincipal] = useState<number>(900000);
-    const [monthlyRepayment, setMonthlyRepayment] = useState<number>(6800);
-    const [initialRentalIncome, setInitialRentalIncome] = useState<number>(4300);
-    const [initialOffsetBalance, setInitialOffsetBalance] = useState<number>(1000000);
-    const [monthlyExpenditure, setMonthlyExpenditure] = useState<number>(10000);
-    const [monthlyExpenditurePre2031, setMonthlyExpenditurePre2031] = useState<number>(1000);
-    const [rentalGrowthRate, setRentalGrowthRate] = useState<number>(2.5);
-    const [isRefinanced, setIsRefinanced] = useState<boolean>(false);
-    const [considerOffsetIncome, setConsiderOffsetIncome] = useState<boolean>(false);
-    const [offsetIncomeRate, setOffsetIncomeRate] = useState<number>(3);
-    const [continueWorking, setContinueWorking] = useState<boolean>(false);
-    const [yearsWorking, setYearsWorking] = useState<number>(3);
-    const [netIncome, setNetIncome] = useState<number>(10000);
     const [scrollTo2031, setScrollTo2031] = useState(0);
     const [scrollToFirstDepletedOffset, setScrollToFirstDepletedOffset] = useState(0);
 
@@ -39,26 +63,11 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     };
 
     const calculateOptimalExpenditure = () => {
-        const inputs = {
-            interestRate,
-            principal,
-            monthlyRepayment,
-            initialRentalIncome,
-            initialOffsetBalance,
-            monthlyExpenditure,
-            monthlyExpenditurePre2031,
-            rentalGrowthRate,
-            isRefinanced,
-            considerOffsetIncome,
-            offsetIncomeRate,
-            continueWorking,
-            yearsWorking,
-            netIncome,
-        };
+        const inputs = { ...state };
 
         let low = 0;
         let high = 50000; // Assume expenditure won't exceed this
-        let optimalExpenditure = monthlyExpenditure;
+        let optimalExpenditure = state.monthlyExpenditure;
 
         for (let i = 0; i < 30; i++) { // 30 iterations for precision
             const mid = (low + high) / 2;
@@ -73,28 +82,12 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
             }
         }
 
-        setMonthlyExpenditure(optimalExpenditure);
+        dispatch({ type: 'SET_MONTHLY_EXPENDITURE', payload: optimalExpenditure });
     };
 
     const calculateOptimalWorkingYears = () => {
-        setContinueWorking(true);
-
-        const inputs = {
-            interestRate,
-            principal,
-            monthlyRepayment,
-            initialRentalIncome,
-            initialOffsetBalance,
-            monthlyExpenditure,
-            monthlyExpenditurePre2031,
-            rentalGrowthRate,
-            isRefinanced,
-            considerOffsetIncome,
-            offsetIncomeRate,
-            continueWorking: true, // Force true for calculation
-            yearsWorking,
-            netIncome,
-        };
+        dispatch({ type: 'SET_CONTINUE_WORKING', payload: true });
+        const inputs = { ...state, continueWorking: true };
 
         let optimalYears = -1;
         for (let years = 0; years <= 10; years++) {
@@ -110,7 +103,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
 
         let low = 0;
         let high = 50000; // Assume income won't exceed this
-        let optimalIncome = netIncome;
+        let optimalIncome = state.netIncome;
 
         for (let i = 0; i < 30; i++) { // 30 iterations for precision
             const mid = (low + high) / 2;
@@ -125,100 +118,26 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
             }
         }
 
-        setYearsWorking(finalYears);
-        setNetIncome(optimalIncome);
+        dispatch({ type: 'SET_YEARS_WORKING', payload: finalYears });
+        dispatch({ type: 'SET_NET_INCOME', payload: optimalIncome });
     };
 
     const actualMonthlyRepayment = useMemo(() => {
-        if (isRefinanced) {
-            return calculateRefiMonthlyPayment({
-                interestRate,
-                principal,
-                monthlyRepayment,
-                initialRentalIncome,
-                initialOffsetBalance,
-                monthlyExpenditure,
-                monthlyExpenditurePre2031,
-                rentalGrowthRate,
-                isRefinanced,
-                considerOffsetIncome,
-                offsetIncomeRate,
-                continueWorking,
-                yearsWorking,
-                netIncome,
-            });
+        if (state.isRefinanced) {
+            return calculateRefiMonthlyPayment(state);
         }
-        return monthlyRepayment;
-    }, [
-        isRefinanced,
-        interestRate,
-        principal,
-        monthlyRepayment,
-        initialRentalIncome,
-        initialOffsetBalance,
-        monthlyExpenditure,
-        monthlyExpenditurePre2031,
-        rentalGrowthRate,
-        considerOffsetIncome,
-        offsetIncomeRate,
-        continueWorking,
-        yearsWorking,
-        netIncome,
-    ]);
+        return state.monthlyRepayment;
+    }, [state]);
 
     useEffect(() => {
-        const inputs = {
-            interestRate,
-            principal,
-            monthlyRepayment,
-            initialRentalIncome,
-            initialOffsetBalance,
-            monthlyExpenditure,
-            monthlyExpenditurePre2031,
-            rentalGrowthRate,
-            isRefinanced,
-            considerOffsetIncome,
-            offsetIncomeRate,
-            continueWorking,
-            yearsWorking,
-            netIncome,
-        };
-
-        const data = calculateAmortizationSchedule(inputs);
+        const data = calculateAmortizationSchedule(state);
         setAmortizationData(data);
-    }, [
-        interestRate,
-        principal,
-        initialRentalIncome,
-        initialOffsetBalance,
-        monthlyExpenditure,
-        monthlyExpenditurePre2031,
-        rentalGrowthRate,
-        continueWorking,
-        yearsWorking,
-        netIncome,
-        considerOffsetIncome,
-        offsetIncomeRate,
-        isRefinanced,
-        monthlyRepayment
-    ]);
+    }, [state]);
 
     return {
+        state,
+        dispatch,
         amortizationData,
-        interestRate, setInterestRate,
-        principal, setPrincipal,
-        monthlyRepayment, setMonthlyRepayment,
-        initialRentalIncome, setInitialRentalIncome,
-        initialOffsetBalance, setInitialOffsetBalance,
-        monthlyExpenditure, setMonthlyExpenditure,
-        monthlyExpenditurePre2031, setMonthlyExpenditurePre2031,
-        rentalGrowthRate, setRentalGrowthRate,
-        isRefinanced, setIsRefinanced,
-        considerOffsetIncome, setConsiderOffsetIncome,
-        offsetIncomeRate, setOffsetIncomeRate,
-        continueWorking, setContinueWorking,
-        yearsWorking, setYearsWorking,
-        netIncome, setNetIncome,
         actualMonthlyRepayment,
         scrollTo2031,
         triggerScrollTo2031,

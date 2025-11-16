@@ -1,5 +1,5 @@
 // File: 'src/utils/calculations/amortizationCalculations.ts'
-import type { AmortizationRow, AmortizationInputs } from '../../types/amortization.types';
+import type { AmortizationRow, State as AmortizationInputs } from '../../types/amortization.types';
 import { formatDate } from '../formatters';
 
 const LOAN_DETAILS = {

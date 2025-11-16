@@ -8,8 +8,8 @@ interface AmortizationTableProps {
 
 export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator }) => {
     const {
+        state: { considerOffsetIncome },
         amortizationData,
-        considerOffsetIncome,
         scrollTo2031,
         triggerScrollTo2031,
         clearScrollTo2031,

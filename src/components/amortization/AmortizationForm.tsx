@@ -14,24 +14,14 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
     const [activeTab, setActiveTab] = React.useState<'loan' | 'cashflow' | 'assumptions'>('loan');
 
     const {
-        interestRate, setInterestRate,
-        principal, setPrincipal,
-        monthlyRepayment, setMonthlyRepayment,
-        initialRentalIncome, setInitialRentalIncome,
-        initialOffsetBalance, setInitialOffsetBalance,
-        monthlyExpenditure, setMonthlyExpenditure,
-        monthlyExpenditurePre2031, setMonthlyExpenditurePre2031,
-        rentalGrowthRate, setRentalGrowthRate,
-        isRefinanced, setIsRefinanced,
-        considerOffsetIncome, setConsiderOffsetIncome,
-        offsetIncomeRate, setOffsetIncomeRate,
-        continueWorking, setContinueWorking,
-        yearsWorking, setYearsWorking,
-        netIncome, setNetIncome,
+        state,
+        dispatch,
         actualMonthlyRepayment,
         calculateOptimalExpenditure,
         calculateOptimalWorkingYears,
     } = calculator;
+
+    const { interestRate, principal, monthlyRepayment, initialRentalIncome, initialOffsetBalance, monthlyExpenditure, monthlyExpenditurePre2031, rentalGrowthRate, isRefinanced, considerOffsetIncome, offsetIncomeRate, continueWorking, yearsWorking, netIncome } = state;
 
     // Snap interest rate to discrete 0.25% steps within [4, 8]
     const handleInterestRateChange = React.useCallback((v: number) => {
@@ -39,8 +29,8 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
         const min = 4;
         const max = 8;
         const snapped = Math.min(max, Math.max(min, Math.round(v / step) * step));
-        setInterestRate(Number(snapped.toFixed(2)));
-    }, [setInterestRate]);
+        dispatch({ type: 'SET_INTEREST_RATE', payload: Number(snapped.toFixed(2)) });
+    }, [dispatch]);
 
     return (
         <div
@@ -99,7 +89,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                 min={800000}
                                 max={1100000}
                                 step={25000}
-                                onChange={setPrincipal}
+                                onChange={(v) => dispatch({ type: 'SET_PRINCIPAL', payload: v })}
                             />
                             <RangeSlider
                                 label="Starting Offset"
@@ -107,7 +97,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                 min={800000}
                                 max={1000000}
                                 step={50000}
-                                onChange={setInitialOffsetBalance}
+                                onChange={(v) => dispatch({ type: 'SET_INITIAL_OFFSET_BALANCE', payload: v })}
                             />
                             <RangeSlider
                                 label="Interest Rate"
@@ -134,7 +124,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                         min={4000}
                                         max={5000}
                                         step={100}
-                                        onChange={setInitialRentalIncome}
+                                        onChange={(v) => dispatch({ type: 'SET_INITIAL_RENTAL_INCOME', payload: v })}
                                     />
                                     <RangeSlider
                                         label="Net Income (while working)"
@@ -142,7 +132,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                         min={5000}
                                         max={15000}
                                         step={1000}
-                                        onChange={setNetIncome}
+                                        onChange={(v) => dispatch({ type: 'SET_NET_INCOME', payload: v })}
                                         disabled={!continueWorking}
                                     />
                                 </div>
@@ -158,7 +148,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                         min={5000}
                                         max={15000}
                                         step={1000}
-                                        onChange={setMonthlyExpenditure}
+                                        onChange={(v) => dispatch({ type: 'SET_MONTHLY_EXPENDITURE', payload: v })}
                                     />
                                     <RangeSlider
                                         label="Monthly Expenditure Pre 2031"
@@ -166,7 +156,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                         min={0}
                                         max={5000}
                                         step={500}
-                                        onChange={setMonthlyExpenditurePre2031}
+                                        onChange={(v) => dispatch({ type: 'SET_MONTHLY_EXPENDITURE_PRE_2031', payload: v })}
                                     />
                                     <RangeSlider
                                         label="Monthly Repayment"
@@ -174,7 +164,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                         min={5500}
                                         max={7000}
                                         step={50}
-                                        onChange={setMonthlyRepayment}
+                                        onChange={(v) => dispatch({ type: 'SET_MONTHLY_REPAYMENT', payload: v })}
                                         disabled={isRefinanced}
                                     />
                                 </div>
@@ -193,19 +183,19 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                     min={1}
                                     max={4}
                                     step={0.25}
-                                    onChange={setRentalGrowthRate}
+                                    onChange={(v) => dispatch({ type: 'SET_RENTAL_GROWTH_RATE', payload: v })}
                                 />
                                 <ToggleSwitch
                                     label="Refinance for 25-year term"
                                     checked={isRefinanced}
-                                    onChange={setIsRefinanced}
+                                    onChange={(v) => dispatch({ type: 'SET_IS_REFINANCED', payload: v })}
                                 />
                             </div>
                             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
                                 <ToggleSwitch
                                     label="Consider Offset Interest Income"
                                     checked={considerOffsetIncome}
-                                    onChange={setConsiderOffsetIncome}
+                                    onChange={(v) => dispatch({ type: 'SET_CONSIDER_OFFSET_INCOME', payload: v })}
                                 />
                                 {considerOffsetIncome && (
                                     <InputGroup
@@ -213,7 +203,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                         id="offsetIncomeRate"
                                         step={0.1}
                                         value={String(offsetIncomeRate)}
-                                        onChange={(e) => setOffsetIncomeRate(parseFloat(e.target.value) || 0)}
+                                        onChange={(e) => dispatch({ type: 'SET_OFFSET_INCOME_RATE', payload: parseFloat(e.target.value) || 0 })}
                                         symbol="%"
                                         symbolPosition="right"
                                     />
@@ -223,7 +213,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                 <ToggleSwitch
                                     label="Continue Working"
                                     checked={continueWorking}
-                                    onChange={setContinueWorking}
+                                    onChange={(v) => dispatch({ type: 'SET_CONTINUE_WORKING', payload: v })}
                                 />
                                 {continueWorking && (
                                     <RangeSlider
@@ -232,7 +222,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                         min={0}
                                         max={10}
                                         step={1}
-                                        onChange={setYearsWorking}
+                                        onChange={(v) => dispatch({ type: 'SET_YEARS_WORKING', payload: v })}
                                         disabled={!continueWorking}
                                     />
                                 )}

@@ -11,7 +11,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [initialRentalIncome, setInitialRentalIncome] = useState<number>(4300);
     const [initialOffsetBalance, setInitialOffsetBalance] = useState<number>(1000000);
     const [monthlyExpenditure, setMonthlyExpenditure] = useState<number>(10000);
-    const [monthlyExpenditurePre2031, setMonthlyExpenditurePre2031] = useState<number>(2000);
+    const [monthlyExpenditurePre2031, setMonthlyExpenditurePre2031] = useState<number>(1000);
     const [rentalGrowthRate, setRentalGrowthRate] = useState<number>(2.5);
     const [isRefinanced, setIsRefinanced] = useState<boolean>(false);
     const [considerOffsetIncome, setConsiderOffsetIncome] = useState<boolean>(false);
@@ -19,6 +19,11 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     const [continueWorking, setContinueWorking] = useState<boolean>(false);
     const [yearsWorking, setYearsWorking] = useState<number>(3);
     const [netIncome, setNetIncome] = useState<number>(10000);
+    const [scrollTo2031, setScrollTo2031] = useState(0);
+
+    const triggerScrollTo2031 = () => {
+        setScrollTo2031(prev => prev + 1);
+    };
 
     const actualMonthlyRepayment = useMemo(() => {
         if (isRefinanced) {
@@ -111,5 +116,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         yearsWorking, setYearsWorking,
         netIncome, setNetIncome,
         actualMonthlyRepayment,
+        scrollTo2031,
+        triggerScrollTo2031,
     };
 }

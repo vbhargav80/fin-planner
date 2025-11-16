@@ -96,7 +96,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                 value={principal}
                                 min={800000}
                                 max={1100000}
-                                step={50000}
+                                step={25000}
                                 onChange={setPrincipal}
                             />
                             <RangeSlider
@@ -165,9 +165,9 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                     <RangeSlider
                                         label="Monthly Expenditure Pre 2031"
                                         value={monthlyExpenditurePre2031}
-                                        min={1000}
+                                        min={0}
                                         max={5000}
-                                        step={1000}
+                                        step={500}
                                         onChange={setMonthlyExpenditurePre2031}
                                     />
                                     <RangeSlider

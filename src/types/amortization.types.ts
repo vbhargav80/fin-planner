@@ -60,4 +60,6 @@ export interface AmortizationCalculatorState {
     netIncome: number;
     setNetIncome: (value: number) => void;
     actualMonthlyRepayment: number;
+    scrollTo2031: number;
+    triggerScrollTo2031: () => void;
 }

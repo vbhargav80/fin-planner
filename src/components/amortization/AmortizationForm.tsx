@@ -30,15 +30,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
 
     const { interestRate, principal, monthlyRepayment, initialRentalIncome, initialOffsetBalance, monthlyExpenditure, monthlyExpenditurePre2031, rentalGrowthRate, isRefinanced, considerOffsetIncome, offsetIncomeRate, continueWorking, yearsWorking, netIncome } = state;
 
-    // Snap interest rate to discrete 0.25% steps within [4, 8]
-    const handleInterestRateChange = React.useCallback((v: number) => {
-        const step = 0.25;
-        const min = 4;
-        const max = AmortizationConstants.INTEREST_RATE.MAX;
-        const snapped = Math.min(max, Math.max(min, Math.round(v / step) * step));
-        dispatch({ type: 'SET_INTEREST_RATE', payload: Number(snapped.toFixed(2))});
-    }, [dispatch]);
-
     return (
         <div
             className="md:w-[35%] p-6 sm:p-8 bg-white/95 backdrop-blur md:sticky md:top-[4rem] md:self-start md:h-[calc(100vh-4rem)] md:overflow-y-auto"
@@ -78,8 +69,8 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                 value={interestRate}
                                 min={AmortizationConstants.INTEREST_RATE.MIN}
                                 max={AmortizationConstants.INTEREST_RATE.MAX}
-                                step={AmortizationConstants.INTEREST_RATE.STEP}
-                                onChange={handleInterestRateChange}
+                                step={0.01} // Allow finer grain control for user, reducer will snap
+                                onChange={(v) => dispatch({ type: 'SET_INTEREST_RATE', payload: v })}
                             />
                         </div>
                     </section>

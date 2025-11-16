@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo, useReducer } from 'react';
 import type { AmortizationRow, AmortizationCalculatorState, State, Action } from '../types/amortization.types';
 import { calculateAmortizationSchedule, calculateRefiMonthlyPayment } from '../utils/calculations/amortizationCalculations';
+import * as AmortizationConstants from '../constants/amortization';
 
 const initialState: State = {
     interestRate: 6,
@@ -22,7 +23,12 @@ const initialState: State = {
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
-        case 'SET_INTEREST_RATE': return { ...state, interestRate: action.payload };
+        case 'SET_INTEREST_RATE': {
+            const { MIN, MAX, STEP } = AmortizationConstants.INTEREST_RATE;
+            const value = action.payload;
+            const snapped = Math.min(MAX, Math.max(MIN, Math.round(value / STEP) * STEP));
+            return { ...state, interestRate: Number(snapped.toFixed(2)) };
+        }
         case 'SET_PRINCIPAL': return { ...state, principal: action.payload };
         case 'SET_MONTHLY_REPAYMENT': return { ...state, monthlyRepayment: action.payload };
         case 'SET_INITIAL_RENTAL_INCOME': return { ...state, initialRentalIncome: action.payload };

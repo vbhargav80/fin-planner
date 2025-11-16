@@ -70,6 +70,12 @@ function reducer(state: State, action: Action): State {
 export function useSuperCalculator(): SuperCalculatorState {
     const [state, dispatch] = useReducer(reducer, initialState);
 
+    // Derive active contribution values based on frequency
+    const myContributionPre50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPre50 : state.myYearlyContributionPre50;
+    const myContributionPost50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPost50 : state.myYearlyContributionPost50;
+    const wifeContributionPre50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPre50 : state.wifeYearlyContributionPre50;
+    const wifeContributionPost50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPost50 : state.wifeYearlyContributionPost50;
+
     // Compute initial results synchronously
     const initialComputation = (() => {
         const inputs = {
@@ -87,11 +93,6 @@ export function useSuperCalculator(): SuperCalculatorState {
     const [breakdownData, setBreakdownData] = useState<SuperBreakdownRow[]>(initialComputation.breakdown);
 
     useEffect(() => {
-        const myContributionPre50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPre50 : state.myYearlyContributionPre50;
-        const myContributionPost50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPost50 : state.myYearlyContributionPost50;
-        const wifeContributionPre50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPre50 : state.wifeYearlyContributionPre50;
-        const wifeContributionPost50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPost50 : state.wifeYearlyContributionPost50;
-
         const inputs = {
             ...state,
             myContributionPre50,
@@ -114,9 +115,9 @@ export function useSuperCalculator(): SuperCalculatorState {
         results,
         error,
         breakdownData,
-        myContributionPre50: state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPre50 : state.myYearlyContributionPre50,
-        myContributionPost50: state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPost50 : state.myYearlyContributionPost50,
-        wifeContributionPre50: state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPre50 : state.wifeYearlyContributionPre50,
-        wifeContributionPost50: state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPost50 : state.wifeYearlyContributionPost50,
+        myContributionPre50,
+        myContributionPost50,
+        wifeContributionPre50,
+        wifeContributionPost50,
     };
 }

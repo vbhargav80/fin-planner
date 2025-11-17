@@ -9,6 +9,9 @@ interface RangeSliderProps {
     onChange: (value: number) => void;
     disabled?: boolean;
     formatValue?: (value: number) => string;
+    // New props for custom styling
+    labelClassName?: string;
+    valueClassName?: string;
 }
 
 export const RangeSlider: React.FC<RangeSliderProps> = ({
@@ -20,6 +23,9 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
                                                             onChange,
                                                             disabled = false,
                                                             formatValue,
+                                                            // Default to existing gray styles if not provided
+                                                            labelClassName = "text-sm text-gray-700",
+                                                            valueClassName = "text-sm font-medium text-gray-900",
                                                         }) => {
     const decimals = !Number.isInteger(step)
         ? (step.toString().split('.')[1]?.length ?? 2)
@@ -39,12 +45,13 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
     return (
         <div className="w-full">
             <div className="flex items-center justify-between mb-1">
-                <label className="text-sm text-gray-700">{label}</label>
-                <span className="text-sm font-medium text-gray-900">{displayValue}</span>
+                {/* Use dynamic classes */}
+                <label className={labelClassName}>{label}</label>
+                <span className={valueClassName}>{displayValue}</span>
             </div>
             <input
                 type="range"
-                className="w-full"
+                className="w-full accent-indigo-500 cursor-pointer"
                 min={min}
                 max={max}
                 step={step}

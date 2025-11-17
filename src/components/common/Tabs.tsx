@@ -78,13 +78,16 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant
 
     if (variant === 'pill') {
         return (
-            <div className={`flex w-full gap-1 rounded-full bg-gray-900 p-1 shadow-inner ${className}`}>
+            // Added overflow-x-auto for safety on very small screens
+            <div className={`flex w-full gap-1 rounded-full bg-gray-900 p-1 shadow-inner overflow-x-auto ${className}`}>
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
                         type="button"
                         onClick={() => onTabClick(tab.id)}
-                        className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                        // Responsive padding (px-2 -> px-4) and text size (text-xs -> text-sm)
+                        // Added whitespace-nowrap to prevent ugly line breaks
+                        className={`flex-1 px-2 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full text-center transition-colors duration-150 border whitespace-nowrap ${
                             activeTab === tab.id
                                 ? 'bg-white text-gray-900 border-gray-900 shadow-sm'
                                 : 'bg-transparent text-white border-transparent hover:bg-gray-700'
@@ -118,7 +121,6 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant
         );
     }
 
-    // New Indigo Segmented
     if (variant === 'segmented-indigo') {
         return (
             <div className={`flex w-full gap-1 rounded-full bg-indigo-50 p-1 shadow-inner ${className}`}>
@@ -140,7 +142,6 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant
         );
     }
 
-    // Default 'button' variant
     return (
         <div className={`flex space-x-1 ${className}`}>
             {tabs.map(tab => (

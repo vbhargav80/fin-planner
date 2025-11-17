@@ -1,8 +1,8 @@
-// File: src/components/budget/IncomeList.tsx
 import React from 'react';
 import type { IncomeItem, Action } from '../../types/budget.types';
 import { formatCurrency } from '../../utils/formatters';
 import { InputGroup } from '../common/InputGroup';
+import { CategoryIcon } from './CategoryIcon';
 
 interface Props {
     items: IncomeItem[];
@@ -28,7 +28,6 @@ export const IncomeList: React.FC<Props> = ({ items, totalIncome, dispatch }) =>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {items.map(item => {
-                    // Calculate 5% step, defaulting to 1 if the value is small/zero
                     const step = Math.max(1, Math.round(item.amount * 0.05));
 
                     return (
@@ -36,6 +35,8 @@ export const IncomeList: React.FC<Props> = ({ items, totalIncome, dispatch }) =>
                             key={item.id}
                             id={item.id}
                             label={item.name}
+                            // Add Icon Here
+                            labelIcon={<CategoryIcon iconKey={item.iconKey} size={16} />}
                             value={item.amount}
                             onChange={(val) => dispatch({
                                 type: 'UPDATE_INCOME',

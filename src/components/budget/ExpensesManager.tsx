@@ -1,8 +1,8 @@
-// File: src/components/budget/ExpensesManager.tsx
 import React, { useState, useMemo } from 'react';
 import type { ExpenseCategory, Action } from '../../types/budget.types';
 import { formatCurrency } from '../../utils/formatters';
 import { InputGroup } from '../common/InputGroup';
+import { CategoryIcon } from './CategoryIcon';
 
 interface Props {
     categories: ExpenseCategory[];
@@ -10,7 +10,6 @@ interface Props {
 }
 
 export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
-    // Local state for navigation
     const [activeCategoryId, setActiveCategoryId] = useState<string>(
         categories.length > 0 ? categories[0].id : ''
     );
@@ -21,7 +20,7 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
 
     return (
         <div className="flex-1 overflow-hidden flex h-full">
-            {/* Category Sidebar (Left strip) */}
+            {/* Category Sidebar */}
             <div className="w-1/3 bg-gray-50 border-r border-gray-200 overflow-y-auto custom-scrollbar">
                 <div className="py-2">
                     {categories.map(cat => {
@@ -38,10 +37,11 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
                                         : 'border-transparent text-gray-600'
                                 }`}
                             >
-                                <div className={`text-sm font-semibold ${isActive ? 'text-indigo-700' : 'text-gray-700'}`}>
-                                    {cat.name}
+                                <div className={`text-sm font-semibold flex items-center gap-2 ${isActive ? 'text-indigo-700' : 'text-gray-700'}`}>
+                                    <CategoryIcon iconKey={cat.iconKey} size={18} className={isActive ? 'text-indigo-600' : 'text-gray-400'} />
+                                    <span className="truncate">{cat.name}</span>
                                 </div>
-                                <div className={`text-xs mt-1 font-medium ${isActive ? 'text-indigo-500' : 'text-gray-400 group-hover:text-gray-500'}`}>
+                                <div className={`text-xs mt-1 font-medium pl-6 ${isActive ? 'text-indigo-500' : 'text-gray-400 group-hover:text-gray-500'}`}>
                                     {formatCurrency(catTotal)}
                                 </div>
                             </button>
@@ -50,14 +50,17 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
                 </div>
             </div>
 
-            {/* Active Category Details (Right area) */}
+            {/* Active Category Details */}
             <div className="w-2/3 bg-white overflow-y-auto p-6">
                 {activeCategory ? (
                     <div className="animate-fade-in">
                         <div className="flex justify-between items-end mb-6 border-b border-gray-100 pb-4">
                             <div>
                                 <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Category</span>
-                                <h3 className="text-xl font-bold text-gray-900">{activeCategory.name}</h3>
+                                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                    <CategoryIcon iconKey={activeCategory.iconKey} size={24} className="text-indigo-600" />
+                                    {activeCategory.name}
+                                </h3>
                             </div>
                             <div className="text-right">
                                 <span className="text-xs font-medium text-gray-500">Subtotal</span>
@@ -69,14 +72,14 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
 
                         <div className="grid grid-cols-1 gap-4">
                             {activeCategory.items.map(item => {
-                                // Calculate 5% step, defaulting to 1 if value is small
                                 const step = Math.max(1, Math.round(item.amount * 0.05));
-
                                 return (
                                     <InputGroup
                                         key={item.id}
                                         id={item.id}
                                         label={item.name}
+                                        // Add Icon Here
+                                        labelIcon={<CategoryIcon iconKey={item.iconKey} size={16} />}
                                         value={item.amount}
                                         onChange={(val) => dispatch({
                                             type: 'UPDATE_EXPENSE_ITEM',

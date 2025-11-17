@@ -49,20 +49,12 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch, isAdmin
         }
     }, [activeCategory?.id, isAdminMode]);
 
-    // Helper to calculate visible total for a category
-    const getVisibleCategoryTotal = (cat: ExpenseCategory) => {
-        return cat.items.reduce((sum, item) => {
-            if (item.isHidden && !isAdminMode) return sum;
-            return sum + item.amount;
-        }, 0);
-    };
-
     return (
         <div className="flex-1 overflow-hidden flex h-full">
             <div className="w-1/3 bg-gray-50 border-r border-gray-200 overflow-y-auto custom-scrollbar">
                 <div className="py-2">
                     {categories.map(cat => {
-                        const catTotal = getVisibleCategoryTotal(cat);
+                        const catTotal = cat.items.reduce((sum, i) => sum + i.amount, 0);
                         const isActive = cat.id === activeCategoryId;
                         return (
                             <button
@@ -99,8 +91,7 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch, isAdmin
                             <div className="text-right">
                                 <span className="text-xs font-medium text-gray-500">Subtotal</span>
                                 <div className="text-lg font-bold text-indigo-600">
-                                    {/* FIXED: Only sum visible items */}
-                                    {formatCurrency(getVisibleCategoryTotal(activeCategory))}
+                                    {formatCurrency(activeCategory.items.reduce((sum, i) => sum + i.amount, 0))}
                                 </div>
                             </div>
                         </div>
@@ -118,7 +109,9 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch, isAdmin
 
                         <div className="grid grid-cols-1 gap-4">
                             {(groupedItems[activeSubGroup] || []).map(item => {
-                                const step = Math.max(1, Math.round(item.amount * 0.05));
+                                const baseAmount = item.initialAmount ?? item.amount;
+                                const step = Math.max(1, Math.round(baseAmount * 0.05));
+
                                 return (
                                     <InputGroup
                                         key={item.id}

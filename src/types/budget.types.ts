@@ -1,3 +1,4 @@
+// File: src/types/budget.types.ts
 import type { Dispatch } from 'react';
 
 export interface BudgetId {
@@ -8,6 +9,7 @@ export interface BudgetId {
 export interface ExpenseItem extends BudgetId {
     name: string;
     amount: number;
+    initialAmount?: number;
     reduction: number;
     isFixed?: boolean;
     subGroup?: string;
@@ -22,6 +24,7 @@ export interface ExpenseCategory extends BudgetId {
 export interface IncomeItem extends BudgetId {
     name: string;
     amount: number;
+    initialAmount?: number;
 }
 
 export interface State {

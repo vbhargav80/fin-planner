@@ -1,3 +1,4 @@
+// File: src/components/budget/SummaryCards.tsx
 import React, { memo } from 'react';
 import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
@@ -10,42 +11,51 @@ interface Props {
 
 export const SummaryCards: React.FC<Props> = memo(({ totalIncome, totalExpenses, remaining }) => {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            {/* Income: Indigo-600 */}
-            <div className="bg-indigo-600 rounded-xl p-4 border border-indigo-500 shadow-sm">
-                <div className="flex items-center gap-2 text-indigo-100 mb-2">
-                    <TrendingUp size={18} />
-                    <span className="text-sm font-medium">Income</span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+            {/* Income */}
+            <div className="bg-indigo-600 rounded-xl p-4 border border-indigo-500 shadow-sm min-w-0">
+                <div className="flex items-center gap-2 text-indigo-100 mb-1">
+                    <TrendingUp size={16} />
+                    <span className="text-xs font-medium uppercase tracking-wide">Income</span>
                 </div>
-                <div className="text-2xl font-bold text-green-300 font-mono">
+                <div
+                    className="text-lg lg:text-xl xl:text-2xl font-bold text-green-300 font-mono truncate"
+                    title={formatCurrency(totalIncome)}
+                >
                     {formatCurrency(totalIncome)}
                 </div>
             </div>
 
-            {/* Expenses: Indigo-600 */}
-            <div className="bg-indigo-600 rounded-xl p-4 border border-indigo-500 shadow-sm">
-                <div className="flex items-center gap-2 text-indigo-100 mb-2">
-                    <TrendingDown size={18} />
-                    <span className="text-sm font-medium">Expenses</span>
+            {/* Expenses */}
+            <div className="bg-indigo-600 rounded-xl p-4 border border-indigo-500 shadow-sm min-w-0">
+                <div className="flex items-center gap-2 text-indigo-100 mb-1">
+                    <TrendingDown size={16} />
+                    <span className="text-xs font-medium uppercase tracking-wide">Expenses</span>
                 </div>
-                <div className="text-2xl font-bold text-red-300 font-mono">
+                <div
+                    className="text-lg lg:text-xl xl:text-2xl font-bold text-red-300 font-mono truncate"
+                    title={formatCurrency(totalExpenses)}
+                >
                     {formatCurrency(totalExpenses)}
                 </div>
             </div>
 
-            {/* Net Result: Updated Red to be 'More Red' but not neon */}
-            <div className={`rounded-xl p-4 border shadow-sm backdrop-blur-sm ${
+            {/* Net Result */}
+            <div className={`rounded-xl p-4 border shadow-sm backdrop-blur-sm min-w-0 ${
                 remaining >= 0
-                    ? 'bg-emerald-900/50 border-emerald-700/50'  // Soft Green
-                    : 'bg-red-900/80 border-red-700/50'           // Richer, deeper Red (80% opacity)
+                    ? 'bg-emerald-900/50 border-emerald-700/50'
+                    : 'bg-red-900/80 border-red-700/50'
             }`}>
-                <div className={`flex items-center gap-2 mb-2 ${
+                <div className={`flex items-center gap-2 mb-1 ${
                     remaining >= 0 ? 'text-emerald-200' : 'text-red-200'
                 }`}>
-                    <Wallet size={18} />
-                    <span className="text-sm font-medium">Net Result</span>
+                    <Wallet size={16} />
+                    <span className="text-xs font-medium uppercase tracking-wide">Net Result</span>
                 </div>
-                <div className="text-2xl font-bold font-mono text-white">
+                <div
+                    className="text-lg lg:text-xl xl:text-2xl font-bold font-mono text-white truncate"
+                    title={formatCurrency(remaining)}
+                >
                     {formatCurrency(remaining)}
                 </div>
             </div>

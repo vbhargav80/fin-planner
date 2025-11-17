@@ -15,6 +15,7 @@ const mkItem = (
     id: uuid(),
     name,
     amount,
+    initialAmount: amount,
     iconKey,
     reduction: 0,
     isFixed,
@@ -23,10 +24,10 @@ const mkItem = (
 });
 
 const initialState: State = {
-    isAdminMode: false, // Default to hidden
+    isAdminMode: false,
     incomes: [
-        { id: uuid(), name: 'Salary', amount: 9000, iconKey: 'work' },
-        { id: uuid(), name: 'Investment Property Rent', amount: 2100, iconKey: 'housing' },
+        { id: uuid(), name: 'Salary', amount: 9000, initialAmount: 9000, iconKey: 'work' },
+        { id: uuid(), name: 'Investment Property Rent', amount: 2100, initialAmount: 2100, iconKey: 'housing' },
     ],
     expenseCategories: [
         {
@@ -71,16 +72,16 @@ const initialState: State = {
             name: 'Transport',
             iconKey: 'transport',
             items: [
-                mkItem('Fuel', 250, 'transport', false, 'Nissan'),
-                mkItem('Rego', 100, 'rates', true, 'Nissan'),
-                mkItem('Insurance', 100, 'rates', false, 'Nissan'),
-                mkItem('Servicing', 70, 'service', false, 'Nissan'),
-                mkItem('Roadside Assist', 10, 'alert', false, 'Nissan'),
-                mkItem('Fuel', 250, 'transport', false, 'Kia'),
-                mkItem('Rego', 100, 'rates', true, 'Kia'),
-                mkItem('Insurance', 100, 'rates', false, 'Kia'),
-                mkItem('Servicing', 70, 'service', false, 'Kia'),
-                mkItem('Roadside Assist', 10, 'alert', false, 'Kia'),
+                mkItem('Fuel', 250, 'transport', false, 'Car 1'),
+                mkItem('Rego', 100, 'rates', true, 'Car 1'),
+                mkItem('Insurance', 100, 'rates', false, 'Car 1'),
+                mkItem('Servicing', 70, 'service', false, 'Car 1'),
+                mkItem('Roadside Assist', 10, 'alert', false, 'Car 1'),
+                mkItem('Fuel', 250, 'transport', false, 'Car 2'),
+                mkItem('Rego', 100, 'rates', true, 'Car 2'),
+                mkItem('Insurance', 100, 'rates', false, 'Car 2'),
+                mkItem('Servicing', 70, 'service', false, 'Car 2'),
+                mkItem('Roadside Assist', 10, 'alert', false, 'Car 2'),
                 mkItem('Train', 120, 'train'),
             ]
         },
@@ -127,6 +128,7 @@ const initialState: State = {
             name: 'Lifestyle & Recreation',
             iconKey: 'lifestyle',
             items: [
+                // COFFEE: Hidden by default (isHidden: true)
                 mkItem('Coffee', 300, 'lifestyle', false, undefined, true),
                 mkItem('Dining Out', 400, 'dining'),
                 mkItem('Misc', 300, 'entertainment'),
@@ -169,17 +171,12 @@ function reducer(state: State, action: Action): State {
         case 'REMOVE_EXPENSE_ITEM': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.filter(item => item.id !== action.payload.itemId) }) };
         case 'UPDATE_EXPENSE_REDUCTION': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, reduction: action.payload.reduction } : item) }) };
         case 'TOGGLE_EXPENSE_FIXED': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, isFixed: !item.isFixed, reduction: 0 } : item) }) };
-
-        // NEW: The Secret Toggle
-        case 'TOGGLE_ADMIN_MODE':
-            return { ...state, isAdminMode: !state.isAdminMode };
-
+        case 'TOGGLE_ADMIN_MODE': return { ...state, isAdminMode: !state.isAdminMode };
         default: return state;
     }
 }
 
 export function useBudgetPlanner(): BudgetPlannerState {
-    // 2. Re-enable Persistence with a unique key 'budget-v1'
     const [state, dispatch] = usePersistentReducer(reducer, initialState, 'budget-v1');
 
     const derived = useMemo(() => {
@@ -207,6 +204,5 @@ export function useBudgetPlanner(): BudgetPlannerState {
         };
     }, [state]);
 
-    // Pass isAdminMode out to the UI
     return { state, dispatch, isAdminMode: state.isAdminMode, ...derived };
 }

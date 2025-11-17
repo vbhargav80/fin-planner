@@ -4,16 +4,23 @@ import type { State, Action, BudgetPlannerState, ExpenseItem } from '../types/bu
 
 const uuid = () => crypto.randomUUID();
 
-const mkItem = (name: string, amount: number, iconKey?: string, isFixed: boolean = false): ExpenseItem => ({
+// Updated helper to accept subGroup
+const mkItem = (
+    name: string,
+    amount: number,
+    iconKey?: string,
+    isFixed: boolean = false,
+    subGroup?: string // New param
+): ExpenseItem => ({
     id: uuid(),
     name,
     amount,
     iconKey,
     reduction: 0,
-    isFixed
+    isFixed,
+    subGroup
 });
 
-// ... (Keep your initialState exactly as it was in the previous step)
 const initialState: State = {
     incomes: [
         { id: uuid(), name: 'Salary', amount: 5000, iconKey: 'work' },
@@ -47,16 +54,21 @@ const initialState: State = {
             name: 'Transport',
             iconKey: 'transport',
             items: [
-                mkItem('Nissan Fuel', 250, 'transport'),
-                mkItem('Kia Fuel', 250, 'transport'),
-                mkItem('Nissan Rego', 100, 'rates', true),
-                mkItem('Kia Rego', 100, 'rates', true),
-                mkItem('Nissan Insurance', 100, 'rates'),
-                mkItem('Kia Insurance', 100, 'rates'),
-                mkItem('Nissan Servicing', 70, 'service'),
-                mkItem('Kia Servicing', 70, 'service'),
-                mkItem('Nissan Roadside Assist', 10, 'alert'),
-                mkItem('Kia Roadside Assist', 10, 'alert'),
+                // NISSAN GROUP
+                mkItem('Fuel', 250, 'transport', false, 'Nissan'),
+                mkItem('Rego', 100, 'rates', true, 'Nissan'),
+                mkItem('Insurance', 100, 'rates', false, 'Nissan'),
+                mkItem('Servicing', 70, 'service', false, 'Nissan'),
+                mkItem('Roadside Assist', 10, 'alert', false, 'Nissan'),
+
+                // KIA GROUP
+                mkItem('Fuel', 250, 'transport', false, 'Kia'),
+                mkItem('Rego', 100, 'rates', true, 'Kia'),
+                mkItem('Insurance', 100, 'rates', false, 'Kia'),
+                mkItem('Servicing', 70, 'service', false, 'Kia'),
+                mkItem('Roadside Assist', 10, 'alert', false, 'Kia'),
+
+                // GENERAL
                 mkItem('Train', 120, 'train'),
             ]
         },
@@ -198,8 +210,6 @@ function reducer(state: State, action: Action): State {
                     };
                 })
             };
-
-        // NEW: Toggle Fixed Status
         case 'TOGGLE_EXPENSE_FIXED':
             return {
                 ...state,
@@ -219,7 +229,6 @@ function reducer(state: State, action: Action): State {
                     };
                 })
             };
-
         default:
             return state;
     }

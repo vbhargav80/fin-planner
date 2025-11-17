@@ -11,6 +11,7 @@ export interface ExpenseItem extends BudgetId {
     amount: number;
     reduction: number;
     isFixed?: boolean;
+    subGroup?: string; // New field for grouping (e.g., "Nissan", "Kia")
 }
 
 export interface ExpenseCategory extends BudgetId {
@@ -39,7 +40,6 @@ export type Action =
     | { type: 'UPDATE_EXPENSE_ITEM'; payload: { categoryId: string; item: ExpenseItem } }
     | { type: 'REMOVE_EXPENSE_ITEM'; payload: { categoryId: string; itemId: string } }
     | { type: 'UPDATE_EXPENSE_REDUCTION'; payload: { categoryId: string; itemId: string; reduction: number } }
-    // New Action
     | { type: 'TOGGLE_EXPENSE_FIXED'; payload: { categoryId: string; itemId: string } };
 
 export interface BudgetDerived {

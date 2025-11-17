@@ -1,8 +1,10 @@
-import React, { useState, useMemo } from 'react';
-import type { ExpenseCategory, Action } from '../../types/budget.types';
+// File: src/components/budget/ExpensesManager.tsx
+import React, { useState, useMemo, useEffect } from 'react';
+import type { ExpenseCategory, Action, ExpenseItem } from '../../types/budget.types';
 import { formatCurrency } from '../../utils/formatters';
 import { InputGroup } from '../common/InputGroup';
 import { CategoryIcon } from './CategoryIcon';
+import { Tabs } from '../common/Tabs'; // Import Tabs
 
 interface Props {
     categories: ExpenseCategory[];
@@ -17,6 +19,38 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
     const activeCategory = useMemo(() =>
             categories.find(c => c.id === activeCategoryId),
         [categories, activeCategoryId]);
+
+    // Group items by subGroup
+    const groupedItems = useMemo(() => {
+        if (!activeCategory) return {};
+        const groups: Record<string, ExpenseItem[]> = { 'General': [] };
+
+        activeCategory.items.forEach(item => {
+            const key = item.subGroup || 'General';
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(item);
+        });
+
+        // If we have specific groups (like Nissan/Kia), and General is empty, remove General
+        if (groups['General'].length === 0 && Object.keys(groups).length > 1) {
+            delete groups['General'];
+        }
+
+        return groups;
+    }, [activeCategory]);
+
+    // Get the list of group names for the tabs
+    const groupNames = Object.keys(groupedItems);
+
+    // State for the active sub-tab (e.g. 'Nissan')
+    const [activeSubGroup, setActiveSubGroup] = useState<string>(groupNames[0] || 'General');
+
+    // Reset sub-tab when category changes
+    useEffect(() => {
+        if (groupNames.length > 0) {
+            setActiveSubGroup(groupNames[0]);
+        }
+    }, [activeCategory?.id]); // Only reset if category ID changes
 
     return (
         <div className="flex-1 overflow-hidden flex h-full">
@@ -50,7 +84,7 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
                 </div>
             </div>
 
-            {/* Active Category Details */}
+            {/* Details Area */}
             <div className="w-2/3 bg-white overflow-y-auto p-6">
                 {activeCategory ? (
                     <div className="animate-fade-in">
@@ -70,15 +104,27 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
                             </div>
                         </div>
 
+                        {/* RENDER TABS IF WE HAVE SUBGROUPS */}
+                        {groupNames.length > 1 && (
+                            <div className="mb-6">
+                                <Tabs
+                                    tabs={groupNames.map(name => ({ id: name, label: name }))}
+                                    activeTab={activeSubGroup}
+                                    onTabClick={setActiveSubGroup}
+                                    variant="segmented-indigo"
+                                />
+                            </div>
+                        )}
+
+                        {/* RENDER INPUTS FOR ACTIVE SUBGROUP */}
                         <div className="grid grid-cols-1 gap-4">
-                            {activeCategory.items.map(item => {
+                            {(groupedItems[activeSubGroup] || []).map(item => {
                                 const step = Math.max(1, Math.round(item.amount * 0.05));
                                 return (
                                     <InputGroup
                                         key={item.id}
                                         id={item.id}
                                         label={item.name}
-                                        // Add Icon Here
                                         labelIcon={<CategoryIcon iconKey={item.iconKey} size={16} />}
                                         value={item.amount}
                                         onChange={(val) => dispatch({

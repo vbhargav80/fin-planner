@@ -1,9 +1,10 @@
 // File: src/components/budget/OptimizerList.tsx
-import React, { useState, useMemo } from 'react';
-import type { ExpenseCategory, Action } from '../../types/budget.types';
+import React, { useState, useMemo, useEffect } from 'react';
+import type { ExpenseCategory, Action, ExpenseItem } from '../../types/budget.types';
 import { formatCurrency } from '../../utils/formatters';
 import { CategoryIcon } from './CategoryIcon';
-import { Lock, Unlock } from 'lucide-react'; // Import icons
+import { Lock, Unlock } from 'lucide-react';
+import { Tabs } from '../common/Tabs'; // Import Tabs
 
 interface Props {
     categories: ExpenseCategory[];
@@ -26,6 +27,31 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
     const activeCategory = useMemo(() =>
             categories.find(c => c.id === activeCategoryId),
         [categories, activeCategoryId]);
+
+    // Grouping Helper
+    const groupedItems = useMemo(() => {
+        if (!activeCategory) return {};
+        const groups: Record<string, ExpenseItem[]> = { 'General': [] };
+
+        activeCategory.items.forEach(item => {
+            const key = item.subGroup || 'General';
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(item);
+        });
+        if (groups['General'].length === 0 && Object.keys(groups).length > 1) {
+            delete groups['General'];
+        }
+        return groups;
+    }, [activeCategory]);
+
+    const groupNames = Object.keys(groupedItems);
+    const [activeSubGroup, setActiveSubGroup] = useState<string>(groupNames[0] || 'General');
+
+    useEffect(() => {
+        if (groupNames.length > 0) {
+            setActiveSubGroup(groupNames[0]);
+        }
+    }, [activeCategory?.id]);
 
     return (
         <div className="flex-1 overflow-hidden flex h-full">
@@ -81,20 +107,29 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
                             </div>
                         </div>
 
+                        {/* RENDER TABS IF NEEDED */}
+                        {groupNames.length > 1 && (
+                            <div className="mb-6">
+                                <Tabs
+                                    tabs={groupNames.map(name => ({ id: name, label: name }))}
+                                    activeTab={activeSubGroup}
+                                    onTabClick={setActiveSubGroup}
+                                    variant="segmented-indigo"
+                                />
+                            </div>
+                        )}
+
                         <div className="space-y-8">
-                            {activeCategory.items.map(item => {
+                            {(groupedItems[activeSubGroup] || []).map(item => {
                                 const savings = item.amount * (item.reduction / 100);
                                 const newAmount = item.amount - savings;
 
                                 return (
                                     <div key={item.id} className="group">
-                                        {/* Header Row */}
                                         <div className="flex justify-between items-center mb-3">
                                             <div className="flex items-center gap-2">
                                                 <CategoryIcon iconKey={item.iconKey} size={18} className="text-gray-400" />
                                                 <span className="text-sm font-medium text-gray-700">{item.name}</span>
-
-                                                {/* CONFIG TOGGLE BUTTON */}
                                                 <button
                                                     onClick={() => dispatch({
                                                         type: 'TOGGLE_EXPENSE_FIXED',
@@ -129,7 +164,6 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
                                             </div>
                                         </div>
 
-                                        {/* Action Pills or Fixed Label */}
                                         <div className="flex flex-wrap gap-1.5">
                                             {item.isFixed ? (
                                                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-gray-50 text-gray-400 border border-gray-200 select-none cursor-not-allowed">

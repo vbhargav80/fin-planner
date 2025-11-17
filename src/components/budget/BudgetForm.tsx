@@ -4,21 +4,23 @@ import { Tabs } from '../common/Tabs';
 import type { BudgetPlannerState } from '../../types/budget.types';
 import { IncomeList } from './IncomeList';
 import { ExpensesManager } from './ExpensesManager';
-import { OptimizerList } from './OptimizerList'; // Import new component
+import { OptimizerList } from './OptimizerList';
 
 interface Props {
     model: BudgetPlannerState;
-    onViewChange: (view: 'income' | 'expenses' | 'optimize') => void; // Callback to tell parent
+    onViewChange: (view: 'income' | 'expenses' | 'optimize') => void;
 }
 
 export const BudgetForm: React.FC<Props> = ({ model, onViewChange }) => {
-    const [viewMode, setViewMode] = useState<'income' | 'expenses' | 'optimize'>('expenses');
+    // Default to 'income'
+    const [viewMode, setViewMode] = useState<'income' | 'expenses' | 'optimize'>('income');
     const { state, dispatch, totalIncome } = model;
 
+    // Reordered Tabs: Income first
     const VIEW_TABS = [
-        { id: 'expenses', label: 'Expenses' },
         { id: 'income', label: 'Income' },
-        { id: 'optimize', label: 'Optimize' }, // New Tab
+        { id: 'expenses', label: 'Expenses' },
+        { id: 'optimize', label: 'Optimize' },
     ];
 
     const handleTabClick = (id: string) => {

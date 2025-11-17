@@ -1,3 +1,4 @@
+// File: src/components/super/SuperDrawdownTable.tsx
 import React from 'react';
 import type { DrawdownRow, State, Action } from '../../types/super.types';
 import { formatCurrency } from '../../utils/formatters';
@@ -36,12 +37,12 @@ export const SuperDrawdownTable: React.FC<Props> = ({ schedule, state, dispatch 
                         <label className="block text-xs font-bold text-indigo-200 mb-2 uppercase tracking-wide">
                             Desired Lifestyle
                         </label>
-                        {/* Using 'pill' variant for white text on dark background */}
+                        {/* UPDATED: Use the new "Pill on Dark" variant */}
                         <Tabs
                             tabs={LIFESTYLE_OPTIONS}
                             activeTab={drawdownLifestyle}
                             onTabClick={(id) => dispatch({ type: 'SET_DRAWDOWN_LIFESTYLE', payload: id as any })}
-                            variant="pill"
+                            variant="pill-on-dark"
                         />
                     </div>
 
@@ -54,7 +55,6 @@ export const SuperDrawdownTable: React.FC<Props> = ({ schedule, state, dispatch 
                             step={SuperConstants.DRAWDOWN_AMOUNT.STEP}
                             onChange={(v) => dispatch({ type: 'SET_DRAWDOWN_ANNUAL_AMOUNT', payload: v })}
                             formatValue={(v) => formatCurrency(v)}
-                            // Custom colors for dark background
                             labelClassName="text-sm font-medium text-indigo-100"
                             valueClassName="text-sm font-bold text-white font-mono"
                         />
@@ -66,7 +66,6 @@ export const SuperDrawdownTable: React.FC<Props> = ({ schedule, state, dispatch 
                             step={SuperConstants.DRAWDOWN_RETURN.STEP}
                             onChange={(v) => dispatch({ type: 'SET_DRAWDOWN_RETURN', payload: v })}
                             formatValue={(v) => `${v.toFixed(1)}%`}
-                            // Custom colors for dark background
                             labelClassName="text-sm font-medium text-indigo-100"
                             valueClassName="text-sm font-bold text-white font-mono"
                         />

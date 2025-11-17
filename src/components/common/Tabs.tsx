@@ -1,3 +1,4 @@
+// File: src/components/common/Tabs.tsx
 import React from 'react';
 
 interface Tab {
@@ -9,11 +10,14 @@ interface TabsProps {
     tabs: Tab[];
     activeTab: string;
     onTabClick: (id: string) => void;
-    variant?: 'button' | 'underline' | 'dark-underline' | 'full-width' | 'pill' | 'segmented' | 'segmented-indigo';
+    variant?: 'button' | 'underline' | 'dark-underline' | 'full-width' | 'pill' | 'pill-on-dark' | 'segmented' | 'segmented-indigo';
     className?: string;
 }
 
 export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant = 'button', className = '' }) => {
+
+    // ... (Keep existing variants: underline, full-width, dark-underline) ...
+
     if (variant === 'underline') {
         return (
             <div className={`border-b border-gray-200 ${className}`}>
@@ -76,21 +80,41 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant
         );
     }
 
+    // Standard Pill (Dark Gray on Light Background)
     if (variant === 'pill') {
         return (
-            // Added overflow-x-auto for safety on very small screens
             <div className={`flex w-full gap-1 rounded-full bg-gray-900 p-1 shadow-inner overflow-x-auto ${className}`}>
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
                         type="button"
                         onClick={() => onTabClick(tab.id)}
-                        // Responsive padding (px-2 -> px-4) and text size (text-xs -> text-sm)
-                        // Added whitespace-nowrap to prevent ugly line breaks
                         className={`flex-1 px-2 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full text-center transition-colors duration-150 border whitespace-nowrap ${
                             activeTab === tab.id
                                 ? 'bg-white text-gray-900 border-gray-900 shadow-sm'
                                 : 'bg-transparent text-white border-transparent hover:bg-gray-700'
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+        );
+    }
+
+    // NEW: Pill on Dark (Deep Indigo on Indigo Background)
+    if (variant === 'pill-on-dark') {
+        return (
+            <div className={`flex w-full gap-1 rounded-full bg-indigo-950 p-1 shadow-inner overflow-x-auto ${className}`}>
+                {tabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => onTabClick(tab.id)}
+                        className={`flex-1 px-2 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full text-center transition-all duration-200 border whitespace-nowrap ${
+                            activeTab === tab.id
+                                ? 'bg-indigo-500 text-white border-indigo-400 shadow-sm'
+                                : 'bg-transparent text-indigo-300 border-transparent hover:text-white hover:bg-indigo-900'
                         }`}
                     >
                         {tab.label}

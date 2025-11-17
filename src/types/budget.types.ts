@@ -45,7 +45,8 @@ export type Action =
     | { type: 'REMOVE_EXPENSE_ITEM'; payload: { categoryId: string; itemId: string } }
     | { type: 'UPDATE_EXPENSE_REDUCTION'; payload: { categoryId: string; itemId: string; reduction: number } }
     | { type: 'TOGGLE_EXPENSE_FIXED'; payload: { categoryId: string; itemId: string } }
-    | { type: 'TOGGLE_ADMIN_MODE' };
+    | { type: 'TOGGLE_ADMIN_MODE' }
+    | { type: 'RESET_BUDGET' }; // NEW ACTION
 
 export interface BudgetDerived {
     totalIncome: number;

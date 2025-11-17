@@ -128,7 +128,6 @@ const initialState: State = {
             name: 'Lifestyle & Recreation',
             iconKey: 'lifestyle',
             items: [
-                // COFFEE: Hidden by default (isHidden: true)
                 mkItem('Coffee', 300, 'lifestyle', false, undefined, true),
                 mkItem('Dining Out', 400, 'dining'),
                 mkItem('Misc', 300, 'entertainment'),
@@ -172,6 +171,7 @@ function reducer(state: State, action: Action): State {
         case 'UPDATE_EXPENSE_REDUCTION': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, reduction: action.payload.reduction } : item) }) };
         case 'TOGGLE_EXPENSE_FIXED': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, isFixed: !item.isFixed, reduction: 0 } : item) }) };
         case 'TOGGLE_ADMIN_MODE': return { ...state, isAdminMode: !state.isAdminMode };
+        case 'RESET_BUDGET': return initialState;
         default: return state;
     }
 }
@@ -187,7 +187,6 @@ export function useBudgetPlanner(): BudgetPlannerState {
 
         state.expenseCategories.forEach(cat => {
             cat.items.forEach(item => {
-                // Always include hidden items in calculation, regardless of Admin Mode
                 totalExpenses += item.amount;
                 const savings = item.amount * (item.reduction / 100);
                 totalOptimizedExpenses += (item.amount - savings);

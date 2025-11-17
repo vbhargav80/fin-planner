@@ -1,4 +1,3 @@
-// File: src/hooks/useBudgetPlanner.ts
 import { useReducer, useMemo } from 'react';
 import type { State, Action, BudgetPlannerState } from '../types/budget.types';
 
@@ -6,107 +5,113 @@ const uuid = () => crypto.randomUUID();
 
 const initialState: State = {
     incomes: [
-        { id: uuid(), name: 'Salary', amount: 5000 },
+        { id: uuid(), name: 'Salary', amount: 5000, iconKey: 'work' },
     ],
     expenseCategories: [
         {
             id: uuid(),
             name: 'Housing',
+            iconKey: 'housing',
             items: [
-                { id: uuid(), name: 'Rates', amount: 200 },
-                { id: uuid(), name: 'Body Corporate', amount: 50 },
-                { id: uuid(), name: 'Insurance', amount: 150 },
-                { id: uuid(), name: 'Maintenance', amount: 300 },
+                { id: uuid(), name: 'Rates', amount: 200, iconKey: 'rates' },
+                { id: uuid(), name: 'Body Corporate', amount: 50, iconKey: 'housing' },
+                { id: uuid(), name: 'Insurance', amount: 150, iconKey: 'rates' },
+                { id: uuid(), name: 'Maintenance', amount: 300, iconKey: 'service' },
             ]
         },
         {
             id: uuid(),
             name: 'Utilities',
+            iconKey: 'utilities',
             items: [
-                { id: uuid(), name: 'Electricity', amount: 150 },
-                { id: uuid(), name: 'Gas', amount: 150 },
-                { id: uuid(), name: 'Water', amount: 150 },
-                { id: uuid(), name: 'Internet', amount: 120 },
-                { id: uuid(), name: 'Mobile', amount: 250 },
+                { id: uuid(), name: 'Electricity', amount: 150, iconKey: 'electricity' },
+                { id: uuid(), name: 'Gas', amount: 150, iconKey: 'gas' },
+                { id: uuid(), name: 'Water', amount: 150, iconKey: 'water' },
+                { id: uuid(), name: 'Internet', amount: 120, iconKey: 'internet' },
+                { id: uuid(), name: 'Mobile', amount: 250, iconKey: 'mobile' },
             ]
         },
         {
             id: uuid(),
             name: 'Transport',
+            iconKey: 'transport',
             items: [
-                { id: uuid(), name: 'Nissan Fuel', amount: 250 },
-                { id: uuid(), name: 'Kia Fuel', amount: 250 },
-                { id: uuid(), name: 'Nissan Rego', amount: 100 },
-                { id: uuid(), name: 'Kia Rego', amount: 100 },
-                { id: uuid(), name: 'Nissan Insurance', amount: 100 },
-                { id: uuid(), name: 'Kia Insurance', amount: 100 },
-                { id: uuid(), name: 'Nissan Servicing', amount: 70 },
-                { id: uuid(), name: 'Kia Servicing', amount: 70 },
-                { id: uuid(), name: 'Nissan Roadside Assist', amount: 10 },
-                { id: uuid(), name: 'Kia Roadside Assist', amount: 10 },
-                { id: uuid(), name: 'Train', amount: 120 },
+                { id: uuid(), name: 'Nissan Fuel', amount: 250, iconKey: 'transport' },
+                { id: uuid(), name: 'Kia Fuel', amount: 250, iconKey: 'transport' },
+                { id: uuid(), name: 'Nissan Rego', amount: 100, iconKey: 'rates' },
+                { id: uuid(), name: 'Kia Rego', amount: 100, iconKey: 'rates' },
+                { id: uuid(), name: 'Nissan Insurance', amount: 100, iconKey: 'rates' },
+                { id: uuid(), name: 'Kia Insurance', amount: 100, iconKey: 'rates' },
+                { id: uuid(), name: 'Nissan Servicing', amount: 70, iconKey: 'service' },
+                { id: uuid(), name: 'Kia Servicing', amount: 70, iconKey: 'service' },
+                { id: uuid(), name: 'Train', amount: 120, iconKey: 'train' },
             ]
         },
         {
             id: uuid(),
             name: 'Groceries & Essential',
+            iconKey: 'groceries',
             items: [
-                { id: uuid(), name: 'Groceries', amount: 1000 },
+                { id: uuid(), name: 'Groceries', amount: 1000, iconKey: 'groceries' },
             ]
         },
         {
             id: uuid(),
             name: 'Health & Insurance',
+            iconKey: 'health',
             items: [
-                { id: uuid(), name: 'Private Health', amount: 350 },
-                { id: uuid(), name: 'Dental', amount: 150 },
-                { id: uuid(), name: 'Prescriptions', amount: 150 },
+                { id: uuid(), name: 'Private Health', amount: 350, iconKey: 'health' },
+                { id: uuid(), name: 'Dental', amount: 150, iconKey: 'health' },
+                { id: uuid(), name: 'Prescriptions', amount: 150, iconKey: 'health' },
             ]
         },
         {
             id: uuid(),
             name: 'Childcare & Education',
+            iconKey: 'childcare',
             items: [
-                { id: uuid(), name: 'Radhika Fees', amount: 500 },
-                { id: uuid(), name: 'Nabhi Swimming', amount: 120 },
-                { id: uuid(), name: 'Radhika Swimming', amount: 120 },
-                { id: uuid(), name: 'Tuition - Karen', amount: 350 },
-                { id: uuid(), name: 'Tuition - Bright Minds', amount: 150 },
+                { id: uuid(), name: 'Radhika Fees', amount: 500, iconKey: 'education' },
+                { id: uuid(), name: 'Nabhi Swimming', amount: 120, iconKey: 'childcare' },
+                { id: uuid(), name: 'Radhika Swimming', amount: 120, iconKey: 'childcare' },
+                { id: uuid(), name: 'Tuition - Karen', amount: 350, iconKey: 'education' },
             ]
         },
         {
             id: uuid(),
             name: 'Debt & Savings',
+            iconKey: 'debt',
             items: [
-                { id: uuid(), name: 'Package Fee', amount: 50 },
+                { id: uuid(), name: 'Package Fee', amount: 50, iconKey: 'debt' },
             ]
         },
         {
             id: uuid(),
             name: 'Lifestyle & Recreation',
+            iconKey: 'lifestyle',
             items: [
-                { id: uuid(), name: 'Coffee', amount: 300 },
-                { id: uuid(), name: 'Dining Out', amount: 400 },
-                { id: uuid(), name: 'Misc', amount: 300 },
+                { id: uuid(), name: 'Coffee', amount: 300, iconKey: 'lifestyle' },
+                { id: uuid(), name: 'Dining Out', amount: 400, iconKey: 'dining' },
+                { id: uuid(), name: 'Misc', amount: 300, iconKey: 'entertainment' },
             ]
         },
         {
             id: uuid(),
             name: 'Personal & Clothing',
+            iconKey: 'personal',
             items: [
-                { id: uuid(), name: 'Haircuts', amount: 100 },
-                { id: uuid(), name: 'Clothing', amount: 400 },
-                { id: uuid(), name: 'Cosmetics', amount: 100 },
+                { id: uuid(), name: 'Haircuts', amount: 100, iconKey: 'hair' },
+                { id: uuid(), name: 'Clothing', amount: 400, iconKey: 'clothing' },
+                { id: uuid(), name: 'Cosmetics', amount: 100, iconKey: 'personal' },
             ]
         },
         {
             id: uuid(),
             name: 'Misc',
+            iconKey: 'misc',
             items: [
-                { id: uuid(), name: 'Gifts', amount: 200 },
-                { id: uuid(), name: 'Donations', amount: 100 },
-                { id: uuid(), name: 'Unexpected Costs', amount: 200 },
-                { id: uuid(), name: 'Software Subscriptions', amount: 150 },
+                { id: uuid(), name: 'Gifts', amount: 200, iconKey: 'gift' },
+                { id: uuid(), name: 'Donations', amount: 100, iconKey: 'gift' },
+                { id: uuid(), name: 'Unexpected Costs', amount: 200, iconKey: 'alert' },
             ]
         },
     ]

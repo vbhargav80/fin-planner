@@ -9,18 +9,20 @@ interface InputGroupProps {
     symbolPosition?: 'left' | 'right';
     step?: number | string;
     disabled?: boolean;
+    labelIcon?: React.ReactNode; // New prop for the icon
 }
 
 export const InputGroup: React.FC<InputGroupProps> = ({
-    label,
-    id,
-    value,
-    onChange,
-    symbol = null,
-    symbolPosition = 'left',
-    step: customStep,
-    disabled = false
-}) => {
+                                                          label,
+                                                          id,
+                                                          value,
+                                                          onChange,
+                                                          symbol = null,
+                                                          symbolPosition = 'left',
+                                                          step: customStep,
+                                                          disabled = false,
+                                                          labelIcon // Destructure new prop
+                                                      }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const num = parseFloat(e.target.value);
         if (!isNaN(num)) {
@@ -32,7 +34,9 @@ export const InputGroup: React.FC<InputGroupProps> = ({
 
     return (
         <div>
-            <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+            <label htmlFor={id} className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                {/* Render icon if provided */}
+                {labelIcon && <span className="text-gray-400">{labelIcon}</span>}
                 {label}
             </label>
             <div className="mt-1 relative rounded-md shadow-sm">

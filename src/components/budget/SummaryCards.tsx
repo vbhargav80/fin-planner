@@ -11,7 +11,7 @@ interface Props {
 export const SummaryCards: React.FC<Props> = memo(({ totalIncome, totalExpenses, remaining }) => {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            {/* Income: Indigo-600 (Standard "Pill" style) */}
+            {/* Income: Indigo-600 */}
             <div className="bg-indigo-600 rounded-xl p-4 border border-indigo-500 shadow-sm">
                 <div className="flex items-center gap-2 text-indigo-100 mb-2">
                     <TrendingUp size={18} />
@@ -22,7 +22,7 @@ export const SummaryCards: React.FC<Props> = memo(({ totalIncome, totalExpenses,
                 </div>
             </div>
 
-            {/* Expenses: Indigo-600 (Standard "Pill" style) */}
+            {/* Expenses: Indigo-600 */}
             <div className="bg-indigo-600 rounded-xl p-4 border border-indigo-500 shadow-sm">
                 <div className="flex items-center gap-2 text-indigo-100 mb-2">
                     <TrendingDown size={18} />
@@ -33,14 +33,14 @@ export const SummaryCards: React.FC<Props> = memo(({ totalIncome, totalExpenses,
                 </div>
             </div>
 
-            {/* Net Result: Soft Translucent Backgrounds */}
+            {/* Net Result: Updated Red to be 'More Red' but not neon */}
             <div className={`rounded-xl p-4 border shadow-sm backdrop-blur-sm ${
                 remaining >= 0
-                    ? 'bg-emerald-900/50 border-emerald-700/50'   // Soft Dark Green
-                    : 'bg-rose-900/50 border-rose-700/50'         // Soft Dark Red
+                    ? 'bg-emerald-900/50 border-emerald-700/50'  // Soft Green
+                    : 'bg-red-900/80 border-red-700/50'           // Richer, deeper Red (80% opacity)
             }`}>
                 <div className={`flex items-center gap-2 mb-2 ${
-                    remaining >= 0 ? 'text-emerald-200' : 'text-rose-200'
+                    remaining >= 0 ? 'text-emerald-200' : 'text-red-200'
                 }`}>
                     <Wallet size={18} />
                     <span className="text-sm font-medium">Net Result</span>

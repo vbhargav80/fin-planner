@@ -2,12 +2,14 @@ import type { Dispatch } from 'react';
 
 export interface BudgetId {
     id: string;
-    iconKey?: string; // Added this optional property
+    iconKey?: string;
 }
 
 export interface ExpenseItem extends BudgetId {
     name: string;
     amount: number;
+    reduction: number;
+    isFixed?: boolean; // New property
 }
 
 export interface ExpenseCategory extends BudgetId {
@@ -34,12 +36,16 @@ export type Action =
     | { type: 'REMOVE_CATEGORY'; payload: string }
     | { type: 'ADD_EXPENSE_ITEM'; payload: { categoryId: string; item: ExpenseItem } }
     | { type: 'UPDATE_EXPENSE_ITEM'; payload: { categoryId: string; item: ExpenseItem } }
-    | { type: 'REMOVE_EXPENSE_ITEM'; payload: { categoryId: string; itemId: string } };
+    | { type: 'REMOVE_EXPENSE_ITEM'; payload: { categoryId: string; itemId: string } }
+    | { type: 'UPDATE_EXPENSE_REDUCTION'; payload: { categoryId: string; itemId: string; reduction: number } };
 
 export interface BudgetDerived {
     totalIncome: number;
     totalExpenses: number;
     remaining: number;
+    totalOptimizedExpenses: number;
+    potentialSavings: number;
+    projectedRemaining: number;
 }
 
 export interface BudgetPlannerState extends BudgetDerived {

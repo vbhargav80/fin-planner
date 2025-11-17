@@ -1,7 +1,17 @@
 import { useReducer, useMemo } from 'react';
-import type { State, Action, BudgetPlannerState } from '../types/budget.types';
+import type { State, Action, BudgetPlannerState, ExpenseItem } from '../types/budget.types';
 
 const uuid = () => crypto.randomUUID();
+
+// Updated helper to accept isFixed
+const mkItem = (name: string, amount: number, iconKey?: string, isFixed: boolean = false): ExpenseItem => ({
+    id: uuid(),
+    name,
+    amount,
+    iconKey,
+    reduction: 0,
+    isFixed
+});
 
 const initialState: State = {
     incomes: [
@@ -13,10 +23,10 @@ const initialState: State = {
             name: 'Housing',
             iconKey: 'housing',
             items: [
-                { id: uuid(), name: 'Rates', amount: 200, iconKey: 'rates' },
-                { id: uuid(), name: 'Body Corporate', amount: 50, iconKey: 'housing' },
-                { id: uuid(), name: 'Insurance', amount: 150, iconKey: 'rates' },
-                { id: uuid(), name: 'Maintenance', amount: 300, iconKey: 'service' },
+                mkItem('Rates', 200, 'rates', true), // FIXED
+                mkItem('Body Corporate', 50, 'housing', true), // FIXED
+                mkItem('Insurance', 150, 'rates'),
+                mkItem('Maintenance', 300, 'service'),
             ]
         },
         {
@@ -24,11 +34,11 @@ const initialState: State = {
             name: 'Utilities',
             iconKey: 'utilities',
             items: [
-                { id: uuid(), name: 'Electricity', amount: 150, iconKey: 'electricity' },
-                { id: uuid(), name: 'Gas', amount: 150, iconKey: 'gas' },
-                { id: uuid(), name: 'Water', amount: 150, iconKey: 'water' },
-                { id: uuid(), name: 'Internet', amount: 120, iconKey: 'internet' },
-                { id: uuid(), name: 'Mobile', amount: 250, iconKey: 'mobile' },
+                mkItem('Electricity', 150, 'electricity'),
+                mkItem('Gas', 150, 'gas'),
+                mkItem('Water', 150, 'water', true), // Usually fixed/essential
+                mkItem('Internet', 120, 'internet'),
+                mkItem('Mobile', 250, 'mobile'),
             ]
         },
         {
@@ -36,15 +46,17 @@ const initialState: State = {
             name: 'Transport',
             iconKey: 'transport',
             items: [
-                { id: uuid(), name: 'Nissan Fuel', amount: 250, iconKey: 'transport' },
-                { id: uuid(), name: 'Kia Fuel', amount: 250, iconKey: 'transport' },
-                { id: uuid(), name: 'Nissan Rego', amount: 100, iconKey: 'rates' },
-                { id: uuid(), name: 'Kia Rego', amount: 100, iconKey: 'rates' },
-                { id: uuid(), name: 'Nissan Insurance', amount: 100, iconKey: 'rates' },
-                { id: uuid(), name: 'Kia Insurance', amount: 100, iconKey: 'rates' },
-                { id: uuid(), name: 'Nissan Servicing', amount: 70, iconKey: 'service' },
-                { id: uuid(), name: 'Kia Servicing', amount: 70, iconKey: 'service' },
-                { id: uuid(), name: 'Train', amount: 120, iconKey: 'train' },
+                mkItem('Nissan Fuel', 250, 'transport'),
+                mkItem('Kia Fuel', 250, 'transport'),
+                mkItem('Nissan Rego', 100, 'rates', true), // FIXED
+                mkItem('Kia Rego', 100, 'rates', true), // FIXED
+                mkItem('Nissan Insurance', 100, 'rates'),
+                mkItem('Kia Insurance', 100, 'rates'),
+                mkItem('Nissan Servicing', 70, 'service'),
+                mkItem('Kia Servicing', 70, 'service'),
+                mkItem('Nissan Roadside Assist', 10, 'alert'),
+                mkItem('Kia Roadside Assist', 10, 'alert'),
+                mkItem('Train', 120, 'train'),
             ]
         },
         {
@@ -52,7 +64,7 @@ const initialState: State = {
             name: 'Groceries & Essential',
             iconKey: 'groceries',
             items: [
-                { id: uuid(), name: 'Groceries', amount: 1000, iconKey: 'groceries' },
+                mkItem('Groceries', 1000, 'groceries'),
             ]
         },
         {
@@ -60,9 +72,9 @@ const initialState: State = {
             name: 'Health & Insurance',
             iconKey: 'health',
             items: [
-                { id: uuid(), name: 'Private Health', amount: 350, iconKey: 'health' },
-                { id: uuid(), name: 'Dental', amount: 150, iconKey: 'health' },
-                { id: uuid(), name: 'Prescriptions', amount: 150, iconKey: 'health' },
+                mkItem('Private Health', 350, 'health', true), // Hard to reduce quickly
+                mkItem('Dental', 150, 'health'),
+                mkItem('Prescriptions', 150, 'health'),
             ]
         },
         {
@@ -70,10 +82,11 @@ const initialState: State = {
             name: 'Childcare & Education',
             iconKey: 'childcare',
             items: [
-                { id: uuid(), name: 'Radhika Fees', amount: 500, iconKey: 'education' },
-                { id: uuid(), name: 'Nabhi Swimming', amount: 120, iconKey: 'childcare' },
-                { id: uuid(), name: 'Radhika Swimming', amount: 120, iconKey: 'childcare' },
-                { id: uuid(), name: 'Tuition - Karen', amount: 350, iconKey: 'education' },
+                mkItem('Radhika Fees', 500, 'education', true), // FIXED
+                mkItem('Nabhi Swimming', 120, 'childcare'),
+                mkItem('Radhika Swimming', 120, 'childcare'),
+                mkItem('Tuition - Karen', 350, 'education'),
+                mkItem('Tuition - Bright Minds', 150, 'education'),
             ]
         },
         {
@@ -81,7 +94,7 @@ const initialState: State = {
             name: 'Debt & Savings',
             iconKey: 'debt',
             items: [
-                { id: uuid(), name: 'Package Fee', amount: 50, iconKey: 'debt' },
+                mkItem('Package Fee', 50, 'debt', true), // FIXED
             ]
         },
         {
@@ -89,9 +102,9 @@ const initialState: State = {
             name: 'Lifestyle & Recreation',
             iconKey: 'lifestyle',
             items: [
-                { id: uuid(), name: 'Coffee', amount: 300, iconKey: 'lifestyle' },
-                { id: uuid(), name: 'Dining Out', amount: 400, iconKey: 'dining' },
-                { id: uuid(), name: 'Misc', amount: 300, iconKey: 'entertainment' },
+                mkItem('Coffee', 300, 'lifestyle'),
+                mkItem('Dining Out', 400, 'dining'),
+                mkItem('Misc', 300, 'entertainment'),
             ]
         },
         {
@@ -99,9 +112,9 @@ const initialState: State = {
             name: 'Personal & Clothing',
             iconKey: 'personal',
             items: [
-                { id: uuid(), name: 'Haircuts', amount: 100, iconKey: 'hair' },
-                { id: uuid(), name: 'Clothing', amount: 400, iconKey: 'clothing' },
-                { id: uuid(), name: 'Cosmetics', amount: 100, iconKey: 'personal' },
+                mkItem('Haircuts', 100, 'hair'),
+                mkItem('Clothing', 400, 'clothing'),
+                mkItem('Cosmetics', 100, 'personal'),
             ]
         },
         {
@@ -109,9 +122,10 @@ const initialState: State = {
             name: 'Misc',
             iconKey: 'misc',
             items: [
-                { id: uuid(), name: 'Gifts', amount: 200, iconKey: 'gift' },
-                { id: uuid(), name: 'Donations', amount: 100, iconKey: 'gift' },
-                { id: uuid(), name: 'Unexpected Costs', amount: 200, iconKey: 'alert' },
+                mkItem('Gifts', 200, 'gift'),
+                mkItem('Donations', 100, 'gift'),
+                mkItem('Unexpected Costs', 200, 'alert'),
+                mkItem('Software Subscriptions', 150, 'internet'),
             ]
         },
     ]
@@ -119,18 +133,12 @@ const initialState: State = {
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
-        // --- INCOME (Flat List) ---
         case 'ADD_INCOME':
             return { ...state, incomes: [...state.incomes, action.payload] };
         case 'UPDATE_INCOME':
-            return {
-                ...state,
-                incomes: state.incomes.map(i => i.id === action.payload.id ? action.payload : i)
-            };
+            return { ...state, incomes: state.incomes.map(i => i.id === action.payload.id ? action.payload : i) };
         case 'REMOVE_INCOME':
             return { ...state, incomes: state.incomes.filter(i => i.id !== action.payload) };
-
-        // --- CATEGORIES ---
         case 'ADD_CATEGORY':
             return { ...state, expenseCategories: [...state.expenseCategories, action.payload] };
         case 'UPDATE_CATEGORY_NAME':
@@ -142,8 +150,6 @@ function reducer(state: State, action: Action): State {
             };
         case 'REMOVE_CATEGORY':
             return { ...state, expenseCategories: state.expenseCategories.filter(c => c.id !== action.payload) };
-
-        // --- EXPENSE ITEMS (Nested) ---
         case 'ADD_EXPENSE_ITEM':
             return {
                 ...state,
@@ -176,7 +182,21 @@ function reducer(state: State, action: Action): State {
                     };
                 })
             };
-
+        case 'UPDATE_EXPENSE_REDUCTION':
+            return {
+                ...state,
+                expenseCategories: state.expenseCategories.map(cat => {
+                    if (cat.id !== action.payload.categoryId) return cat;
+                    return {
+                        ...cat,
+                        items: cat.items.map(item =>
+                            item.id === action.payload.itemId
+                                ? { ...item, reduction: action.payload.reduction }
+                                : item
+                        )
+                    };
+                })
+            };
         default:
             return state;
     }
@@ -188,14 +208,32 @@ export function useBudgetPlanner(): BudgetPlannerState {
     const derived = useMemo(() => {
         const totalIncome = state.incomes.reduce((sum, item) => sum + item.amount, 0);
 
-        const totalExpenses = state.expenseCategories.reduce((catSum, cat) => {
-            const categoryTotal = cat.items.reduce((itemSum, item) => itemSum + item.amount, 0);
-            return catSum + categoryTotal;
-        }, 0);
+        let totalExpenses = 0;
+        let totalOptimizedExpenses = 0;
+
+        state.expenseCategories.forEach(cat => {
+            cat.items.forEach(item => {
+                totalExpenses += item.amount;
+                // Optimized total (amount - savings)
+                // If isFixed, reduction is effectively ignored (or should be 0), but UI prevents setting it.
+                // We calculate based on reduction value, trusting the UI to keep fixed items at 0.
+                const savings = item.amount * (item.reduction / 100);
+                totalOptimizedExpenses += (item.amount - savings);
+            });
+        });
 
         const remaining = totalIncome - totalExpenses;
+        const projectedRemaining = totalIncome - totalOptimizedExpenses;
+        const potentialSavings = totalExpenses - totalOptimizedExpenses;
 
-        return { totalIncome, totalExpenses, remaining };
+        return {
+            totalIncome,
+            totalExpenses,
+            remaining,
+            totalOptimizedExpenses,
+            potentialSavings,
+            projectedRemaining
+        };
     }, [state]);
 
     return { state, dispatch, ...derived };

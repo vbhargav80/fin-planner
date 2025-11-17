@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Landmark, LayoutDashboard, CalendarRange, PiggyBank, Menu, X } from 'lucide-react';
+import { Landmark, LayoutDashboard, CalendarRange, PiggyBank, Menu, X, Wallet } from 'lucide-react';
 import type { NavbarProps } from '../../types/common.types';
 
 export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) => {
@@ -9,6 +9,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
         { id: 'homeLoan' as const, name: 'Amortization', icon: Landmark },
         { id: 'super' as const, name: 'Super Calculator', icon: PiggyBank },
         { id: 'drawdown' as const, name: 'Drawdown Simulator', icon: CalendarRange },
+        { id: 'budget' as const, name: 'Budget', icon: Wallet },
     ];
 
     return (

@@ -9,7 +9,7 @@ interface TabsProps {
     tabs: Tab[];
     activeTab: string;
     onTabClick: (id: string) => void;
-    variant?: 'button' | 'underline' | 'dark-underline' | 'full-width' | 'pill' | 'segmented';
+    variant?: 'button' | 'underline' | 'dark-underline' | 'full-width' | 'pill' | 'segmented' | 'segmented-indigo';
     className?: string;
 }
 
@@ -109,6 +109,28 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant
                             activeTab === tab.id
                                 ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
                                 : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+        );
+    }
+
+    // New Indigo Segmented
+    if (variant === 'segmented-indigo') {
+        return (
+            <div className={`flex w-full gap-1 rounded-full bg-indigo-50 p-1 shadow-inner ${className}`}>
+                {tabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => onTabClick(tab.id)}
+                        className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                            activeTab === tab.id
+                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                : 'bg-transparent text-indigo-700 border-transparent hover:bg-indigo-100'
                         }`}
                     >
                         {tab.label}

@@ -1,9 +1,9 @@
-// File: 'src/App.tsx'
 import { useState } from 'react';
 import { Navbar } from './components/common/Navbar';
 import { SuperCalculator } from './components/super/SuperCalculator';
 import { AmortizationCalculator } from './components/amortization/AmortizationCalculator';
 import { DrawdownSimulator } from './components/drawdown-simulator/DrawdownSimulator';
+import { BudgetPlanner } from './components/budget/BudgetPlanner';
 import type { CalculatorId } from './types/common.types';
 
 export default function App() {
@@ -17,6 +17,8 @@ export default function App() {
                 return <AmortizationCalculator />;
             case 'drawdown':
                 return <DrawdownSimulator />;
+            case 'budget':
+                return <BudgetPlanner />;
             default:
                 return <SuperCalculator />;
         }

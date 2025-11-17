@@ -1,7 +1,6 @@
-// File: 'src/types/common.types.ts'
 import React from 'react';
 
-export type CalculatorId = 'super' | 'homeLoan' | 'drawdown';
+export type CalculatorId = 'super' | 'homeLoan' | 'drawdown' | 'budget';
 
 export interface NavbarProps {
     activeCalculator: CalculatorId;

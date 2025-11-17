@@ -4,19 +4,19 @@ import type { State, Action, BudgetPlannerState, ExpenseItem } from '../types/bu
 
 const uuid = () => crypto.randomUUID();
 
-// Updated helper to accept subGroup
+// Helper to easily create items with the new structure
 const mkItem = (
     name: string,
     amount: number,
     iconKey?: string,
     isFixed: boolean = false,
-    subGroup?: string // New param
+    subGroup?: string
 ): ExpenseItem => ({
     id: uuid(),
     name,
     amount,
     iconKey,
-    reduction: 0,
+    reduction: 0, // Default: Keep 100% of the cost
     isFixed,
     subGroup
 });
@@ -24,6 +24,8 @@ const mkItem = (
 const initialState: State = {
     incomes: [
         { id: uuid(), name: 'Salary', amount: 5000, iconKey: 'work' },
+        // Added new income source
+        { id: uuid(), name: 'Investment Property Rent', amount: 2050, iconKey: 'housing' },
     ],
     expenseCategories: [
         {

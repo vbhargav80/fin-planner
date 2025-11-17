@@ -28,14 +28,15 @@ export const IncomeList: React.FC<Props> = ({ items, totalIncome, dispatch }) =>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {items.map(item => {
-                    const step = Math.max(1, Math.round(item.amount * 0.05));
+                    // Calculate a "smart step" (5% of value), default to 50 if 0
+                    const step = Math.max(1, Math.round(item.amount * 0.05)) || 50;
 
                     return (
                         <InputGroup
                             key={item.id}
                             id={item.id}
                             label={item.name}
-                            // Add Icon Here
+                            // This automatically grabs the 'housing' icon for Investment Rent
                             labelIcon={<CategoryIcon iconKey={item.iconKey} size={16} />}
                             value={item.amount}
                             onChange={(val) => dispatch({

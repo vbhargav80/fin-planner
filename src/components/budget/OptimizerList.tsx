@@ -1,8 +1,9 @@
+// File: src/components/budget/OptimizerList.tsx
 import React, { useState, useMemo } from 'react';
 import type { ExpenseCategory, Action } from '../../types/budget.types';
 import { formatCurrency } from '../../utils/formatters';
 import { CategoryIcon } from './CategoryIcon';
-import { Lock } from 'lucide-react';
+import { Lock, Unlock } from 'lucide-react'; // Import icons
 
 interface Props {
     categories: ExpenseCategory[];
@@ -66,7 +67,7 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
                 </div>
             </div>
 
-            {/* Detail Area with Saving Pills */}
+            {/* Detail Area */}
             <div className="w-2/3 bg-white overflow-y-auto p-6">
                 {activeCategory ? (
                     <div className="animate-fade-in">
@@ -92,11 +93,24 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
                                             <div className="flex items-center gap-2">
                                                 <CategoryIcon iconKey={item.iconKey} size={18} className="text-gray-400" />
                                                 <span className="text-sm font-medium text-gray-700">{item.name}</span>
-                                                {/* FIXED ICON Indicator */}
-                                                {item.isFixed && (
-                                                    <Lock size={14} className="text-gray-300" />
-                                                )}
+
+                                                {/* CONFIG TOGGLE BUTTON */}
+                                                <button
+                                                    onClick={() => dispatch({
+                                                        type: 'TOGGLE_EXPENSE_FIXED',
+                                                        payload: { categoryId: activeCategory.id, itemId: item.id }
+                                                    })}
+                                                    className={`p-1 rounded-md transition-colors ml-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                                                        item.isFixed
+                                                            ? 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                                                            : 'text-indigo-200 hover:text-indigo-500 hover:bg-indigo-50'
+                                                    }`}
+                                                    title={item.isFixed ? "Locked (Click to unlock)" : "Editable (Click to lock)"}
+                                                >
+                                                    {item.isFixed ? <Lock size={14} /> : <Unlock size={14} />}
+                                                </button>
                                             </div>
+
                                             <div className="text-right">
                                                 {!item.isFixed && item.reduction > 0 ? (
                                                     <div className="flex flex-col items-end">
@@ -118,7 +132,7 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
                                         {/* Action Pills or Fixed Label */}
                                         <div className="flex flex-wrap gap-1.5">
                                             {item.isFixed ? (
-                                                <span className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed">
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-gray-50 text-gray-400 border border-gray-200 select-none cursor-not-allowed">
                                                     <Lock size={12} />
                                                     Fixed Cost
                                                 </span>

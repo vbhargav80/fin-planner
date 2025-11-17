@@ -1,3 +1,4 @@
+// File: src/types/budget.types.ts
 import type { Dispatch } from 'react';
 
 export interface BudgetId {
@@ -9,7 +10,7 @@ export interface ExpenseItem extends BudgetId {
     name: string;
     amount: number;
     reduction: number;
-    isFixed?: boolean; // New property
+    isFixed?: boolean;
 }
 
 export interface ExpenseCategory extends BudgetId {
@@ -37,7 +38,9 @@ export type Action =
     | { type: 'ADD_EXPENSE_ITEM'; payload: { categoryId: string; item: ExpenseItem } }
     | { type: 'UPDATE_EXPENSE_ITEM'; payload: { categoryId: string; item: ExpenseItem } }
     | { type: 'REMOVE_EXPENSE_ITEM'; payload: { categoryId: string; itemId: string } }
-    | { type: 'UPDATE_EXPENSE_REDUCTION'; payload: { categoryId: string; itemId: string; reduction: number } };
+    | { type: 'UPDATE_EXPENSE_REDUCTION'; payload: { categoryId: string; itemId: string; reduction: number } }
+    // New Action
+    | { type: 'TOGGLE_EXPENSE_FIXED'; payload: { categoryId: string; itemId: string } };
 
 export interface BudgetDerived {
     totalIncome: number;

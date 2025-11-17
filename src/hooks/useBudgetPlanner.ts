@@ -1,9 +1,9 @@
+// File: src/hooks/useBudgetPlanner.ts
 import { useReducer, useMemo } from 'react';
 import type { State, Action, BudgetPlannerState, ExpenseItem } from '../types/budget.types';
 
 const uuid = () => crypto.randomUUID();
 
-// Updated helper to accept isFixed
 const mkItem = (name: string, amount: number, iconKey?: string, isFixed: boolean = false): ExpenseItem => ({
     id: uuid(),
     name,
@@ -13,6 +13,7 @@ const mkItem = (name: string, amount: number, iconKey?: string, isFixed: boolean
     isFixed
 });
 
+// ... (Keep your initialState exactly as it was in the previous step)
 const initialState: State = {
     incomes: [
         { id: uuid(), name: 'Salary', amount: 5000, iconKey: 'work' },
@@ -23,8 +24,8 @@ const initialState: State = {
             name: 'Housing',
             iconKey: 'housing',
             items: [
-                mkItem('Rates', 200, 'rates', true), // FIXED
-                mkItem('Body Corporate', 50, 'housing', true), // FIXED
+                mkItem('Rates', 200, 'rates', true),
+                mkItem('Body Corporate', 50, 'housing', true),
                 mkItem('Insurance', 150, 'rates'),
                 mkItem('Maintenance', 300, 'service'),
             ]
@@ -36,7 +37,7 @@ const initialState: State = {
             items: [
                 mkItem('Electricity', 150, 'electricity'),
                 mkItem('Gas', 150, 'gas'),
-                mkItem('Water', 150, 'water', true), // Usually fixed/essential
+                mkItem('Water', 150, 'water', true),
                 mkItem('Internet', 120, 'internet'),
                 mkItem('Mobile', 250, 'mobile'),
             ]
@@ -48,8 +49,8 @@ const initialState: State = {
             items: [
                 mkItem('Nissan Fuel', 250, 'transport'),
                 mkItem('Kia Fuel', 250, 'transport'),
-                mkItem('Nissan Rego', 100, 'rates', true), // FIXED
-                mkItem('Kia Rego', 100, 'rates', true), // FIXED
+                mkItem('Nissan Rego', 100, 'rates', true),
+                mkItem('Kia Rego', 100, 'rates', true),
                 mkItem('Nissan Insurance', 100, 'rates'),
                 mkItem('Kia Insurance', 100, 'rates'),
                 mkItem('Nissan Servicing', 70, 'service'),
@@ -72,7 +73,7 @@ const initialState: State = {
             name: 'Health & Insurance',
             iconKey: 'health',
             items: [
-                mkItem('Private Health', 350, 'health', true), // Hard to reduce quickly
+                mkItem('Private Health', 350, 'health', true),
                 mkItem('Dental', 150, 'health'),
                 mkItem('Prescriptions', 150, 'health'),
             ]
@@ -82,7 +83,7 @@ const initialState: State = {
             name: 'Childcare & Education',
             iconKey: 'childcare',
             items: [
-                mkItem('Radhika Fees', 500, 'education', true), // FIXED
+                mkItem('Radhika Fees', 500, 'education', true),
                 mkItem('Nabhi Swimming', 120, 'childcare'),
                 mkItem('Radhika Swimming', 120, 'childcare'),
                 mkItem('Tuition - Karen', 350, 'education'),
@@ -94,7 +95,7 @@ const initialState: State = {
             name: 'Debt & Savings',
             iconKey: 'debt',
             items: [
-                mkItem('Package Fee', 50, 'debt', true), // FIXED
+                mkItem('Package Fee', 50, 'debt', true),
             ]
         },
         {
@@ -197,6 +198,28 @@ function reducer(state: State, action: Action): State {
                     };
                 })
             };
+
+        // NEW: Toggle Fixed Status
+        case 'TOGGLE_EXPENSE_FIXED':
+            return {
+                ...state,
+                expenseCategories: state.expenseCategories.map(cat => {
+                    if (cat.id !== action.payload.categoryId) return cat;
+                    return {
+                        ...cat,
+                        items: cat.items.map(item =>
+                            item.id === action.payload.itemId
+                                ? {
+                                    ...item,
+                                    isFixed: !item.isFixed,
+                                    reduction: 0 // Reset reduction to 0 if locking
+                                }
+                                : item
+                        )
+                    };
+                })
+            };
+
         default:
             return state;
     }
@@ -214,9 +237,6 @@ export function useBudgetPlanner(): BudgetPlannerState {
         state.expenseCategories.forEach(cat => {
             cat.items.forEach(item => {
                 totalExpenses += item.amount;
-                // Optimized total (amount - savings)
-                // If isFixed, reduction is effectively ignored (or should be 0), but UI prevents setting it.
-                // We calculate based on reduction value, trusting the UI to keep fixed items at 0.
                 const savings = item.amount * (item.reduction / 100);
                 totalOptimizedExpenses += (item.amount - savings);
             });

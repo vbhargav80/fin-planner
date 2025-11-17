@@ -49,12 +49,20 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch, isAdmin
         }
     }, [activeCategory?.id, isAdminMode]);
 
+    // Helper to calculate visible total for a category
+    const getVisibleCategoryTotal = (cat: ExpenseCategory) => {
+        return cat.items.reduce((sum, item) => {
+            if (item.isHidden && !isAdminMode) return sum;
+            return sum + item.amount;
+        }, 0);
+    };
+
     return (
         <div className="flex-1 overflow-hidden flex h-full">
             <div className="w-1/3 bg-gray-50 border-r border-gray-200 overflow-y-auto custom-scrollbar">
                 <div className="py-2">
                     {categories.map(cat => {
-                        const catTotal = cat.items.reduce((sum, i) => sum + i.amount, 0);
+                        const catTotal = getVisibleCategoryTotal(cat);
                         const isActive = cat.id === activeCategoryId;
                         return (
                             <button
@@ -91,7 +99,8 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch, isAdmin
                             <div className="text-right">
                                 <span className="text-xs font-medium text-gray-500">Subtotal</span>
                                 <div className="text-lg font-bold text-indigo-600">
-                                    {formatCurrency(activeCategory.items.reduce((sum, i) => sum + i.amount, 0))}
+                                    {/* FIXED: Only sum visible items */}
+                                    {formatCurrency(getVisibleCategoryTotal(activeCategory))}
                                 </div>
                             </div>
                         </div>
@@ -114,16 +123,17 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch, isAdmin
                                     <InputGroup
                                         key={item.id}
                                         id={item.id}
-                                        label={item.name}
-                                        labelIcon={
+                                        label={
                                             item.isHidden ? (
-                                                <span title="Hidden from public" className="flex items-center">
-                                                    <EyeOff size={16} className="text-red-400" />
+                                                <span className="flex items-center gap-2 text-red-500">
+                                                    {item.name}
+                                                    <EyeOff size={14} className="text-red-400" />
                                                 </span>
                                             ) : (
-                                                <CategoryIcon iconKey={item.iconKey} size={16} />
+                                                item.name
                                             )
                                         }
+                                        labelIcon={<CategoryIcon iconKey={item.iconKey} size={16} />}
                                         value={item.amount}
                                         onChange={(val) => dispatch({
                                             type: 'UPDATE_EXPENSE_ITEM',

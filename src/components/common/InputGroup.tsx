@@ -1,16 +1,6 @@
+// File: src/components/common/InputGroup.tsx
 import React from 'react';
-
-interface InputGroupProps {
-    label: string;
-    id: string;
-    value: number;
-    onChange: (value: number) => void;
-    symbol?: string | null;
-    symbolPosition?: 'left' | 'right';
-    step?: number | string;
-    disabled?: boolean;
-    labelIcon?: React.ReactNode; // New prop for the icon
-}
+import type { InputGroupProps } from '../../types/common.types';
 
 export const InputGroup: React.FC<InputGroupProps> = ({
                                                           label,
@@ -21,7 +11,7 @@ export const InputGroup: React.FC<InputGroupProps> = ({
                                                           symbolPosition = 'left',
                                                           step: customStep,
                                                           disabled = false,
-                                                          labelIcon // Destructure new prop
+                                                          labelIcon
                                                       }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const num = parseFloat(e.target.value);
@@ -35,7 +25,6 @@ export const InputGroup: React.FC<InputGroupProps> = ({
     return (
         <div>
             <label htmlFor={id} className="block text-sm font-medium text-gray-700 flex items-center gap-2">
-                {/* Render icon if provided */}
                 {labelIcon && <span className="text-gray-400">{labelIcon}</span>}
                 {label}
             </label>

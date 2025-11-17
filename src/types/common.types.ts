@@ -13,14 +13,16 @@ export interface SidebarProps {
 }
 
 export interface InputGroupProps {
-    label: string;
+    // CHANGED: label can now be a ReactNode
+    label: string | React.ReactNode;
     id: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    value: string | number;
+    onChange: (value: number) => void;
     symbol?: string | null;
     symbolPosition?: 'left' | 'right';
-    step?: number;
+    step?: number | string;
     disabled?: boolean;
+    labelIcon?: React.ReactNode;
 }
 
 export interface ToggleSwitchProps {

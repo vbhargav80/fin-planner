@@ -9,10 +9,9 @@ import { Tabs } from '../common/Tabs';
 interface Props {
     categories: ExpenseCategory[];
     dispatch: React.Dispatch<Action>;
-    isAdminMode: boolean; // New Prop
+    isAdminMode: boolean;
 }
 
-// ... (SAVING_OPTIONS const remains same)
 const SAVING_OPTIONS = [
     { label: 'Keep', val: 0, color: 'bg-gray-100 text-gray-600 hover:bg-gray-200' },
     { label: 'Trim 10%', val: 10, color: 'bg-blue-50 text-blue-600 hover:bg-blue-100' },
@@ -35,7 +34,6 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch, isAdminMo
         const groups: Record<string, ExpenseItem[]> = { 'General': [] };
 
         activeCategory.items.forEach(item => {
-            // --- VISIBILITY LOGIC ---
             if (item.isHidden && !isAdminMode) return;
 
             const key = item.subGroup || 'General';
@@ -59,12 +57,21 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch, isAdminMo
 
     return (
         <div className="flex-1 overflow-hidden flex h-full">
-            {/* Sidebar (Same logic as before) */}
+            {/* Sidebar */}
             <div className="w-1/3 bg-gray-50 border-r border-gray-200 overflow-y-auto custom-scrollbar">
                 <div className="py-2">
                     {categories.map(cat => {
-                        const catTotal = cat.items.reduce((sum, i) => sum + i.amount, 0);
-                        const catSavings = cat.items.reduce((sum, i) => sum + (i.amount * (i.reduction/100)), 0);
+                        // FIXED: Only sum visible items
+                        const catTotal = cat.items.reduce((sum, i) => {
+                            if (i.isHidden && !isAdminMode) return sum;
+                            return sum + i.amount;
+                        }, 0);
+
+                        const catSavings = cat.items.reduce((sum, i) => {
+                            if (i.isHidden && !isAdminMode) return sum;
+                            return sum + (i.amount * (i.reduction / 100));
+                        }, 0);
+
                         const isActive = cat.id === activeCategoryId;
                         return (
                             <button
@@ -128,13 +135,10 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch, isAdminMo
                                     <div key={item.id} className="group">
                                         <div className="flex justify-between items-center mb-3">
                                             <div className="flex items-center gap-2">
-                                                {item.isHidden ? (
-                                                    <EyeOff size={18} className="text-red-400" />
-                                                ) : (
-                                                    <CategoryIcon iconKey={item.iconKey} size={18} className="text-gray-400" />
-                                                )}
-                                                <span className={`text-sm font-medium ${item.isHidden ? 'text-red-500' : 'text-gray-700'}`}>
+                                                <CategoryIcon iconKey={item.iconKey} size={18} className="text-gray-400" />
+                                                <span className={`text-sm font-medium flex items-center gap-2 ${item.isHidden ? 'text-red-500' : 'text-gray-700'}`}>
                                                     {item.name}
+                                                    {item.isHidden && <EyeOff size={14} className="text-red-400" />}
                                                 </span>
 
                                                 <button

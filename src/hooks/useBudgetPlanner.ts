@@ -1,4 +1,5 @@
-import { useReducer, useMemo } from 'react';
+import { useMemo } from 'react';
+import { usePersistentReducer } from './usePersistentReducer';
 import type { State, Action, BudgetPlannerState, ExpenseItem } from '../types/budget.types';
 
 const uuid = () => crypto.randomUUID();
@@ -22,7 +23,7 @@ const mkItem = (
 });
 
 const initialState: State = {
-    isAdminMode: false,
+    isAdminMode: false, // Default to hidden
     incomes: [
         { id: uuid(), name: 'Salary', amount: 9000, iconKey: 'work' },
         { id: uuid(), name: 'Investment Property Rent', amount: 2100, iconKey: 'housing' },
@@ -126,7 +127,6 @@ const initialState: State = {
             name: 'Lifestyle & Recreation',
             iconKey: 'lifestyle',
             items: [
-                // COFFEE: Hidden by default (isHidden: true)
                 mkItem('Coffee', 300, 'lifestyle', false, undefined, true),
                 mkItem('Dining Out', 400, 'dining'),
                 mkItem('Misc', 300, 'entertainment'),
@@ -169,16 +169,20 @@ function reducer(state: State, action: Action): State {
         case 'REMOVE_EXPENSE_ITEM': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.filter(item => item.id !== action.payload.itemId) }) };
         case 'UPDATE_EXPENSE_REDUCTION': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, reduction: action.payload.reduction } : item) }) };
         case 'TOGGLE_EXPENSE_FIXED': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, isFixed: !item.isFixed, reduction: 0 } : item) }) };
-        case 'TOGGLE_ADMIN_MODE': return { ...state, isAdminMode: !state.isAdminMode };
+
+        // NEW: The Secret Toggle
+        case 'TOGGLE_ADMIN_MODE':
+            return { ...state, isAdminMode: !state.isAdminMode };
+
         default: return state;
     }
 }
 
 export function useBudgetPlanner(): BudgetPlannerState {
-    const [state, dispatch] = useReducer(reducer, initialState);
+    // 2. Re-enable Persistence with a unique key 'budget-v1'
+    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'budget-v1');
 
     const derived = useMemo(() => {
-        // Logic: Only sum items that are visible (or if we are in admin mode)
         const totalIncome = state.incomes.reduce((sum, item) => sum + item.amount, 0);
 
         let totalExpenses = 0;
@@ -186,9 +190,7 @@ export function useBudgetPlanner(): BudgetPlannerState {
 
         state.expenseCategories.forEach(cat => {
             cat.items.forEach(item => {
-                // SKIP HIDDEN ITEMS IF NOT IN ADMIN MODE
-                if (item.isHidden && !state.isAdminMode) return;
-
+                // Always include hidden items in calculation, regardless of Admin Mode
                 totalExpenses += item.amount;
                 const savings = item.amount * (item.reduction / 100);
                 totalOptimizedExpenses += (item.amount - savings);
@@ -205,5 +207,6 @@ export function useBudgetPlanner(): BudgetPlannerState {
         };
     }, [state]);
 
+    // Pass isAdminMode out to the UI
     return { state, dispatch, isAdminMode: state.isAdminMode, ...derived };
 }

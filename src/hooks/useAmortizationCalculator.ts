@@ -1,5 +1,5 @@
-// File: `src/hooks/useAmortizationCalculator.ts`
-import { useState, useEffect, useReducer, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react'; // Remove useReducer import
+import { usePersistentReducer } from './usePersistentReducer'; // Add this
 import type { AmortizationRow, AmortizationCalculatorState, State, Action } from '../types/amortization.types';
 import { calculateAmortizationSchedule } from '../utils/calculations/amortizationCalculations';
 import * as AmortizationConstants from '../constants/amortization';
@@ -47,7 +47,7 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useAmortizationCalculator(): AmortizationCalculatorState {
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'amortization-v1');
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
     const [scrollTo2031, setScrollTo2031] = useState(0);
     const [actualMonthlyRepayment, setActualMonthlyRepayment] = useState(initialState.monthlyRepayment);

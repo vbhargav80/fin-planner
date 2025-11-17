@@ -1,4 +1,5 @@
-import { useMemo, useReducer } from 'react';
+import { useMemo } from 'react'; // Remove useReducer
+import { usePersistentReducer } from './usePersistentReducer'; // Add this
 import type { SuperCalculatorState, State, Action } from '../types/super.types';
 import { calculateSuper } from '../utils/calculations/superCalculations';
 
@@ -68,7 +69,7 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useSuperCalculator(): SuperCalculatorState {
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'super-v1');
 
     // Derive active contribution values based on frequency
     const myContributionPre50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPre50 : state.myYearlyContributionPre50;

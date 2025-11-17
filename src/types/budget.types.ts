@@ -1,4 +1,3 @@
-// File: src/types/budget.types.ts
 import type { Dispatch } from 'react';
 
 export interface BudgetId {
@@ -35,6 +34,7 @@ export type Action =
     | { type: 'UPDATE_INCOME'; payload: IncomeItem }
     | { type: 'REMOVE_INCOME'; payload: string }
     | { type: 'ADD_CATEGORY'; payload: ExpenseCategory }
+    | { type: 'SYNC_COFFEE_VISIBILITY'; payload: boolean }
     | { type: 'UPDATE_CATEGORY_NAME'; payload: { id: string; name: string } }
     | { type: 'REMOVE_CATEGORY'; payload: string }
     | { type: 'ADD_EXPENSE_ITEM'; payload: { categoryId: string; item: ExpenseItem } }

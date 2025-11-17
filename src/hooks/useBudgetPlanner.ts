@@ -1,4 +1,5 @@
-import { useReducer, useMemo } from 'react';
+import { useMemo, useEffect } from 'react'; // Import useEffect
+import { usePersistentReducer } from './usePersistentReducer';
 import type { State, Action, BudgetPlannerState, ExpenseItem } from '../types/budget.types';
 
 const uuid = () => crypto.randomUUID();
@@ -257,13 +258,31 @@ function reducer(state: State, action: Action): State {
                     };
                 })
             };
+        case 'SYNC_COFFEE_VISIBILITY':
+            return {
+                ...state,
+                expenseCategories: state.expenseCategories.map(cat => ({
+                    ...cat,
+                    items: cat.items.map(item =>
+                        item.name === 'Coffee'
+                            ? { ...item, isHidden: !action.payload }
+                            : item
+                    )
+                }))
+            };
         default:
             return state;
     }
 }
 
 export function useBudgetPlanner(): BudgetPlannerState {
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'budget-v1');
+
+    // Force sync cookie visibility on mount
+    useEffect(() => {
+        const showCoffee = getShowCoffeeCookie();
+        dispatch({ type: 'SYNC_COFFEE_VISIBILITY', payload: showCoffee });
+    }, [dispatch]);
 
     const derived = useMemo(() => {
         const totalIncome = state.incomes.reduce((sum, item) => sum + item.amount, 0);

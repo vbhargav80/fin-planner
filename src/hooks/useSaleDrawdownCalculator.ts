@@ -1,4 +1,5 @@
-import { useMemo, useReducer } from 'react';
+import { useMemo } from 'react'; // Remove useReducer
+import { usePersistentReducer } from './usePersistentReducer'; // Add this
 import type { SaleDrawdownState, State, Action } from '../types/drawdown.types';
 import { computeSaleDrawdownDerived } from '../utils/calculations/drawdownCalculations';
 
@@ -38,7 +39,7 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useSaleDrawdownCalculator(): SaleDrawdownState {
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'drawdown-v1');
 
     const derived = useMemo(
         () =>

@@ -118,12 +118,12 @@ export function calculateSuper(
         fvOfCurrentSuper = fvMySuper + fvWifeSuper;
 
         const annuityFactor = n_months > 0 ? (Math.pow(1 + monthlyRate, n_months) - 1) / monthlyRate : 0;
-        
+
         const shortfall = targetBalance! - fvOfCurrentSuper;
-        
+
         // This is the required NET amount that needs to be invested
         const requiredNetPerPersonPMT = (shortfall > 0 && annuityFactor > 0) ? shortfall / (annuityFactor * 2) : 0;
-        
+
         // This is the GROSS amount the user needs to contribute (before tax)
         const requiredGrossTotalPMT = requiredNetPerPersonPMT / (1 - CONTRIBUTION_TAX_RATE);
 
@@ -137,9 +137,10 @@ export function calculateSuper(
         const wifeRetirementAge = wifeAge + yearsToGrow;
         const wifeFinal = calculateFutureValue(wifeAge, wifeRetirementAge, wifeSuper, requiredGrossTotalPMT, requiredGrossTotalPMT, 0, monthlyRate, 0, 'monthly', false);
         finalBalance = myFinal.finalBalance + wifeFinal.finalBalance;
-        
-        const longerBreakdown = myFinal.breakdown.length > wifeFinal.breakdown.length ? myFinal.breakdown : wifeFinal.breakdown;
-        const shorterBreakdown = myFinal.breakdown.length > wifeFinal.breakdown.length ? wifeFinal.breakdown : myFinal.breakdown;
+
+        // FIX: Changed '>' to '>=' to prioritize 'myFinal' when lengths are equal
+        const longerBreakdown = myFinal.breakdown.length >= wifeFinal.breakdown.length ? myFinal.breakdown : wifeFinal.breakdown;
+        const shorterBreakdown = myFinal.breakdown.length >= wifeFinal.breakdown.length ? wifeFinal.breakdown : myFinal.breakdown;
 
         combinedBreakdown = longerBreakdown.map((row, i) => {
             const otherBalance = i < shorterBreakdown.length ? shorterBreakdown[i].balance : (shorterBreakdown.length > 0 ? shorterBreakdown[shorterBreakdown.length - 1].balance : 0);
@@ -162,9 +163,10 @@ export function calculateSuper(
             pmt: myContributionPre50,
             pmtPost50: myContributionPost50,
         };
-        
-        const longerBreakdown = myFinal.breakdown.length > wifeFinal.breakdown.length ? myFinal.breakdown : wifeFinal.breakdown;
-        const shorterBreakdown = myFinal.breakdown.length > wifeFinal.breakdown.length ? wifeFinal.breakdown : myFinal.breakdown;
+
+        // FIX: Changed '>' to '>=' here as well
+        const longerBreakdown = myFinal.breakdown.length >= wifeFinal.breakdown.length ? myFinal.breakdown : wifeFinal.breakdown;
+        const shorterBreakdown = myFinal.breakdown.length >= wifeFinal.breakdown.length ? wifeFinal.breakdown : myFinal.breakdown;
 
         combinedBreakdown = longerBreakdown.map((row, i) => {
             const otherBalance = i < shorterBreakdown.length ? shorterBreakdown[i].balance : (shorterBreakdown.length > 0 ? shorterBreakdown[shorterBreakdown.length - 1].balance : 0);

@@ -23,7 +23,11 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         wifeContributionPost50,
     } = calculator;
 
-    const { targetAge, targetBalance, netReturn, calcMode, contributionFrequency, makeExtraContribution } = state;
+    const {
+        targetAge, targetBalance, netReturn, calcMode, contributionFrequency, makeExtraContribution,
+        drawdownLifestyle, drawdownAnnualAmount, drawdownReturn
+    } = state;
+
     const isMonthly = contributionFrequency === 'monthly';
     const isBalanceMode = state.calcMode === 'balance';
     const CALC_MODE_TABS = [
@@ -33,6 +37,13 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
     const FREQUENCY_TABS = [
         { id: 'monthly', label: 'Monthly' },
         { id: 'yearly', label: 'Yearly' },
+    ];
+
+    const LIFESTYLE_OPTIONS = [
+        { id: 'modest', label: 'Modest' },
+        { id: 'comfortable', label: 'Comfortable' },
+        { id: 'luxury', label: 'Luxury' },
+        { id: 'custom', label: 'Custom' },
     ];
 
     return (
@@ -60,7 +71,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             </div>
                         )}
                         <div className="sm:col-span-2">
-                            <RangeSlider label="Est. Annual Net Return (after fees)" value={netReturn} min={SuperConstants.NET_RETURN.MIN} max={SuperConstants.NET_RETURN.MAX} step={SuperConstants.NET_RETURN.STEP} onChange={(v) => dispatch({ type: 'SET_NET_RETURN', payload: v })} formatValue={(v) => `${v.toFixed(1)}%`} />
+                            <RangeSlider label="Est. Annual Net Return (Accumulation)" value={netReturn} min={SuperConstants.NET_RETURN.MIN} max={SuperConstants.NET_RETURN.MAX} step={SuperConstants.NET_RETURN.STEP} onChange={(v) => dispatch({ type: 'SET_NET_RETURN', payload: v })} formatValue={(v) => `${v.toFixed(1)}%`} />
                         </div>
                         {isBalanceMode && (
                             <>
@@ -73,6 +84,44 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                 </div>
                             </>
                         )}
+                    </div>
+                </PersonTabsPanel>
+
+                {/* NEW: Retirement Drawdown Panel */}
+                <PersonTabsPanel>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Retirement Drawdown Phase</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                        <div className="sm:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Desired Lifestyle</label>
+                            <Tabs
+                                tabs={LIFESTYLE_OPTIONS}
+                                activeTab={drawdownLifestyle}
+                                onTabClick={(id) => dispatch({ type: 'SET_DRAWDOWN_LIFESTYLE', payload: id as any })}
+                                variant="segmented-indigo"
+                            />
+                        </div>
+                        <div className="sm:col-span-2">
+                            <RangeSlider
+                                label="Annual Drawdown Amount"
+                                value={drawdownAnnualAmount}
+                                min={SuperConstants.DRAWDOWN_AMOUNT.MIN}
+                                max={SuperConstants.DRAWDOWN_AMOUNT.MAX}
+                                step={SuperConstants.DRAWDOWN_AMOUNT.STEP}
+                                onChange={(v) => dispatch({ type: 'SET_DRAWDOWN_ANNUAL_AMOUNT', payload: v })}
+                                formatValue={(v) => formatCurrency(v)}
+                            />
+                        </div>
+                        <div className="sm:col-span-2">
+                            <RangeSlider
+                                label="Est. Annual Net Return (Retirement)"
+                                value={drawdownReturn}
+                                min={SuperConstants.DRAWDOWN_RETURN.MIN}
+                                max={SuperConstants.DRAWDOWN_RETURN.MAX}
+                                step={SuperConstants.DRAWDOWN_RETURN.STEP}
+                                onChange={(v) => dispatch({ type: 'SET_DRAWDOWN_RETURN', payload: v })}
+                                formatValue={(v) => `${v.toFixed(1)}%`}
+                            />
+                        </div>
                     </div>
                 </PersonTabsPanel>
 

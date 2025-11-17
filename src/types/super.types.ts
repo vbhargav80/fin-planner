@@ -1,31 +1,33 @@
+// File: src/types/super.types.ts
 
 export type CalcMode = 'contribution' | 'balance';
 export type ContributionFrequency = 'monthly' | 'yearly';
+export type Lifestyle = 'modest' | 'comfortable' | 'luxury' | 'custom';
 
 export interface SuperInputs {
+    // Existing
     myAge: number;
     wifeAge: number;
     mySuper: number;
     wifeSuper: number;
     targetAge: number;
-    netReturn: number;
+    netReturn: number; // Accumulation Phase Return
     contributionFrequency: ContributionFrequency;
     makeExtraContribution: boolean;
-
-    // For 'contribution' mode, this is required.
     targetBalance?: number;
-
-    // For 'balance' mode
     myContributionPre50?: number;
     myContributionPost50?: number;
     wifeContributionPre50?: number;
     wifeContributionPost50?: number;
-
-    // Extra yearly contributions
     myExtraYearlyContribution?: number;
     wifeExtraYearlyContribution?: number;
     myExtraContributionYears?: number;
     wifeExtraContributionYears?: number;
+
+    // NEW: Drawdown Phase Inputs
+    drawdownLifestyle: Lifestyle;
+    drawdownAnnualAmount: number;
+    drawdownReturn: number; // Retirement Phase Return (Parameterized)
 }
 
 export interface SuperResultData {
@@ -42,6 +44,7 @@ export interface SuperResultData {
 }
 
 export interface State {
+    // Existing
     myAge: number;
     wifeAge: number;
     mySuper: number;
@@ -52,7 +55,6 @@ export interface State {
     calcMode: CalcMode;
     contributionFrequency: ContributionFrequency;
     makeExtraContribution: boolean;
-    // Separate states for monthly and yearly contributions
     myMonthlyContributionPre50: number;
     myMonthlyContributionPost50: number;
     wifeMonthlyContributionPre50: number;
@@ -61,11 +63,15 @@ export interface State {
     myYearlyContributionPost50: number;
     wifeYearlyContributionPre50: number;
     wifeYearlyContributionPost50: number;
-    // Extra contributions
     myExtraYearlyContribution: number;
     myExtraContributionYears: number;
     wifeExtraYearlyContribution: number;
     wifeExtraContributionYears: number;
+
+    // NEW: Drawdown Phase State
+    drawdownLifestyle: Lifestyle;
+    drawdownAnnualAmount: number;
+    drawdownReturn: number;
 }
 
 export type Action =
@@ -86,12 +92,26 @@ export type Action =
     | { type: 'SET_MY_EXTRA_YEARLY_CONTRIBUTION'; payload: number }
     | { type: 'SET_MY_EXTRA_CONTRIBUTION_YEARS'; payload: number }
     | { type: 'SET_WIFE_EXTRA_YEARLY_CONTRIBUTION'; payload: number }
-    | { type: 'SET_WIFE_EXTRA_CONTRIBUTION_YEARS'; payload: number };
+    | { type: 'SET_WIFE_EXTRA_CONTRIBUTION_YEARS'; payload: number }
+    // NEW Actions
+    | { type: 'SET_DRAWDOWN_LIFESTYLE'; payload: Lifestyle }
+    | { type: 'SET_DRAWDOWN_ANNUAL_AMOUNT'; payload: number }
+    | { type: 'SET_DRAWDOWN_RETURN'; payload: number };
 
 export interface SuperBreakdownRow {
     month: number;
     age: number;
     balance: number;
+}
+
+// NEW: Interface for the Drawdown Table
+export interface DrawdownRow {
+    age: number;
+    month: number;
+    startBalance: number;
+    drawdown: number;
+    earnings: number;
+    endBalance: number;
 }
 
 export interface SuperCalculatorState {
@@ -100,7 +120,7 @@ export interface SuperCalculatorState {
     results: SuperResultData | null;
     error: string;
     breakdownData: SuperBreakdownRow[];
-    // Derived values
+    drawdownSchedule: DrawdownRow[];
     myContributionPre50: number;
     myContributionPost50: number;
     wifeContributionPre50: number;

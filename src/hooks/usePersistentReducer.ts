@@ -10,7 +10,14 @@ export function usePersistentReducer<S, A>(
     const [state, dispatch] = useReducer(reducer, initialState, (init) => {
         try {
             const stored = localStorage.getItem(storageKey);
-            return stored ? JSON.parse(stored) : init;
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                // MERGE: Use initialState as a base, then overwrite with saved data.
+                // This ensures new fields in initialState (like drawdownReturn)
+                // are present even if the saved data is old.
+                return { ...init, ...parsed };
+            }
+            return init;
         } catch (error) {
             console.warn(`Failed to load state for key "${storageKey}"`, error);
             return init;

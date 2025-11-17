@@ -1,9 +1,10 @@
-import { useMemo } from 'react'; // Remove useReducer
-import { usePersistentReducer } from './usePersistentReducer'; // Add this
+// File: src/hooks/useSuperCalculator.ts
+import { useMemo } from 'react';
+import { usePersistentReducer } from './usePersistentReducer';
 import type { SuperCalculatorState, State, Action } from '../types/super.types';
 import { calculateSuper } from '../utils/calculations/superCalculations';
+import { LIFESTYLE_AMOUNTS } from '../constants/super';
 
-// Define defaults in a single place
 const initialState: State = {
     myAge: 45,
     wifeAge: 42,
@@ -15,21 +16,23 @@ const initialState: State = {
     calcMode: 'contribution',
     contributionFrequency: 'monthly',
     makeExtraContribution: false,
-    // Monthly defaults
     myMonthlyContributionPre50: 1000,
     myMonthlyContributionPost50: 0,
     wifeMonthlyContributionPre50: 200,
     wifeMonthlyContributionPost50: 0,
-    // Yearly defaults
     myYearlyContributionPre50: 1500,
     myYearlyContributionPost50: 0,
     wifeYearlyContributionPre50: 1500,
     wifeYearlyContributionPost50: 0,
-    // Extra yearly
     myExtraYearlyContribution: 2000,
     wifeExtraYearlyContribution: 2000,
     myExtraContributionYears: 1,
     wifeExtraContributionYears: 1,
+
+    // NEW: Drawdown Defaults
+    drawdownLifestyle: 'comfortable',
+    drawdownAnnualAmount: 80000,
+    drawdownReturn: 7,
 };
 
 function reducer(state: State, action: Action): State {
@@ -64,20 +67,32 @@ function reducer(state: State, action: Action): State {
             return state.contributionFrequency === 'monthly'
                 ? { ...state, wifeMonthlyContributionPost50: action.payload }
                 : { ...state, wifeYearlyContributionPost50: action.payload };
+
+        // NEW: Drawdown Reducers
+        case 'SET_DRAWDOWN_LIFESTYLE': {
+            const lifestyle = action.payload;
+            const newAmount = lifestyle !== 'custom' ? LIFESTYLE_AMOUNTS[lifestyle] : state.drawdownAnnualAmount;
+            return { ...state, drawdownLifestyle: lifestyle, drawdownAnnualAmount: newAmount };
+        }
+        case 'SET_DRAWDOWN_ANNUAL_AMOUNT':
+            return { ...state, drawdownAnnualAmount: action.payload, drawdownLifestyle: 'custom' };
+        case 'SET_DRAWDOWN_RETURN':
+            return { ...state, drawdownReturn: action.payload };
+
         default: return state;
     }
 }
 
 export function useSuperCalculator(): SuperCalculatorState {
-    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'super-v1');
+    // Use 'super-v2' key to avoid conflicts with old data structure
+    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'super-v2');
 
-    // Derive active contribution values based on frequency
     const myContributionPre50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPre50 : state.myYearlyContributionPre50;
     const myContributionPost50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPost50 : state.myYearlyContributionPost50;
     const wifeContributionPre50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPre50 : state.wifeYearlyContributionPre50;
     const wifeContributionPost50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPost50 : state.wifeYearlyContributionPost50;
 
-    const { results, breakdownData, error } = useMemo(() => {
+    const { results, breakdownData, drawdownSchedule, error } = useMemo(() => {
         const inputs = {
             ...state,
             myContributionPre50,
@@ -89,6 +104,7 @@ export function useSuperCalculator(): SuperCalculatorState {
         return {
             results: result.results,
             breakdownData: result.breakdown,
+            drawdownSchedule: result.drawdownSchedule,
             error: result.error || '',
         };
     }, [state, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50]);
@@ -97,8 +113,9 @@ export function useSuperCalculator(): SuperCalculatorState {
         state,
         dispatch,
         results,
-        error: error,
+        error,
         breakdownData,
+        drawdownSchedule,
         myContributionPre50,
         myContributionPost50,
         wifeContributionPre50,

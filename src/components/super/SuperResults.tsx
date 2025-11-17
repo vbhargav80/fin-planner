@@ -1,7 +1,9 @@
+// File: src/components/super/SuperResults.tsx
 import React, { useState } from 'react';
 import type { SuperCalculatorState } from '../../types/super.types';
 import { SuperSummary } from './SuperSummary';
 import { SuperBreakdown } from './SuperBreakdown';
+import { SuperDrawdownTable } from './SuperDrawdownTable'; // Import new component
 import { Tabs } from '../common/Tabs';
 
 interface SuperResultsProps {
@@ -9,11 +11,13 @@ interface SuperResultsProps {
 }
 
 export const SuperResults: React.FC<SuperResultsProps> = ({ calculator }) => {
-    const { results, breakdownData } = calculator;
-    const [activeTab, setActiveTab] = useState<'summary' | 'breakdown'>('summary');
+    const { results, breakdownData, drawdownSchedule } = calculator;
+    const [activeTab, setActiveTab] = useState<'summary' | 'breakdown' | 'drawdown'>('summary');
+
     const TABS = [
         { id: 'summary', label: 'Summary' },
-        { id: 'breakdown', label: 'Month-by-Month Breakdown' },
+        { id: 'breakdown', label: 'Accumulation' },
+        { id: 'drawdown', label: 'Drawdown' }, // New Tab
     ];
 
     return (
@@ -36,9 +40,10 @@ export const SuperResults: React.FC<SuperResultsProps> = ({ calculator }) => {
                 <>
                     <Tabs tabs={TABS} activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} variant="dark-underline" className="mb-4" />
 
-                    <div className="flex-grow flex flex-col justify-center">
+                    <div className="flex-grow flex flex-col justify-start">
                         {activeTab === 'summary' && <SuperSummary results={results} />}
                         {activeTab === 'breakdown' && <SuperBreakdown breakdownData={breakdownData} />}
+                        {activeTab === 'drawdown' && <SuperDrawdownTable schedule={drawdownSchedule} />}
                     </div>
                 </>
             )}

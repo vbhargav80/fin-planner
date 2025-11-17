@@ -4,7 +4,7 @@ import type { ExpenseCategory, Action, ExpenseItem } from '../../types/budget.ty
 import { formatCurrency } from '../../utils/formatters';
 import { CategoryIcon } from './CategoryIcon';
 import { Lock, Unlock } from 'lucide-react';
-import { Tabs } from '../common/Tabs'; // Import Tabs
+import { Tabs } from '../common/Tabs';
 
 interface Props {
     categories: ExpenseCategory[];
@@ -28,12 +28,15 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
             categories.find(c => c.id === activeCategoryId),
         [categories, activeCategoryId]);
 
-    // Grouping Helper
+    // Grouping Helper with HIDDEN FILTER
     const groupedItems = useMemo(() => {
         if (!activeCategory) return {};
         const groups: Record<string, ExpenseItem[]> = { 'General': [] };
 
         activeCategory.items.forEach(item => {
+            // FILTER HERE
+            if (item.isHidden) return;
+
             const key = item.subGroup || 'General';
             if (!groups[key]) groups[key] = [];
             groups[key].push(item);
@@ -107,7 +110,6 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
                             </div>
                         </div>
 
-                        {/* RENDER TABS IF NEEDED */}
                         {groupNames.length > 1 && (
                             <div className="mb-6">
                                 <Tabs

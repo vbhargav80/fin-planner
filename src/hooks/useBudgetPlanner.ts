@@ -1,8 +1,20 @@
-// File: src/hooks/useBudgetPlanner.ts
 import { useReducer, useMemo } from 'react';
 import type { State, Action, BudgetPlannerState, ExpenseItem } from '../types/budget.types';
 
 const uuid = () => crypto.randomUUID();
+
+// --- COOKIE CHECK ---
+// Returns true if a cookie named "showCoffee" exists (value doesn't matter)
+const getShowCoffeeCookie = () => {
+    if (typeof document === 'undefined') return false;
+    return document.cookie.split(';').some(c => {
+        const trimmed = c.trim();
+        // Check for "showCoffee" (no value) or "showCoffee=..."
+        return trimmed === 'showCoffee' || trimmed.startsWith('showCoffee=');
+    });
+};
+
+const showCoffee = getShowCoffeeCookie();
 
 // Helper to easily create items with the new structure
 const mkItem = (
@@ -10,7 +22,8 @@ const mkItem = (
     amount: number,
     iconKey?: string,
     isFixed: boolean = false,
-    subGroup?: string
+    subGroup?: string,
+    isHidden: boolean = false
 ): ExpenseItem => ({
     id: uuid(),
     name,
@@ -18,14 +31,14 @@ const mkItem = (
     iconKey,
     reduction: 0, // Default: Keep 100% of the cost
     isFixed,
-    subGroup
+    subGroup,
+    isHidden
 });
 
 const initialState: State = {
     incomes: [
-        { id: uuid(), name: 'Salary', amount: 5000, iconKey: 'work' },
-        // Added new income source
-        { id: uuid(), name: 'Investment Property Rent', amount: 2050, iconKey: 'housing' },
+        { id: uuid(), name: 'Salary', amount: 9000, iconKey: 'work' },
+        { id: uuid(), name: 'Investment Property Rent', amount: 2100, iconKey: 'housing' },
     ],
     expenseCategories: [
         {
@@ -33,10 +46,24 @@ const initialState: State = {
             name: 'Housing',
             iconKey: 'housing',
             items: [
+                mkItem('Mortgage Repayment', 1050, 'housing', true), // NEW ITEM
                 mkItem('Rates', 200, 'rates', true),
                 mkItem('Body Corporate', 50, 'housing', true),
                 mkItem('Insurance', 150, 'rates'),
                 mkItem('Maintenance', 300, 'service'),
+            ]
+        },
+        // NEW CATEGORY
+        {
+            id: uuid(),
+            name: 'Investment Property Expenses',
+            iconKey: 'housing',
+            items: [
+                mkItem('Mortgage Repayment', 2800, 'debt', true),
+                mkItem('Insurance', 180, 'rates', false),
+                mkItem('Council Rates', 200, 'rates', true),
+                mkItem('Water Rates', 80, 'water', true),
+                mkItem('Land Tax', 200, 'rates', true),
             ]
         },
         {
@@ -117,7 +144,8 @@ const initialState: State = {
             name: 'Lifestyle & Recreation',
             iconKey: 'lifestyle',
             items: [
-                mkItem('Coffee', 300, 'lifestyle'),
+                // COFFEE: Hidden unless "showCoffee" cookie exists
+                mkItem('Coffee', 300, 'lifestyle', false, undefined, !showCoffee),
                 mkItem('Dining Out', 400, 'dining'),
                 mkItem('Misc', 300, 'entertainment'),
             ]
@@ -247,6 +275,7 @@ export function useBudgetPlanner(): BudgetPlannerState {
 
         state.expenseCategories.forEach(cat => {
             cat.items.forEach(item => {
+                // Calc Logic: Iterate over ALL items, even hidden ones.
                 totalExpenses += item.amount;
                 const savings = item.amount * (item.reduction / 100);
                 totalOptimizedExpenses += (item.amount - savings);

@@ -11,7 +11,8 @@ export interface ExpenseItem extends BudgetId {
     amount: number;
     reduction: number;
     isFixed?: boolean;
-    subGroup?: string; // New field for grouping (e.g., "Nissan", "Kia")
+    subGroup?: string;
+    isHidden?: boolean; // New property for UI hiding
 }
 
 export interface ExpenseCategory extends BudgetId {

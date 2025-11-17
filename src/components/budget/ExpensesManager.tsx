@@ -4,7 +4,7 @@ import type { ExpenseCategory, Action, ExpenseItem } from '../../types/budget.ty
 import { formatCurrency } from '../../utils/formatters';
 import { InputGroup } from '../common/InputGroup';
 import { CategoryIcon } from './CategoryIcon';
-import { Tabs } from '../common/Tabs'; // Import Tabs
+import { Tabs } from '../common/Tabs';
 
 interface Props {
     categories: ExpenseCategory[];
@@ -20,18 +20,20 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
             categories.find(c => c.id === activeCategoryId),
         [categories, activeCategoryId]);
 
-    // Group items by subGroup
+    // Group items, IGNORING HIDDEN ONES for the UI
     const groupedItems = useMemo(() => {
         if (!activeCategory) return {};
         const groups: Record<string, ExpenseItem[]> = { 'General': [] };
 
         activeCategory.items.forEach(item => {
+            // FILTER HERE: Skip rendering if hidden
+            if (item.isHidden) return;
+
             const key = item.subGroup || 'General';
             if (!groups[key]) groups[key] = [];
             groups[key].push(item);
         });
 
-        // If we have specific groups (like Nissan/Kia), and General is empty, remove General
         if (groups['General'].length === 0 && Object.keys(groups).length > 1) {
             delete groups['General'];
         }
@@ -39,18 +41,14 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
         return groups;
     }, [activeCategory]);
 
-    // Get the list of group names for the tabs
     const groupNames = Object.keys(groupedItems);
-
-    // State for the active sub-tab (e.g. 'Nissan')
     const [activeSubGroup, setActiveSubGroup] = useState<string>(groupNames[0] || 'General');
 
-    // Reset sub-tab when category changes
     useEffect(() => {
         if (groupNames.length > 0) {
             setActiveSubGroup(groupNames[0]);
         }
-    }, [activeCategory?.id]); // Only reset if category ID changes
+    }, [activeCategory?.id]);
 
     return (
         <div className="flex-1 overflow-hidden flex h-full">
@@ -58,6 +56,10 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
             <div className="w-1/3 bg-gray-50 border-r border-gray-200 overflow-y-auto custom-scrollbar">
                 <div className="py-2">
                     {categories.map(cat => {
+                        // Calculate total including hidden items (or excluding? usually we want the visible total?)
+                        // Based on your requirement "still use their values in calcs", the TOTALS should usually reflect reality.
+                        // However, for the sidebar "preview", it might be confusing if the total doesn't match the visible items.
+                        // Let's stick to the requirement: "Use values in calcs". So I will keep the TRUE total here.
                         const catTotal = cat.items.reduce((sum, i) => sum + i.amount, 0);
                         const isActive = cat.id === activeCategoryId;
 
@@ -104,7 +106,6 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
                             </div>
                         </div>
 
-                        {/* RENDER TABS IF WE HAVE SUBGROUPS */}
                         {groupNames.length > 1 && (
                             <div className="mb-6">
                                 <Tabs
@@ -116,7 +117,6 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
                             </div>
                         )}
 
-                        {/* RENDER INPUTS FOR ACTIVE SUBGROUP */}
                         <div className="grid grid-cols-1 gap-4">
                             {(groupedItems[activeSubGroup] || []).map(item => {
                                 const step = Math.max(1, Math.round(item.amount * 0.05));

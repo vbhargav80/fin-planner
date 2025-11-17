@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import type { SuperCalculatorState } from '../../types/super.types';
 import { SuperSummary } from './SuperSummary';
 import { SuperBreakdown } from './SuperBreakdown';
-import { SuperDrawdownTable } from './SuperDrawdownTable'; // Import new component
+import { SuperDrawdownTable } from './SuperDrawdownTable';
 import { Tabs } from '../common/Tabs';
 
 interface SuperResultsProps {
@@ -11,13 +11,14 @@ interface SuperResultsProps {
 }
 
 export const SuperResults: React.FC<SuperResultsProps> = ({ calculator }) => {
-    const { results, breakdownData, drawdownSchedule } = calculator;
+    // Destructure state and dispatch from calculator
+    const { results, breakdownData, drawdownSchedule, state, dispatch } = calculator;
     const [activeTab, setActiveTab] = useState<'summary' | 'breakdown' | 'drawdown'>('summary');
 
     const TABS = [
         { id: 'summary', label: 'Summary' },
         { id: 'breakdown', label: 'Accumulation' },
-        { id: 'drawdown', label: 'Drawdown' }, // New Tab
+        { id: 'drawdown', label: 'Drawdown' },
     ];
 
     return (
@@ -43,11 +44,16 @@ export const SuperResults: React.FC<SuperResultsProps> = ({ calculator }) => {
                     <div className="flex-grow flex flex-col justify-start">
                         {activeTab === 'summary' && <SuperSummary results={results} />}
                         {activeTab === 'breakdown' && <SuperBreakdown breakdownData={breakdownData} />}
-                        {activeTab === 'drawdown' && <SuperDrawdownTable schedule={drawdownSchedule} />}
+                        {activeTab === 'drawdown' && (
+                            <SuperDrawdownTable
+                                schedule={drawdownSchedule}
+                                state={state}
+                                dispatch={dispatch}
+                            />
+                        )}
                     </div>
                 </>
             )}
-
         </div>
     );
 };

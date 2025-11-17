@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type CalculatorId = 'super' | 'homeLoan' | 'drawdown' | 'budget';
+export type CalculatorId = 'dashboard' | 'super' | 'homeLoan' | 'drawdown' | 'budget';
 
 export interface NavbarProps {
     activeCalculator: CalculatorId;

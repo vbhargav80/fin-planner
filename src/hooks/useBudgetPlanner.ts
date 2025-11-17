@@ -9,7 +9,6 @@ const getShowCoffeeCookie = () => {
     if (typeof document === 'undefined') return false;
     return document.cookie.split(';').some(c => {
         const trimmed = c.trim();
-        // Check for "showCoffee" (no value) or "showCoffee=..."
         return trimmed === 'showCoffee' || trimmed.startsWith('showCoffee=');
     });
 };
@@ -46,14 +45,13 @@ const initialState: State = {
             name: 'Housing',
             iconKey: 'housing',
             items: [
-                mkItem('Mortgage Repayment', 1050, 'housing', true), // NEW ITEM
+                mkItem('Mortgage Repayment', 1050, 'housing', true),
                 mkItem('Rates', 200, 'rates', true),
                 mkItem('Body Corporate', 50, 'housing', true),
                 mkItem('Insurance', 150, 'rates'),
                 mkItem('Maintenance', 300, 'service'),
             ]
         },
-        // NEW CATEGORY
         {
             id: uuid(),
             name: 'Investment Property Expenses',
@@ -64,6 +62,7 @@ const initialState: State = {
                 mkItem('Council Rates', 200, 'rates', true),
                 mkItem('Water Rates', 80, 'water', true),
                 mkItem('Land Tax', 200, 'rates', true),
+                mkItem('Maintenance', 150, 'service', false),
             ]
         },
         {
@@ -144,7 +143,6 @@ const initialState: State = {
             name: 'Lifestyle & Recreation',
             iconKey: 'lifestyle',
             items: [
-                // COFFEE: Hidden unless "showCoffee" cookie exists
                 mkItem('Coffee', 300, 'lifestyle', false, undefined, !showCoffee),
                 mkItem('Dining Out', 400, 'dining'),
                 mkItem('Misc', 300, 'entertainment'),
@@ -275,7 +273,6 @@ export function useBudgetPlanner(): BudgetPlannerState {
 
         state.expenseCategories.forEach(cat => {
             cat.items.forEach(item => {
-                // Calc Logic: Iterate over ALL items, even hidden ones.
                 totalExpenses += item.amount;
                 const savings = item.amount * (item.reduction / 100);
                 totalOptimizedExpenses += (item.amount - savings);

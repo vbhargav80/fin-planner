@@ -3,14 +3,16 @@ import React, { useState, useMemo, useEffect } from 'react';
 import type { ExpenseCategory, Action, ExpenseItem } from '../../types/budget.types';
 import { formatCurrency } from '../../utils/formatters';
 import { CategoryIcon } from './CategoryIcon';
-import { Lock, Unlock } from 'lucide-react';
+import { Lock, Unlock, EyeOff } from 'lucide-react';
 import { Tabs } from '../common/Tabs';
 
 interface Props {
     categories: ExpenseCategory[];
     dispatch: React.Dispatch<Action>;
+    isAdminMode: boolean; // New Prop
 }
 
+// ... (SAVING_OPTIONS const remains same)
 const SAVING_OPTIONS = [
     { label: 'Keep', val: 0, color: 'bg-gray-100 text-gray-600 hover:bg-gray-200' },
     { label: 'Trim 10%', val: 10, color: 'bg-blue-50 text-blue-600 hover:bg-blue-100' },
@@ -19,7 +21,7 @@ const SAVING_OPTIONS = [
     { label: 'Drop', val: 100, color: 'bg-red-50 text-red-600 hover:bg-red-100' },
 ];
 
-export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
+export const OptimizerList: React.FC<Props> = ({ categories, dispatch, isAdminMode }) => {
     const [activeCategoryId, setActiveCategoryId] = useState<string>(
         categories.length > 0 ? categories[0].id : ''
     );
@@ -28,14 +30,13 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
             categories.find(c => c.id === activeCategoryId),
         [categories, activeCategoryId]);
 
-    // Grouping Helper with HIDDEN FILTER
     const groupedItems = useMemo(() => {
         if (!activeCategory) return {};
         const groups: Record<string, ExpenseItem[]> = { 'General': [] };
 
         activeCategory.items.forEach(item => {
-            // FILTER HERE
-            if (item.isHidden) return;
+            // --- VISIBILITY LOGIC ---
+            if (item.isHidden && !isAdminMode) return;
 
             const key = item.subGroup || 'General';
             if (!groups[key]) groups[key] = [];
@@ -45,35 +46,32 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
             delete groups['General'];
         }
         return groups;
-    }, [activeCategory]);
+    }, [activeCategory, isAdminMode]);
 
     const groupNames = Object.keys(groupedItems);
     const [activeSubGroup, setActiveSubGroup] = useState<string>(groupNames[0] || 'General');
 
     useEffect(() => {
-        if (groupNames.length > 0) {
+        if (groupNames.length > 0 && !groupNames.includes(activeSubGroup)) {
             setActiveSubGroup(groupNames[0]);
         }
-    }, [activeCategory?.id]);
+    }, [activeCategory?.id, isAdminMode]);
 
     return (
         <div className="flex-1 overflow-hidden flex h-full">
-            {/* Sidebar */}
+            {/* Sidebar (Same logic as before) */}
             <div className="w-1/3 bg-gray-50 border-r border-gray-200 overflow-y-auto custom-scrollbar">
                 <div className="py-2">
                     {categories.map(cat => {
                         const catTotal = cat.items.reduce((sum, i) => sum + i.amount, 0);
                         const catSavings = cat.items.reduce((sum, i) => sum + (i.amount * (i.reduction/100)), 0);
                         const isActive = cat.id === activeCategoryId;
-
                         return (
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCategoryId(cat.id)}
                                 className={`w-full text-left px-4 py-3 border-l-4 transition-all group ${
-                                    isActive
-                                        ? 'bg-white border-indigo-600 shadow-sm'
-                                        : 'border-transparent text-gray-600 hover:bg-gray-100'
+                                    isActive ? 'bg-white border-indigo-600 shadow-sm' : 'border-transparent text-gray-600 hover:bg-gray-100'
                                 }`}
                             >
                                 <div className={`text-sm font-semibold flex items-center gap-2 ${isActive ? 'text-indigo-700' : 'text-gray-700'}`}>
@@ -130,8 +128,15 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
                                     <div key={item.id} className="group">
                                         <div className="flex justify-between items-center mb-3">
                                             <div className="flex items-center gap-2">
-                                                <CategoryIcon iconKey={item.iconKey} size={18} className="text-gray-400" />
-                                                <span className="text-sm font-medium text-gray-700">{item.name}</span>
+                                                {item.isHidden ? (
+                                                    <EyeOff size={18} className="text-red-400" />
+                                                ) : (
+                                                    <CategoryIcon iconKey={item.iconKey} size={18} className="text-gray-400" />
+                                                )}
+                                                <span className={`text-sm font-medium ${item.isHidden ? 'text-red-500' : 'text-gray-700'}`}>
+                                                    {item.name}
+                                                </span>
+
                                                 <button
                                                     onClick={() => dispatch({
                                                         type: 'TOGGLE_EXPENSE_FIXED',
@@ -142,7 +147,7 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch }) => {
                                                             ? 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                                                             : 'text-indigo-200 hover:text-indigo-500 hover:bg-indigo-50'
                                                     }`}
-                                                    title={item.isFixed ? "Locked (Click to unlock)" : "Editable (Click to lock)"}
+                                                    title={item.isFixed ? "Locked" : "Editable"}
                                                 >
                                                     {item.isFixed ? <Lock size={14} /> : <Unlock size={14} />}
                                                 </button>

@@ -1,22 +1,8 @@
-import { useMemo, useEffect } from 'react'; // Import useEffect
-import { usePersistentReducer } from './usePersistentReducer';
+import { useReducer, useMemo } from 'react';
 import type { State, Action, BudgetPlannerState, ExpenseItem } from '../types/budget.types';
 
 const uuid = () => crypto.randomUUID();
 
-// --- COOKIE CHECK ---
-// Returns true if a cookie named "showCoffee" exists (value doesn't matter)
-const getShowCoffeeCookie = () => {
-    if (typeof document === 'undefined') return false;
-    return document.cookie.split(';').some(c => {
-        const trimmed = c.trim();
-        return trimmed === 'showCoffee' || trimmed.startsWith('showCoffee=');
-    });
-};
-
-const showCoffee = getShowCoffeeCookie();
-
-// Helper to easily create items with the new structure
 const mkItem = (
     name: string,
     amount: number,
@@ -29,13 +15,14 @@ const mkItem = (
     name,
     amount,
     iconKey,
-    reduction: 0, // Default: Keep 100% of the cost
+    reduction: 0,
     isFixed,
     subGroup,
     isHidden
 });
 
 const initialState: State = {
+    isAdminMode: false, // Default to hidden
     incomes: [
         { id: uuid(), name: 'Salary', amount: 9000, iconKey: 'work' },
         { id: uuid(), name: 'Investment Property Rent', amount: 2100, iconKey: 'housing' },
@@ -83,21 +70,16 @@ const initialState: State = {
             name: 'Transport',
             iconKey: 'transport',
             items: [
-                // NISSAN GROUP
                 mkItem('Fuel', 250, 'transport', false, 'Nissan'),
                 mkItem('Rego', 100, 'rates', true, 'Nissan'),
                 mkItem('Insurance', 100, 'rates', false, 'Nissan'),
                 mkItem('Servicing', 70, 'service', false, 'Nissan'),
                 mkItem('Roadside Assist', 10, 'alert', false, 'Nissan'),
-
-                // KIA GROUP
                 mkItem('Fuel', 250, 'transport', false, 'Kia'),
                 mkItem('Rego', 100, 'rates', true, 'Kia'),
                 mkItem('Insurance', 100, 'rates', false, 'Kia'),
                 mkItem('Servicing', 70, 'service', false, 'Kia'),
                 mkItem('Roadside Assist', 10, 'alert', false, 'Kia'),
-
-                // GENERAL
                 mkItem('Train', 120, 'train'),
             ]
         },
@@ -144,7 +126,7 @@ const initialState: State = {
             name: 'Lifestyle & Recreation',
             iconKey: 'lifestyle',
             items: [
-                mkItem('Coffee', 300, 'lifestyle', false, undefined, !showCoffee),
+                mkItem('Coffee', 300, 'lifestyle', false, undefined, true),
                 mkItem('Dining Out', 400, 'dining'),
                 mkItem('Misc', 300, 'entertainment'),
             ]
@@ -175,114 +157,28 @@ const initialState: State = {
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
-        case 'ADD_INCOME':
-            return { ...state, incomes: [...state.incomes, action.payload] };
-        case 'UPDATE_INCOME':
-            return { ...state, incomes: state.incomes.map(i => i.id === action.payload.id ? action.payload : i) };
-        case 'REMOVE_INCOME':
-            return { ...state, incomes: state.incomes.filter(i => i.id !== action.payload) };
-        case 'ADD_CATEGORY':
-            return { ...state, expenseCategories: [...state.expenseCategories, action.payload] };
-        case 'UPDATE_CATEGORY_NAME':
-            return {
-                ...state,
-                expenseCategories: state.expenseCategories.map(cat =>
-                    cat.id === action.payload.id ? { ...cat, name: action.payload.name } : cat
-                )
-            };
-        case 'REMOVE_CATEGORY':
-            return { ...state, expenseCategories: state.expenseCategories.filter(c => c.id !== action.payload) };
-        case 'ADD_EXPENSE_ITEM':
-            return {
-                ...state,
-                expenseCategories: state.expenseCategories.map(cat => {
-                    if (cat.id !== action.payload.categoryId) return cat;
-                    return { ...cat, items: [...cat.items, action.payload.item] };
-                })
-            };
-        case 'UPDATE_EXPENSE_ITEM':
-            return {
-                ...state,
-                expenseCategories: state.expenseCategories.map(cat => {
-                    if (cat.id !== action.payload.categoryId) return cat;
-                    return {
-                        ...cat,
-                        items: cat.items.map(item =>
-                            item.id === action.payload.item.id ? action.payload.item : item
-                        )
-                    };
-                })
-            };
-        case 'REMOVE_EXPENSE_ITEM':
-            return {
-                ...state,
-                expenseCategories: state.expenseCategories.map(cat => {
-                    if (cat.id !== action.payload.categoryId) return cat;
-                    return {
-                        ...cat,
-                        items: cat.items.filter(item => item.id !== action.payload.itemId)
-                    };
-                })
-            };
-        case 'UPDATE_EXPENSE_REDUCTION':
-            return {
-                ...state,
-                expenseCategories: state.expenseCategories.map(cat => {
-                    if (cat.id !== action.payload.categoryId) return cat;
-                    return {
-                        ...cat,
-                        items: cat.items.map(item =>
-                            item.id === action.payload.itemId
-                                ? { ...item, reduction: action.payload.reduction }
-                                : item
-                        )
-                    };
-                })
-            };
-        case 'TOGGLE_EXPENSE_FIXED':
-            return {
-                ...state,
-                expenseCategories: state.expenseCategories.map(cat => {
-                    if (cat.id !== action.payload.categoryId) return cat;
-                    return {
-                        ...cat,
-                        items: cat.items.map(item =>
-                            item.id === action.payload.itemId
-                                ? {
-                                    ...item,
-                                    isFixed: !item.isFixed,
-                                    reduction: 0 // Reset reduction to 0 if locking
-                                }
-                                : item
-                        )
-                    };
-                })
-            };
-        case 'SYNC_COFFEE_VISIBILITY':
-            return {
-                ...state,
-                expenseCategories: state.expenseCategories.map(cat => ({
-                    ...cat,
-                    items: cat.items.map(item =>
-                        item.name === 'Coffee'
-                            ? { ...item, isHidden: !action.payload }
-                            : item
-                    )
-                }))
-            };
-        default:
-            return state;
+        case 'ADD_INCOME': return { ...state, incomes: [...state.incomes, action.payload] };
+        case 'UPDATE_INCOME': return { ...state, incomes: state.incomes.map(i => i.id === action.payload.id ? action.payload : i) };
+        case 'REMOVE_INCOME': return { ...state, incomes: state.incomes.filter(i => i.id !== action.payload) };
+        case 'ADD_CATEGORY': return { ...state, expenseCategories: [...state.expenseCategories, action.payload] };
+        case 'UPDATE_CATEGORY_NAME': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id === action.payload.id ? { ...cat, name: action.payload.name } : cat) };
+        case 'REMOVE_CATEGORY': return { ...state, expenseCategories: state.expenseCategories.filter(c => c.id !== action.payload) };
+        case 'ADD_EXPENSE_ITEM': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: [...cat.items, action.payload.item] }) };
+        case 'UPDATE_EXPENSE_ITEM': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.item.id ? action.payload.item : item) }) };
+        case 'REMOVE_EXPENSE_ITEM': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.filter(item => item.id !== action.payload.itemId) }) };
+        case 'UPDATE_EXPENSE_REDUCTION': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, reduction: action.payload.reduction } : item) }) };
+        case 'TOGGLE_EXPENSE_FIXED': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, isFixed: !item.isFixed, reduction: 0 } : item) }) };
+
+        // NEW: The Secret Toggle
+        case 'TOGGLE_ADMIN_MODE':
+            return { ...state, isAdminMode: !state.isAdminMode };
+
+        default: return state;
     }
 }
 
 export function useBudgetPlanner(): BudgetPlannerState {
-    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'budget-v1');
-
-    // Force sync cookie visibility on mount
-    useEffect(() => {
-        const showCoffee = getShowCoffeeCookie();
-        dispatch({ type: 'SYNC_COFFEE_VISIBILITY', payload: showCoffee });
-    }, [dispatch]);
+    const [state, dispatch] = useReducer(reducer, initialState);
 
     const derived = useMemo(() => {
         const totalIncome = state.incomes.reduce((sum, item) => sum + item.amount, 0);
@@ -303,14 +199,11 @@ export function useBudgetPlanner(): BudgetPlannerState {
         const potentialSavings = totalExpenses - totalOptimizedExpenses;
 
         return {
-            totalIncome,
-            totalExpenses,
-            remaining,
-            totalOptimizedExpenses,
-            potentialSavings,
-            projectedRemaining
+            totalIncome, totalExpenses, remaining,
+            totalOptimizedExpenses, potentialSavings, projectedRemaining
         };
     }, [state]);
 
-    return { state, dispatch, ...derived };
+    // Pass isAdminMode out to the UI
+    return { state, dispatch, isAdminMode: state.isAdminMode, ...derived };
 }

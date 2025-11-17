@@ -5,13 +5,15 @@ import { formatCurrency } from '../../utils/formatters';
 import { InputGroup } from '../common/InputGroup';
 import { CategoryIcon } from './CategoryIcon';
 import { Tabs } from '../common/Tabs';
+import { EyeOff } from 'lucide-react';
 
 interface Props {
     categories: ExpenseCategory[];
     dispatch: React.Dispatch<Action>;
+    isAdminMode: boolean;
 }
 
-export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
+export const ExpensesManager: React.FC<Props> = ({ categories, dispatch, isAdminMode }) => {
     const [activeCategoryId, setActiveCategoryId] = useState<string>(
         categories.length > 0 ? categories[0].id : ''
     );
@@ -20,14 +22,12 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
             categories.find(c => c.id === activeCategoryId),
         [categories, activeCategoryId]);
 
-    // Group items, IGNORING HIDDEN ONES for the UI
     const groupedItems = useMemo(() => {
         if (!activeCategory) return {};
         const groups: Record<string, ExpenseItem[]> = { 'General': [] };
 
         activeCategory.items.forEach(item => {
-            // FILTER HERE: Skip rendering if hidden
-            if (item.isHidden) return;
+            if (item.isHidden && !isAdminMode) return;
 
             const key = item.subGroup || 'General';
             if (!groups[key]) groups[key] = [];
@@ -37,40 +37,31 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
         if (groups['General'].length === 0 && Object.keys(groups).length > 1) {
             delete groups['General'];
         }
-
         return groups;
-    }, [activeCategory]);
+    }, [activeCategory, isAdminMode]);
 
     const groupNames = Object.keys(groupedItems);
     const [activeSubGroup, setActiveSubGroup] = useState<string>(groupNames[0] || 'General');
 
     useEffect(() => {
-        if (groupNames.length > 0) {
+        if (groupNames.length > 0 && !groupNames.includes(activeSubGroup)) {
             setActiveSubGroup(groupNames[0]);
         }
-    }, [activeCategory?.id]);
+    }, [activeCategory?.id, isAdminMode]);
 
     return (
         <div className="flex-1 overflow-hidden flex h-full">
-            {/* Category Sidebar */}
             <div className="w-1/3 bg-gray-50 border-r border-gray-200 overflow-y-auto custom-scrollbar">
                 <div className="py-2">
                     {categories.map(cat => {
-                        // Calculate total including hidden items (or excluding? usually we want the visible total?)
-                        // Based on your requirement "still use their values in calcs", the TOTALS should usually reflect reality.
-                        // However, for the sidebar "preview", it might be confusing if the total doesn't match the visible items.
-                        // Let's stick to the requirement: "Use values in calcs". So I will keep the TRUE total here.
                         const catTotal = cat.items.reduce((sum, i) => sum + i.amount, 0);
                         const isActive = cat.id === activeCategoryId;
-
                         return (
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCategoryId(cat.id)}
                                 className={`w-full text-left px-4 py-3 border-l-4 transition-all hover:bg-gray-100 group ${
-                                    isActive
-                                        ? 'bg-white border-indigo-600 shadow-sm'
-                                        : 'border-transparent text-gray-600'
+                                    isActive ? 'bg-white border-indigo-600 shadow-sm' : 'border-transparent text-gray-600'
                                 }`}
                             >
                                 <div className={`text-sm font-semibold flex items-center gap-2 ${isActive ? 'text-indigo-700' : 'text-gray-700'}`}>
@@ -86,7 +77,6 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
                 </div>
             </div>
 
-            {/* Details Area */}
             <div className="w-2/3 bg-white overflow-y-auto p-6">
                 {activeCategory ? (
                     <div className="animate-fade-in">
@@ -125,14 +115,19 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch }) => {
                                         key={item.id}
                                         id={item.id}
                                         label={item.name}
-                                        labelIcon={<CategoryIcon iconKey={item.iconKey} size={16} />}
+                                        labelIcon={
+                                            item.isHidden ? (
+                                                <span title="Hidden from public" className="flex items-center">
+                                                    <EyeOff size={16} className="text-red-400" />
+                                                </span>
+                                            ) : (
+                                                <CategoryIcon iconKey={item.iconKey} size={16} />
+                                            )
+                                        }
                                         value={item.amount}
                                         onChange={(val) => dispatch({
                                             type: 'UPDATE_EXPENSE_ITEM',
-                                            payload: {
-                                                categoryId: activeCategory.id,
-                                                item: { ...item, amount: val }
-                                            }
+                                            payload: { categoryId: activeCategory.id, item: { ...item, amount: val } }
                                         })}
                                         symbol="$"
                                         symbolPosition="left"

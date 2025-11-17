@@ -11,7 +11,7 @@ export interface ExpenseItem extends BudgetId {
     reduction: number;
     isFixed?: boolean;
     subGroup?: string;
-    isHidden?: boolean; // New property for UI hiding
+    isHidden?: boolean;
 }
 
 export interface ExpenseCategory extends BudgetId {
@@ -27,6 +27,7 @@ export interface IncomeItem extends BudgetId {
 export interface State {
     incomes: IncomeItem[];
     expenseCategories: ExpenseCategory[];
+    isAdminMode: boolean;
 }
 
 export type Action =
@@ -34,14 +35,14 @@ export type Action =
     | { type: 'UPDATE_INCOME'; payload: IncomeItem }
     | { type: 'REMOVE_INCOME'; payload: string }
     | { type: 'ADD_CATEGORY'; payload: ExpenseCategory }
-    | { type: 'SYNC_COFFEE_VISIBILITY'; payload: boolean }
     | { type: 'UPDATE_CATEGORY_NAME'; payload: { id: string; name: string } }
     | { type: 'REMOVE_CATEGORY'; payload: string }
     | { type: 'ADD_EXPENSE_ITEM'; payload: { categoryId: string; item: ExpenseItem } }
     | { type: 'UPDATE_EXPENSE_ITEM'; payload: { categoryId: string; item: ExpenseItem } }
     | { type: 'REMOVE_EXPENSE_ITEM'; payload: { categoryId: string; itemId: string } }
     | { type: 'UPDATE_EXPENSE_REDUCTION'; payload: { categoryId: string; itemId: string; reduction: number } }
-    | { type: 'TOGGLE_EXPENSE_FIXED'; payload: { categoryId: string; itemId: string } };
+    | { type: 'TOGGLE_EXPENSE_FIXED'; payload: { categoryId: string; itemId: string } }
+    | { type: 'TOGGLE_ADMIN_MODE' };
 
 export interface BudgetDerived {
     totalIncome: number;
@@ -55,4 +56,5 @@ export interface BudgetDerived {
 export interface BudgetPlannerState extends BudgetDerived {
     state: State;
     dispatch: Dispatch<Action>;
+    isAdminMode: boolean;
 }

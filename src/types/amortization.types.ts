@@ -45,19 +45,13 @@ export type Action =
     | { type: 'SET_CONTINUE_WORKING'; payload: boolean }
     | { type: 'SET_YEARS_WORKING'; payload: number }
     | { type: 'SET_NET_INCOME'; payload: number }
-    | { type: 'RESET'; payload: State }; // UPDATED
+    | { type: 'RESET'; payload: State };
 
 export interface AmortizationCalculatorState {
     state: State;
     dispatch: Dispatch<Action>;
     amortizationData: AmortizationRow[];
     actualMonthlyRepayment: number;
-    scrollTo2031: number;
-    triggerScrollTo2031: () => void;
-    clearScrollTo2031: () => void;
-    scrollToFirstDepletedOffset: number;
-    triggerScrollToFirstDepletedOffset: () => void;
-    clearScrollToFirstDepletedOffset: () => void;
     calculateOptimalExpenditure: () => number;
     calculateOptimalWorkingYears: () => { years: number; income: number };
     hasDepletedOffsetRows: boolean;

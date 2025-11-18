@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { usePersistentReducer } from './usePersistentReducer';
-import { useConfig } from '../contexts/ConfigContext'; // NEW
+import { useConfig } from '../contexts/ConfigContext';
 import type { AmortizationRow, AmortizationCalculatorState, State, Action } from '../types/amortization.types';
 import { calculateAmortizationSchedule } from '../utils/calculations/amortizationCalculations';
 import * as AmortizationConstants from '../constants/amortization';
@@ -26,29 +26,20 @@ function reducer(state: State, action: Action): State {
         case 'SET_CONTINUE_WORKING': return { ...state, continueWorking: action.payload };
         case 'SET_YEARS_WORKING': return { ...state, yearsWorking: action.payload };
         case 'SET_NET_INCOME': return { ...state, netIncome: action.payload };
-        case 'RESET': return action.payload as State; // NEW
+        case 'RESET': return action.payload as State;
         default: return state;
     }
 }
 
 export function useAmortizationCalculator(): AmortizationCalculatorState {
-    const { config } = useConfig(); // NEW
+    const { config } = useConfig();
     const [state, dispatch] = usePersistentReducer(reducer, config.amortization, 'amortization-v1');
 
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
-    const [scrollTo2031, setScrollTo2031] = useState(0);
     const [actualMonthlyRepayment, setActualMonthlyRepayment] = useState(config.amortization.monthlyRepayment);
-    const [scrollToFirstDepletedOffset, setScrollToFirstDepletedOffset] = useState(0);
     const [hasDepletedOffsetRows, setHasDepletedOffsetRows] = useState(false);
 
-    // ... (scroll handlers remain same) ...
-    const triggerScrollTo2031 = () => setScrollTo2031(c => c + 1);
-    const clearScrollTo2031 = useCallback(() => setScrollTo2031(0), []);
-    const triggerScrollToFirstDepletedOffset = () => setScrollToFirstDepletedOffset(c => c + 1);
-    const clearScrollToFirstDepletedOffset = useCallback(() => setScrollToFirstDepletedOffset(0), []);
-
     const calculateOptimalExpenditure = () => {
-        // ... (logic remains same)
         const inputs = { ...state };
         let low = 0, high = 50000, optimalExpenditure = state.monthlyExpenditure;
         for (let i = 0; i < 30; i++) {
@@ -62,7 +53,6 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     };
 
     const calculateOptimalWorkingYears = () => {
-        // ... (logic remains same)
         dispatch({ type: 'SET_CONTINUE_WORKING', payload: true });
         const inputs = { ...state, continueWorking: true };
         let optimalYears = -1;
@@ -94,12 +84,6 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         dispatch,
         amortizationData,
         actualMonthlyRepayment,
-        scrollTo2031,
-        triggerScrollTo2031,
-        clearScrollTo2031,
-        scrollToFirstDepletedOffset,
-        triggerScrollToFirstDepletedOffset,
-        clearScrollToFirstDepletedOffset,
         calculateOptimalExpenditure,
         calculateOptimalWorkingYears,
         hasDepletedOffsetRows,

@@ -128,13 +128,14 @@ export const Tabs = <T extends string>({
 
     if (variant === 'segmented') {
         return (
-            <div className={`flex w-full gap-1 rounded-full bg-teal-50 p-1 shadow-inner ${className}`}>
+            // Updated with overflow-x-auto and responsive padding/text
+            <div className={`flex w-full gap-1 rounded-full bg-teal-50 p-1 shadow-inner overflow-x-auto ${className}`}>
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
                         type="button"
                         onClick={() => onTabClick(tab.id)}
-                        className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                        className={`flex-1 px-2 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full text-center transition-colors duration-150 border whitespace-nowrap ${
                             activeTab === tab.id
                                 ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
                                 : 'bg-transparent text-teal-700 border-transparent hover:bg-teal-100'
@@ -149,13 +150,14 @@ export const Tabs = <T extends string>({
 
     if (variant === 'segmented-indigo') {
         return (
-            <div className={`flex w-full gap-1 rounded-full bg-indigo-50 p-1 shadow-inner ${className}`}>
+            // Updated with overflow-x-auto and responsive padding/text
+            <div className={`flex w-full gap-1 rounded-full bg-indigo-50 p-1 shadow-inner overflow-x-auto ${className}`}>
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
                         type="button"
                         onClick={() => onTabClick(tab.id)}
-                        className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full text-center transition-colors duration-150 border ${
+                        className={`flex-1 px-2 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full text-center transition-colors duration-150 border whitespace-nowrap ${
                             activeTab === tab.id
                                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
                                 : 'bg-transparent text-indigo-700 border-transparent hover:bg-indigo-100'

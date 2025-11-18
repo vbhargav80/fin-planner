@@ -6,7 +6,7 @@ import { ToggleSwitch } from '../common/ToggleSwitch';
 import * as SuperConstants from '../../constants/super';
 import { Tabs } from '../common/Tabs';
 import { SegmentedControl } from '../common/SegmentedControl';
-import { TrendingUp, Sunset, Wallet, PiggyBank, User, Target, ArrowRight } from 'lucide-react';
+import { TrendingUp, Sunset, Wallet, PiggyBank, User, Target } from 'lucide-react';
 
 interface SuperFormProps {
     calculator: SuperCalculatorState;
@@ -39,16 +39,14 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
     const [useAgeBasedMe, setUseAgeBasedMe] = useState(false);
     const [useAgeBasedSpouse, setUseAgeBasedSpouse] = useState(false);
 
-    // UPDATED: Added visual cues for sequential phases
+    // UPDATED: Labels with Icons and new text
     const PHASE_TABS = [
         {
             id: 'accumulation',
             label: (
                 <span className="flex items-center gap-2">
-                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-bold">1</span>
                     <TrendingUp size={18} />
-                    <span>Build Wealth</span>
-                    <ArrowRight size={14} className="ml-2 text-gray-300" />
+                    1. Build Wealth
                 </span>
             )
         },
@@ -56,9 +54,8 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
             id: 'retirement',
             label: (
                 <span className="flex items-center gap-2">
-                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-500 text-[10px] font-bold">2</span>
                     <Sunset size={18} />
-                    <span>Plan Retirement</span>
+                    2. Plan Retirement
                 </span>
             )
         },
@@ -76,11 +73,6 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         { id: 'comfortable', label: 'Comfortable' },
         { id: 'luxury', label: 'Luxury' },
         { id: 'custom', label: 'Custom' },
-    ];
-
-    const CALC_MODE_TABS = [
-        { id: 'balance', label: 'Forecast Final Balance' },
-        { id: 'contribution', label: 'Target a Goal' },
     ];
 
     const isMonthly = contributionFrequency === 'monthly';
@@ -144,15 +136,52 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             </div>
                         </div>
 
-                        {/* 2. Strategy Selector */}
+                        {/* 2. Strategy Selector - Radio Cards */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">What is your goal?</label>
-                            <Tabs
-                                tabs={CALC_MODE_TABS}
-                                activeTab={calcMode}
-                                onTabClick={(id) => dispatch({ type: 'SET_CALC_MODE', payload: id as any })}
-                                variant="segmented-indigo"
-                            />
+                            <label className="block text-xs font-bold text-gray-500 mb-3 uppercase tracking-wide">
+                                What is your primary goal?
+                            </label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <button
+                                    type="button"
+                                    onClick={() => dispatch({ type: 'SET_CALC_MODE', payload: 'balance' })}
+                                    className={`relative p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                                        calcMode === 'balance'
+                                            ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600 shadow-sm'
+                                            : 'border-gray-200 bg-white hover:border-indigo-200 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <div className={`flex items-center gap-2 mb-2 ${calcMode === 'balance' ? 'text-indigo-700' : 'text-gray-600'}`}>
+                                        <div className={`p-1.5 rounded-md ${calcMode === 'balance' ? 'bg-indigo-100' : 'bg-gray-100'}`}>
+                                            <TrendingUp size={18} />
+                                        </div>
+                                        <span className="font-bold text-sm">Forecast</span>
+                                    </div>
+                                    <p className="text-xs text-gray-500 leading-relaxed">
+                                        Project how much wealth you will accumulate based on your current strategy.
+                                    </p>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => dispatch({ type: 'SET_CALC_MODE', payload: 'contribution' })}
+                                    className={`relative p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                                        calcMode === 'contribution'
+                                            ? 'border-blue-500 bg-blue-50/50 ring-1 ring-blue-500 shadow-sm'
+                                            : 'border-gray-200 bg-white hover:border-blue-200 hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <div className={`flex items-center gap-2 mb-2 ${calcMode === 'contribution' ? 'text-blue-700' : 'text-gray-600'}`}>
+                                        <div className={`p-1.5 rounded-md ${calcMode === 'contribution' ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                                            <Target size={18} />
+                                        </div>
+                                        <span className="font-bold text-sm">Target</span>
+                                    </div>
+                                    <p className="text-xs text-gray-500 leading-relaxed">
+                                        Calculate exactly how much you need to contribute to reach a specific goal.
+                                    </p>
+                                </button>
+                            </div>
                         </div>
 
                         {/* 3A. MODE: FORECAST BALANCE (Inputs: Contributions) */}
@@ -281,7 +310,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             </div>
                         )}
 
-                        {/* 3B. Target Goal (Inputs: Goal, Output: Result) */}
+                        {/* 3B. MODE: TARGET GOAL (Inputs: Goal, Output: Result) */}
                         {calcMode === 'contribution' && (
                             <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm animate-fade-in">
                                 <div className="flex items-center gap-2 text-gray-900 font-bold mb-4">

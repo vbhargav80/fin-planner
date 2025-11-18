@@ -64,7 +64,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
             <h2 className="text-3xl font-bold text-gray-900">Amortization Calculator</h2>
             <p className="mt-2 text-gray-600">Monthly schedule to 2040.</p>
 
-            <Tabs tabs={TABS} variant="pill" activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} className="mt-6" />
+            <Tabs tabs={TABS} variant="segmented-indigo" activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} className="mt-6" />
 
             <div className="mt-8 space-y-6">
                 {activeTab === 'loan' && (

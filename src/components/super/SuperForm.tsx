@@ -39,9 +39,26 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
     const [useAgeBasedMe, setUseAgeBasedMe] = useState(false);
     const [useAgeBasedSpouse, setUseAgeBasedSpouse] = useState(false);
 
+    // UPDATED: Labels with Icons and new text
     const PHASE_TABS = [
-        { id: 'accumulation', label: 'Accumulation Phase' },
-        { id: 'retirement', label: 'Retirement Phase' },
+        {
+            id: 'accumulation',
+            label: (
+                <span className="flex items-center gap-2">
+                    <TrendingUp size={18} />
+                    1. Build Wealth
+                </span>
+            )
+        },
+        {
+            id: 'retirement',
+            label: (
+                <span className="flex items-center gap-2">
+                    <Sunset size={18} />
+                    2. Plan Retirement
+                </span>
+            )
+        },
     ];
 
     const CONTRIBUTOR_TABS = [
@@ -87,11 +104,12 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 <p className="mt-2 text-gray-600 mb-6">Optimize your super growth and retirement income.</p>
 
                 <div className="mb-6">
+                    {/* UPDATED: Uses underline variant with icon tabs */}
                     <Tabs
                         tabs={PHASE_TABS}
                         activeTab={activePhase}
                         onTabClick={(id) => setActivePhase(id as any)}
-                        variant="segmented-indigo"
+                        variant="underline"
                     />
                 </div>
             </div>
@@ -131,11 +149,11 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                 tabs={CALC_MODE_TABS}
                                 activeTab={calcMode}
                                 onTabClick={(id) => dispatch({ type: 'SET_CALC_MODE', payload: id as any })}
-                                variant="pill"
+                                variant="segmented-indigo"
                             />
                         </div>
 
-                        {/* 3A. MODE: FORECAST BALANCE */}
+                        {/* 3A. MODE: FORECAST BALANCE (Inputs: Contributions) */}
                         {calcMode === 'balance' && (
                             <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm animate-fade-in">
                                 <div className="flex items-center justify-between mb-4 gap-4">
@@ -279,6 +297,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                     formatValue={(v) => formatCurrency(v)}
                                 />
 
+                                {/* RESULT DISPLAY */}
                                 <div className="mt-6 bg-indigo-50 border border-indigo-100 rounded-lg p-4 flex items-center justify-between">
                                     <div>
                                         <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Required Contribution</span>
@@ -293,7 +312,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             </div>
                         )}
 
-                        {/* 4. Assumptions */}
+                        {/* 4. Assumptions (Always Visible) */}
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                             <div className="flex items-center gap-2 text-gray-700 font-bold mb-3">
                                 <TrendingUp size={20} />
@@ -320,8 +339,15 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                 step={SuperConstants.TARGET_AGE.STEP}
                                 onChange={(v) => dispatch({ type: 'SET_TARGET_AGE', payload: v })}
                             />
+                            <div className="mt-4">
+                                {/* Optional Goal Balance Slider only if mode is Contribution */}
+                                {calcMode === 'contribution' && (
+                                    <RangeSlider label="Target Combined Balance" value={targetBalance || 0} min={SuperConstants.TARGET_BALANCE.MIN} max={SuperConstants.TARGET_BALANCE.MAX} step={SuperConstants.TARGET_BALANCE.STEP} onChange={(v) => dispatch({ type: 'SET_TARGET_BALANCE', payload: v })} formatValue={(v) => formatCurrency(v)} />
+                                )}
+                            </div>
                         </div>
 
+                        {/* 2. Lifestyle Settings */}
                         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                             <div className="flex items-center gap-2 text-gray-900 font-bold mb-4">
                                 <User size={20} className="text-indigo-500" />

@@ -1,32 +1,36 @@
-// File: src/components/common/Tabs.tsx
 import React from 'react';
 
-interface Tab {
-    id: string;
-    label: string;
+// CHANGED: label can now be a node (for icons), not just a string
+export interface Tab<T extends string> {
+    id: T;
+    label: string | React.ReactNode;
 }
 
-interface TabsProps {
-    tabs: Tab[];
-    activeTab: string;
-    onTabClick: (id: string) => void;
+interface TabsProps<T extends string> {
+    tabs: Tab<T>[];
+    activeTab: T;
+    onTabClick: (id: T) => void;
     variant?: 'button' | 'underline' | 'dark-underline' | 'full-width' | 'pill' | 'pill-on-dark' | 'segmented' | 'segmented-indigo';
     className?: string;
 }
 
-export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant = 'button', className = '' }) => {
-
-    // ... (Keep existing variants: underline, full-width, dark-underline) ...
+export const Tabs = <T extends string>({
+                                           tabs,
+                                           activeTab,
+                                           onTabClick,
+                                           variant = 'button',
+                                           className = ''
+                                       }: TabsProps<T>) => {
 
     if (variant === 'underline') {
         return (
             <div className={`border-b border-gray-200 ${className}`}>
-                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => onTabClick(tab.id)}
-                            className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium ${
+                            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors ${
                                 activeTab === tab.id
                                     ? 'border-indigo-600 text-indigo-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -80,7 +84,6 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant
         );
     }
 
-    // Standard Pill (Dark Gray on Light Background)
     if (variant === 'pill') {
         return (
             <div className={`flex w-full gap-1 rounded-full bg-gray-900 p-1 shadow-inner overflow-x-auto ${className}`}>
@@ -102,7 +105,6 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onTabClick, variant
         );
     }
 
-    // NEW: Pill on Dark (Deep Indigo on Indigo Background)
     if (variant === 'pill-on-dark') {
         return (
             <div className={`flex w-full gap-1 rounded-full bg-indigo-950 p-1 shadow-inner overflow-x-auto ${className}`}>

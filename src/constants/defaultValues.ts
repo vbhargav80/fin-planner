@@ -12,7 +12,7 @@ export const SYSTEM_DEFAULTS: AppConfig = {
         monthlySalary: 10000,
         transitionalSalary: 5000,
         currentLivingExpenses: 10000,
-        retirementLivingExpenses: 8000,
+        retirementLivingExpenses: 10000,
         rentalGrowthRate: 2.5,
         isRefinanced: false,
         considerOffsetIncome: false,

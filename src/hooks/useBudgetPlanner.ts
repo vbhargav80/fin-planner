@@ -15,7 +15,6 @@ const mkItem = (
     id: uuid(),
     name,
     amount,
-    initialAmount: amount,
     iconKey,
     reduction: 0,
     isFixed,
@@ -72,16 +71,16 @@ const initialState: State = {
             name: 'Transport',
             iconKey: 'transport',
             items: [
-                mkItem('Fuel', 250, 'transport', false, 'Car 1'),
-                mkItem('Rego', 100, 'rates', true, 'Car 1'),
-                mkItem('Insurance', 100, 'rates', false, 'Car 1'),
-                mkItem('Servicing', 70, 'service', false, 'Car 1'),
-                mkItem('Roadside Assist', 10, 'alert', false, 'Car 1'),
-                mkItem('Fuel', 250, 'transport', false, 'Car 2'),
-                mkItem('Rego', 100, 'rates', true, 'Car 2'),
-                mkItem('Insurance', 100, 'rates', false, 'Car 2'),
-                mkItem('Servicing', 70, 'service', false, 'Car 2'),
-                mkItem('Roadside Assist', 10, 'alert', false, 'Car 2'),
+                mkItem('Fuel', 250, 'transport', false, 'Nissan'),
+                mkItem('Rego', 100, 'rates', true, 'Nissan'),
+                mkItem('Insurance', 100, 'rates', false, 'Nissan'),
+                mkItem('Servicing', 70, 'service', false, 'Nissan'),
+                mkItem('Roadside Assist', 10, 'alert', false, 'Nissan'),
+                mkItem('Fuel', 250, 'transport', false, 'Kia'),
+                mkItem('Rego', 100, 'rates', true, 'Kia'),
+                mkItem('Insurance', 100, 'rates', false, 'Kia'),
+                mkItem('Servicing', 70, 'service', false, 'Kia'),
+                mkItem('Roadside Assist', 10, 'alert', false, 'Kia'),
                 mkItem('Train', 120, 'train'),
             ]
         },
@@ -128,6 +127,7 @@ const initialState: State = {
             name: 'Lifestyle & Recreation',
             iconKey: 'lifestyle',
             items: [
+                // Coffee hidden by default
                 mkItem('Coffee', 300, 'lifestyle', false, undefined, true),
                 mkItem('Dining Out', 400, 'dining'),
                 mkItem('Misc', 300, 'entertainment'),
@@ -177,16 +177,24 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useBudgetPlanner(): BudgetPlannerState {
+    // Use persistent reducer
     const [state, dispatch] = usePersistentReducer(reducer, initialState, 'budget-v1');
 
     const derived = useMemo(() => {
-        const totalIncome = state.incomes.reduce((sum, item) => sum + item.amount, 0);
+        // INCOME: Skip hidden items unless Admin Mode is ON
+        const totalIncome = state.incomes.reduce((sum, item) => {
+            if (item.isHidden && !state.isAdminMode) return sum;
+            return sum + item.amount;
+        }, 0);
 
         let totalExpenses = 0;
         let totalOptimizedExpenses = 0;
 
         state.expenseCategories.forEach(cat => {
             cat.items.forEach(item => {
+                // EXPENSES: Skip hidden items unless Admin Mode is ON
+                if (item.isHidden && !state.isAdminMode) return;
+
                 totalExpenses += item.amount;
                 const savings = item.amount * (item.reduction / 100);
                 totalOptimizedExpenses += (item.amount - savings);
@@ -201,7 +209,7 @@ export function useBudgetPlanner(): BudgetPlannerState {
             totalIncome, totalExpenses, remaining,
             totalOptimizedExpenses, potentialSavings, projectedRemaining
         };
-    }, [state]);
+    }, [state]); // Recalculates whenever state (including isAdminMode) changes
 
     return { state, dispatch, isAdminMode: state.isAdminMode, ...derived };
 }

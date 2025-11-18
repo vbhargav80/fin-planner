@@ -21,10 +21,12 @@ export interface ExpenseCategory extends BudgetId {
     items: ExpenseItem[];
 }
 
+// UPDATED: Added missing properties to IncomeItem
 export interface IncomeItem extends BudgetId {
     name: string;
     amount: number;
-    initialAmount?: number;
+    initialAmount?: number; // Needed for smart step size
+    isHidden?: boolean;     // Needed for filtering logic
 }
 
 export interface State {
@@ -46,7 +48,7 @@ export type Action =
     | { type: 'UPDATE_EXPENSE_REDUCTION'; payload: { categoryId: string; itemId: string; reduction: number } }
     | { type: 'TOGGLE_EXPENSE_FIXED'; payload: { categoryId: string; itemId: string } }
     | { type: 'TOGGLE_ADMIN_MODE' }
-    | { type: 'RESET_BUDGET' }; // NEW ACTION
+    | { type: 'RESET_BUDGET' };
 
 export interface BudgetDerived {
     totalIncome: number;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wallet, Landmark, PiggyBank, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Wallet, Landmark, PiggyBank, CheckCircle2, AlertCircle, RotateCcw } from 'lucide-react';
 import type { CalculatorId } from '../../types/common.types';
 import { formatCurrency } from '../../utils/formatters';
 import { useDashboardMetrics } from '../../hooks/useDashboardMetrics';
@@ -20,8 +20,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         isSuperGoalMet
     } = useDashboardMetrics();
 
+    const handleGlobalReset = () => {
+        if (window.confirm("This will wipe all your saved data across ALL calculators and reset them to defaults. Are you sure?")) {
+            // 1. Clear all known storage keys
+            // We clear both v1 and v2 keys to be safe against version changes
+            const keysToClear = [
+                'amortization-v1',
+                'super-v1',
+                'super-v2',
+                'drawdown-v1',
+                'budget-v1'
+            ];
+
+            keysToClear.forEach(key => localStorage.removeItem(key));
+
+            // 2. Force reload to reset application state
+            window.location.reload();
+        }
+    };
+
     return (
-        <div className="p-6 sm:p-8 max-w-7xl mx-auto space-y-8 animate-fade-in">
+        <div className="p-6 sm:p-8 max-w-7xl mx-auto space-y-8 animate-fade-in flex flex-col min-h-full">
 
             {/* Header */}
             <div>
@@ -35,7 +54,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <DashboardCard
                     title="Monthly Surplus"
                     value={formatCurrency(monthlySurplus)}
-                    // Dynamic styling for value color based on surplus
                     subValue={
                         monthlySurplus < 0 ? (
                             <span className="text-xs font-medium text-red-500 bg-red-50 px-2 py-1 rounded-full">
@@ -83,6 +101,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
             {/* Insights Section */}
             <SmartInsights monthlySurplus={monthlySurplus} />
+
+            {/* Footer Actions */}
+            <div className="mt-auto pt-12 border-t border-gray-200 flex justify-end">
+                <button
+                    onClick={handleGlobalReset}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200"
+                    title="Clear all data and restart"
+                >
+                    <RotateCcw size={16} />
+                    Reset All Data
+                </button>
+            </div>
         </div>
     );
 };

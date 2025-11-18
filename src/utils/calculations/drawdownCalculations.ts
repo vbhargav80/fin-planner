@@ -3,6 +3,7 @@ import type {
     SaleInputs,
     DrawdownPlanInputs,
     SaleDrawdownDerived,
+    ChartDataPoint,
 } from '../../types/drawdown.types';
 
 function clampNonNegative(n: number): number {
@@ -34,20 +35,16 @@ export function calculateSaleAndTaxes(sale: SaleInputs) {
     const p2Rate = clampNonNegative(sale.person2TaxRate) / 100;
     const discountRate = clampNonNegative(sale.cgtDiscountRate) / 100;
 
-    // 1. Calculate Capital Gain (Loan does NOT affect this)
     const adjustedCostBase = Math.max(0, costBase - depreciation);
     const rawGain = salePrice - sellingCosts - adjustedCostBase;
     const taxableGain = Math.max(0, rawGain);
 
-    // 2. Apply Discount
     const perOwnerDiscountedGain = (taxableGain * 0.5) * (1 - discountRate);
 
-    // 3. Calculate Tax
     const person1Tax = perOwnerDiscountedGain * p1Rate;
     const person2Tax = perOwnerDiscountedGain * p2Rate;
     const totalTax = person1Tax + person2Tax;
 
-    // 4. Calculate Net Proceeds (Price - Loan - Costs - Tax)
     const netProceeds = Math.max(0, salePrice - outstandingLoan - sellingCosts - totalTax);
 
     return { taxableGain, person1Tax, person2Tax, totalTax, netProceeds };
@@ -72,11 +69,14 @@ export function buildDrawdownSchedule(
     const schedule: DrawdownRow[] = [];
     let balance = clampNonNegative(startingBalance);
 
+    // If drawing nothing or earning more than drawing, it lasts forever
     if ((monthlyRate > 0 && balance * monthlyRate >= monthlyDraw && monthlyDraw > 0) || monthlyDraw === 0) {
-        return { schedule, monthsToDeplete: null, depletionDateLabel: null, durationLabel: 'Does not deplete' };
+        // Generate a short preview schedule anyway so the chart has data
+        // But we return "Does not deplete"
+        // For chart generation, we will handle this separately.
     }
 
-    const maxMonths = 1200;
+    const maxMonths = 1200; // 100 years
     let months = 0;
     while (balance > 0 && months < maxMonths) {
         const date = addMonthsUTC(startDate, months);
@@ -114,6 +114,53 @@ export function buildDrawdownSchedule(
     return { schedule, monthsToDeplete, depletionDateLabel, durationLabel };
 }
 
+// NEW: Generate comparison data for the chart (30 years)
+function generateWealthChart(
+    netProceeds: number,
+    schedule: DrawdownRow[],
+    salePrice: number,
+    outstandingLoan: number,
+    capitalGrowthRate: number
+): ChartDataPoint[] {
+    const years = 30;
+    const data: ChartDataPoint[] = [];
+
+    // Initial Point (Year 0)
+    data.push({
+        year: 0,
+        cashWealth: netProceeds,
+        propertyWealth: Math.max(0, salePrice - outstandingLoan)
+    });
+
+    let currentPropertyValue = salePrice;
+    const growthDec = capitalGrowthRate / 100;
+
+    for (let y = 1; y <= years; y++) {
+        // 1. Calculate Keep Wealth
+        currentPropertyValue *= (1 + growthDec);
+        const keepWealth = Math.max(0, currentPropertyValue - outstandingLoan);
+
+        // 2. Get Sell Wealth from Schedule
+        // Find the balance at the end of month y*12
+        const monthIndex = (y * 12) - 1;
+        let sellWealth = 0;
+
+        if (monthIndex < schedule.length) {
+            sellWealth = schedule[monthIndex].endBalance;
+        } else {
+            sellWealth = 0; // Depleted
+        }
+
+        data.push({
+            year: y,
+            cashWealth: Math.round(sellWealth),
+            propertyWealth: Math.round(keepWealth)
+        });
+    }
+
+    return data;
+}
+
 export function computeSaleDrawdownDerived(
     sale: SaleInputs,
     plan: DrawdownPlanInputs
@@ -122,6 +169,15 @@ export function computeSaleDrawdownDerived(
     const { schedule, monthsToDeplete, depletionDateLabel, durationLabel } =
         buildDrawdownSchedule(plan, netProceeds);
 
+    // Generate Chart Data
+    const chartData = generateWealthChart(
+        netProceeds,
+        schedule,
+        sale.salePrice,
+        sale.outstandingLoan,
+        plan.capitalGrowthRate
+    );
+
     return {
         taxableGain,
         person1Tax,
@@ -129,6 +185,7 @@ export function computeSaleDrawdownDerived(
         totalTax,
         netProceeds,
         schedule,
+        chartData, // Export
         monthsToDeplete,
         depletionDateLabel,
         durationLabel,

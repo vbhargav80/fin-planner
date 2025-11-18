@@ -157,7 +157,7 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                             </div>
 
                             <p className="text-xs text-orange-700/80">
-                                Compare your drawdown income against the rental income you would forego by selling the asset.
+                                Compare your drawdown income against the wealth you would hold if you kept the property.
                             </p>
 
                             <RangeSlider
@@ -178,6 +178,18 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                                 step={DrawdownConstants.NET_RENT_GROWTH_RATE.STEP}
                                 onChange={(v) => dispatch({ type: 'SET_NET_RENT_GROWTH_RATE', payload: v })}
                                 formatValue={(v) => `${v.toFixed(2)}%`}
+                                valueClassName="text-sm font-bold text-orange-700 font-mono"
+                            />
+
+                            {/* NEW SLIDER */}
+                            <RangeSlider
+                                label="Est. Capital Growth Rate (%)"
+                                value={state.capitalGrowthRate}
+                                min={DrawdownConstants.CAPITAL_GROWTH_RATE.MIN}
+                                max={DrawdownConstants.CAPITAL_GROWTH_RATE.MAX}
+                                step={DrawdownConstants.CAPITAL_GROWTH_RATE.STEP}
+                                onChange={(v) => dispatch({ type: 'SET_CAPITAL_GROWTH_RATE', payload: v })}
+                                formatValue={(v) => `${v.toFixed(1)}%`}
                                 valueClassName="text-sm font-bold text-orange-700 font-mono"
                             />
                         </div>

@@ -43,3 +43,5 @@ export const MONTHLY_DRAWDOWN = {
     MAX: 15_000,
     STEP: 1_000,
 };
+
+export const CAPITAL_GROWTH_RATE = { MIN: 0, MAX: 10, STEP: 0.1 };

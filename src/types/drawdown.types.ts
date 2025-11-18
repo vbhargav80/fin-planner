@@ -9,6 +9,12 @@ export interface DrawdownRow {
     rentLost: number;
 }
 
+export interface ChartDataPoint {
+    year: number;
+    cashWealth: number;
+    propertyWealth: number;
+}
+
 export interface SaleInputs {
     salePrice: number;
     outstandingLoan: number;
@@ -26,6 +32,7 @@ export interface DrawdownPlanInputs {
     startMonth: string;
     netMonthlyRent: number;
     netRentGrowthRate: number;
+    capitalGrowthRate: number;
 }
 
 export type State = SaleInputs & DrawdownPlanInputs;
@@ -43,7 +50,8 @@ export type Action =
     | { type: 'SET_MONTHLY_DRAWDOWN'; payload: number }
     | { type: 'SET_START_MONTH'; payload: string }
     | { type: 'SET_NET_MONTHLY_RENT'; payload: number }
-    | { type: 'SET_NET_RENT_GROWTH_RATE'; payload: number };
+    | { type: 'SET_NET_RENT_GROWTH_RATE'; payload: number }
+    | { type: 'SET_CAPITAL_GROWTH_RATE'; payload: number };
 
 export interface SaleDrawdownDerived {
     taxableGain: number;
@@ -52,6 +60,7 @@ export interface SaleDrawdownDerived {
     totalTax: number;
     netProceeds: number;
     schedule: DrawdownRow[];
+    chartData: ChartDataPoint[];
     monthsToDeplete: number | null;
     depletionDateLabel: string | null;
     durationLabel: string;

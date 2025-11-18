@@ -28,7 +28,9 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         myAge, wifeAge, mySuper, wifeSuper,
         targetAge, targetBalance, netReturn, calcMode, contributionFrequency, makeExtraContribution,
         myExtraYearlyContribution, myExtraContributionYears, wifeExtraYearlyContribution, wifeExtraContributionYears,
-        drawdownLifestyle, drawdownAnnualAmount, drawdownReturn
+        drawdownLifestyle, drawdownAnnualAmount, drawdownReturn,
+        myContributionChangeAge = 50,
+        wifeContributionChangeAge = 50,
     } = state;
 
     const [activePhase, setActivePhase] = useState<'accumulation' | 'retirement'>('accumulation');
@@ -100,7 +102,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 {activePhase === 'accumulation' && (
                     <div className="space-y-6 animate-fade-in">
 
-                        {/* 1. Context: Current Status */}
+                        {/* 1. Current Status */}
                         <div className="border-l-4 border-indigo-500 bg-indigo-50/50 p-4 rounded-r-lg">
                             <div className="flex items-center gap-2 text-indigo-900 font-bold mb-4">
                                 <Wallet size={20} />
@@ -122,7 +124,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             </div>
                         </div>
 
-                        {/* 2. Decision: Strategy Goal */}
+                        {/* 2. Strategy Selector */}
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">What is your goal?</label>
                             <Tabs
@@ -133,7 +135,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             />
                         </div>
 
-                        {/* 3A. OPTION: FORECAST (Inputs: Contributions) */}
+                        {/* 3A. MODE: FORECAST BALANCE */}
                         {calcMode === 'balance' && (
                             <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm animate-fade-in">
                                 <div className="flex items-center justify-between mb-4 gap-4">
@@ -152,21 +154,19 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                     </div>
                                 </div>
 
-                                {/* Person Switcher */}
                                 <Tabs tabs={CONTRIBUTOR_TABS} activeTab={contributorTab} onTabClick={(id) => setContributorTab(id as any)} variant="underline" className="mb-4" />
 
-                                {/* Contribution Sliders */}
                                 {contributorTab === 'me' ? (
                                     <div className="space-y-5 animate-fade-in">
                                         <div className="flex justify-end">
-                                            <ToggleSwitch label="Vary strategy in future?" checked={useAgeBasedMe} onChange={setUseAgeBasedMe} />
+                                            <ToggleSwitch label="Vary strategy later?" checked={useAgeBasedMe} onChange={setUseAgeBasedMe} />
                                         </div>
 
                                         {useAgeBasedMe && (
                                             <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mb-2">
                                                 <RangeSlider
                                                     label="Change Strategy at Age"
-                                                    value={state.myContributionChangeAge}
+                                                    value={myContributionChangeAge}
                                                     min={SuperConstants.CONTRIBUTION_CHANGE_AGE.MIN}
                                                     max={targetAge - 1}
                                                     step={1}
@@ -176,7 +176,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                         )}
 
                                         <RangeSlider
-                                            label={useAgeBasedMe ? `Contribution (Pre-${state.myContributionChangeAge})` : "Regular Contribution"}
+                                            label={useAgeBasedMe ? `Contribution (Pre-${myContributionChangeAge})` : "Regular Contribution"}
                                             value={myContributionCurrent}
                                             min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN}
                                             max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX}
@@ -187,7 +187,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
 
                                         {useAgeBasedMe && (
                                             <RangeSlider
-                                                label={`Contribution (Age ${state.myContributionChangeAge}+)`}
+                                                label={`Contribution (Age ${myContributionChangeAge}+)`}
                                                 value={myContributionFuture}
                                                 min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN}
                                                 max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX}
@@ -210,14 +210,14 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                 ) : (
                                     <div className="space-y-5 animate-fade-in">
                                         <div className="flex justify-end">
-                                            <ToggleSwitch label="Vary strategy in future?" checked={useAgeBasedSpouse} onChange={setUseAgeBasedSpouse} />
+                                            <ToggleSwitch label="Vary strategy later?" checked={useAgeBasedSpouse} onChange={setUseAgeBasedSpouse} />
                                         </div>
 
                                         {useAgeBasedSpouse && (
                                             <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mb-2">
                                                 <RangeSlider
                                                     label="Change Strategy at Age"
-                                                    value={state.wifeContributionChangeAge}
+                                                    value={wifeContributionChangeAge}
                                                     min={SuperConstants.CONTRIBUTION_CHANGE_AGE.MIN}
                                                     max={targetAge - 1}
                                                     step={1}
@@ -227,7 +227,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                         )}
 
                                         <RangeSlider
-                                            label={useAgeBasedSpouse ? `Contribution (Pre-${state.wifeContributionChangeAge})` : "Regular Contribution"}
+                                            label={useAgeBasedSpouse ? `Contribution (Pre-${wifeContributionChangeAge})` : "Regular Contribution"}
                                             value={wifeContributionCurrent}
                                             min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN}
                                             max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX}
@@ -237,7 +237,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                         />
                                         {useAgeBasedSpouse && (
                                             <RangeSlider
-                                                label={`Contribution (Age ${state.wifeContributionChangeAge}+)`}
+                                                label={`Contribution (Age ${wifeContributionChangeAge}+)`}
                                                 value={wifeContributionFuture}
                                                 min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN}
                                                 max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX}
@@ -261,7 +261,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             </div>
                         )}
 
-                        {/* 3B. OPTION: TARGET GOAL (Inputs: Goal, Output: Result) */}
+                        {/* 3B. MODE: TARGET GOAL (Inputs: Goal, Output: Result) */}
                         {calcMode === 'contribution' && (
                             <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm animate-fade-in">
                                 <div className="flex items-center gap-2 text-gray-900 font-bold mb-4">
@@ -279,7 +279,6 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                     formatValue={(v) => formatCurrency(v)}
                                 />
 
-                                {/* RESULT DISPLAY */}
                                 <div className="mt-6 bg-indigo-50 border border-indigo-100 rounded-lg p-4 flex items-center justify-between">
                                     <div>
                                         <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Required Contribution</span>
@@ -294,7 +293,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             </div>
                         )}
 
-                        {/* 4. Assumptions (Always Visible) */}
+                        {/* 4. Assumptions */}
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                             <div className="flex items-center gap-2 text-gray-700 font-bold mb-3">
                                 <TrendingUp size={20} />
@@ -305,7 +304,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                     </div>
                 )}
 
-                {/* ... (Spend Phase remains the same) ... */}
+                {/* ==================== RETIREMENT PHASE ==================== */}
                 {activePhase === 'retirement' && (
                     <div className="space-y-6 animate-fade-in">
                         <div className="border-l-4 border-orange-500 bg-orange-50/50 p-4 rounded-r-lg">
@@ -321,15 +320,8 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                 step={SuperConstants.TARGET_AGE.STEP}
                                 onChange={(v) => dispatch({ type: 'SET_TARGET_AGE', payload: v })}
                             />
-                            <div className="mt-4">
-                                {/* Optional Goal Balance Slider only if mode is Contribution */}
-                                {calcMode === 'contribution' && (
-                                    <RangeSlider label="Target Combined Balance" value={targetBalance || 0} min={SuperConstants.TARGET_BALANCE.MIN} max={SuperConstants.TARGET_BALANCE.MAX} step={SuperConstants.TARGET_BALANCE.STEP} onChange={(v) => dispatch({ type: 'SET_TARGET_BALANCE', payload: v })} formatValue={(v) => formatCurrency(v)} />
-                                )}
-                            </div>
                         </div>
 
-                        {/* 2. Lifestyle Settings (Moved from Results!) */}
                         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                             <div className="flex items-center gap-2 text-gray-900 font-bold mb-4">
                                 <User size={20} className="text-indigo-500" />

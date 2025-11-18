@@ -1,4 +1,4 @@
-// File: `src/types/amortization.types.ts`
+// File: src/types/amortization.types.ts
 import type { Dispatch } from 'react';
 
 export interface AmortizationRow {
@@ -58,7 +58,8 @@ export interface AmortizationCalculatorState {
     scrollToFirstDepletedOffset: number;
     triggerScrollToFirstDepletedOffset: () => void;
     clearScrollToFirstDepletedOffset: () => void;
-    calculateOptimalExpenditure: () => void;
-    calculateOptimalWorkingYears: () => void;
+    // UPDATED: Functions now return the calculated values
+    calculateOptimalExpenditure: () => number;
+    calculateOptimalWorkingYears: () => { years: number; income: number };
     hasDepletedOffsetRows: boolean;
 }

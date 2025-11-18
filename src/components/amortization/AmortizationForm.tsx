@@ -1,23 +1,28 @@
-// File: 'src/components/amortization/AmortizationForm.tsx'
-import React from 'react';
+// File: src/components/amortization/AmortizationForm.tsx
+import React, { useState } from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { ToggleSwitch } from '../common/ToggleSwitch';
 import { RangeSlider } from '../common/RangeSlider';
 import { Tabs } from '../common/Tabs';
 import type { AmortizationCalculatorState } from '../../types/amortization.types';
 import * as AmortizationConstants from '../../constants/amortization';
-import { Briefcase, Wallet } from 'lucide-react';
+import { Briefcase, Wallet, CheckCircle2 } from 'lucide-react';
+// Import formatter
+import { formatCurrency } from '../../utils/formatters';
 
 interface AmortizationFormProps {
     calculator: AmortizationCalculatorState;
 }
 
 export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }) => {
-    const [activeTab, setActiveTab] = React.useState<'loan' | 'cashflow' | 'assumptions'>('loan');
+    const [activeTab, setActiveTab] = React.useState<'loan' | 'cashflow' | 'assumptions' | 'strategies'>('loan');
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
     const TABS = [
-        { id: 'loan', label: 'Loan Details' },
-        { id: 'cashflow', label: 'Monthly Cashflow' },
-        { id: 'assumptions', label: 'Assumptions & Actions' },
+        { id: 'loan', label: 'Loan' },
+        { id: 'cashflow', label: 'Cashflow' },
+        { id: 'assumptions', label: 'Assumptions' },
+        { id: 'strategies', label: 'Strategies' },
     ];
 
     const {
@@ -30,6 +35,19 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
 
     const { interestRate, principal, monthlyRepayment, initialRentalIncome, initialOffsetBalance, monthlyExpenditure, monthlyExpenditurePre2031, rentalGrowthRate, isRefinanced, considerOffsetIncome, offsetIncomeRate, continueWorking, yearsWorking, netIncome } = state;
 
+    // Handlers to capture values and show specific feedback
+    const handleOptimizeExpenditure = () => {
+        const result = calculateOptimalExpenditure();
+        setSuccessMsg(`Expenditure optimized to ${formatCurrency(result)}/mo`);
+        setTimeout(() => setSuccessMsg(null), 4000);
+    };
+
+    const handleOptimizeWork = () => {
+        const { years, income } = calculateOptimalWorkingYears();
+        setSuccessMsg(`Plan set: Work ${years} years earning ${formatCurrency(income)}/mo`);
+        setTimeout(() => setSuccessMsg(null), 4000);
+    };
+
     return (
         <div
             className="md:w-[35%] p-6 sm:p-8 bg-white/95 backdrop-blur md:sticky md:top-[4rem] md:self-start md:h-[calc(100vh-4rem)] md:overflow-y-auto"
@@ -41,12 +59,11 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                 Monthly schedule from Jan 2026 to Dec 2040. Results update automatically.
             </p>
 
-            {/* Tabs */}
-            <Tabs tabs={TABS} activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} className="mt-6" />
+            <Tabs tabs={TABS} variant="pill" activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} className="mt-6" />
 
             <div className="mt-8 space-y-6">
                 {activeTab === 'loan' && (
-                    <section>
+                    <section className="animate-fade-in">
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
                             <RangeSlider
                                 label="Starting Loan"
@@ -69,7 +86,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                 value={interestRate}
                                 min={AmortizationConstants.INTEREST_RATE.MIN}
                                 max={AmortizationConstants.INTEREST_RATE.MAX}
-                                step={0.01} // Allow finer grain control for user, reducer will snap
+                                step={0.01}
                                 onChange={(v) => dispatch({ type: 'SET_INTEREST_RATE', payload: v })}
                             />
                         </div>
@@ -77,9 +94,8 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                 )}
 
                 {activeTab === 'cashflow' && (
-                    <section>
+                    <section className="animate-fade-in">
                         <div className="space-y-8">
-                            {/* Incomings */}
                             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                 <h4 className="text-sm font-semibold text-gray-600 mb-3">Incomings</h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -103,7 +119,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                 </div>
                             </div>
 
-                            {/* Outgoings */}
                             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                 <h4 className="text-sm font-semibold text-gray-600 mb-3">Outgoings</h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -139,7 +154,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                 )}
 
                 {activeTab === 'assumptions' && (
-                    <section>
+                    <section className="animate-fade-in">
                         <div className="space-y-6">
                             <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-4">
                                 <RangeSlider
@@ -195,23 +210,63 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                         </div>
                     </section>
                 )}
-            </div>
 
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                    onClick={calculateOptimalExpenditure}
-                    className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
-                >
-                    <Wallet size={16} />
-                    <span className="text-sm">Optimize Expenditure</span>
-                </button>
-                <button
-                    onClick={calculateOptimalWorkingYears}
-                    className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
-                >
-                    <Briefcase size={16} />
-                    <span className="text-sm">Optimize Work &amp; Income</span>
-                </button>
+                {activeTab === 'strategies' && (
+                    <section className="animate-fade-in space-y-4">
+                        <div
+                            onClick={handleOptimizeExpenditure}
+                            className="group bg-gradient-to-br from-indigo-50 to-white p-5 rounded-xl border border-indigo-100 hover:border-indigo-300 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden"
+                        >
+                            <div className="flex items-start gap-4 relative z-10">
+                                <div className="p-3 bg-indigo-100 text-indigo-600 rounded-lg group-hover:scale-110 transition-transform">
+                                    <Wallet size={24} />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-gray-900 text-lg group-hover:text-indigo-700 transition-colors">Maximize Lifestyle</h4>
+                                    <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                                        Find the maximum monthly expenditure you can afford while still zeroing out your loan by the end of the term.
+                                    </p>
+                                    {/* Current Value Badge */}
+                                    <div className="mt-3 inline-block bg-white px-2 py-1 rounded text-xs font-medium text-gray-500 border border-gray-200">
+                                        Current: {formatCurrency(monthlyExpenditure)}/mo
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-colors" />
+                        </div>
+
+                        <div
+                            onClick={handleOptimizeWork}
+                            className="group bg-gradient-to-br from-emerald-50 to-white p-5 rounded-xl border border-emerald-100 hover:border-emerald-300 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden"
+                        >
+                            <div className="flex items-start gap-4 relative z-10">
+                                <div className="p-3 bg-emerald-100 text-emerald-600 rounded-lg group-hover:scale-110 transition-transform">
+                                    <Briefcase size={24} />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-gray-900 text-lg group-hover:text-emerald-700 transition-colors">Minimize Work Required</h4>
+                                    <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                                        Calculate the minimum working years and income required to meet your loan obligations safely.
+                                    </p>
+                                    {/* Current Value Badge */}
+                                    <div className="mt-3 inline-block bg-white px-2 py-1 rounded text-xs font-medium text-gray-500 border border-gray-200">
+                                        Current: {yearsWorking} years @ {formatCurrency(netIncome)}/mo
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-colors" />
+                        </div>
+
+                        {successMsg && (
+                            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 md:absolute md:bottom-0 md:left-0 md:w-full md:translate-x-0 p-4 animate-in slide-in-from-bottom-4 fade-in z-50">
+                                <div className="bg-gray-900 text-white px-4 py-3 rounded-lg shadow-xl flex items-center justify-center gap-2 text-sm font-medium">
+                                    <CheckCircle2 size={18} className="text-green-400" />
+                                    {successMsg}
+                                </div>
+                            </div>
+                        )}
+                    </section>
+                )}
             </div>
         </div>
     );

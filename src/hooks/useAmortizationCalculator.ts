@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'; // Remove useReducer import
-import { usePersistentReducer } from './usePersistentReducer'; // Add this
+// File: src/hooks/useAmortizationCalculator.ts
+import { useState, useEffect, useCallback } from 'react';
+import { usePersistentReducer } from './usePersistentReducer';
 import type { AmortizationRow, AmortizationCalculatorState, State, Action } from '../types/amortization.types';
 import { calculateAmortizationSchedule } from '../utils/calculations/amortizationCalculations';
 import * as AmortizationConstants from '../constants/amortization';
@@ -74,10 +75,10 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         const inputs = { ...state };
 
         let low = 0;
-        let high = 50000; // Assume expenditure won't exceed this
+        let high = 50000;
         let optimalExpenditure = state.monthlyExpenditure;
 
-        for (let i = 0; i < 30; i++) { // 30 iterations for precision
+        for (let i = 0; i < 30; i++) {
             const mid = (low + high) / 2;
             const { schedule } = calculateAmortizationSchedule({ ...inputs, monthlyExpenditure: mid });
             const finalOffsetBalance = schedule.length > 0 ? schedule[schedule.length - 1].offsetBalance : 0;
@@ -91,6 +92,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         }
 
         dispatch({ type: 'SET_MONTHLY_EXPENDITURE', payload: optimalExpenditure });
+        return optimalExpenditure; // Return the result
     };
 
     const calculateOptimalWorkingYears = () => {
@@ -110,10 +112,10 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         const finalYears = optimalYears === -1 ? 10 : optimalYears;
 
         let low = 0;
-        let high = 50000; // Assume income won't exceed this
+        let high = 50000;
         let optimalIncome = state.netIncome;
 
-        for (let i = 0; i < 30; i++) { // 30 iterations for precision
+        for (let i = 0; i < 30; i++) {
             const mid = (low + high) / 2;
             const { schedule } = calculateAmortizationSchedule({ ...inputs, yearsWorking: finalYears, netIncome: mid });
             const finalOffsetBalance = schedule.length > 0 ? schedule[schedule.length - 1].offsetBalance : 0;
@@ -128,6 +130,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
 
         dispatch({ type: 'SET_YEARS_WORKING', payload: finalYears });
         dispatch({ type: 'SET_NET_INCOME', payload: optimalIncome });
+        return { years: finalYears, income: optimalIncome }; // Return the result
     };
 
     useEffect(() => {

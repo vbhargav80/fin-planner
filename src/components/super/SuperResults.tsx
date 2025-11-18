@@ -11,8 +11,7 @@ interface SuperResultsProps {
 }
 
 export const SuperResults: React.FC<SuperResultsProps> = ({ calculator }) => {
-    // Destructure state and dispatch from calculator
-    const { results, breakdownData, drawdownSchedule, state, dispatch } = calculator;
+    const { results, breakdownData, drawdownSchedule } = calculator;
     const [activeTab, setActiveTab] = useState<'summary' | 'breakdown' | 'drawdown'>('summary');
 
     const TABS = [
@@ -47,8 +46,6 @@ export const SuperResults: React.FC<SuperResultsProps> = ({ calculator }) => {
                         {activeTab === 'drawdown' && (
                             <SuperDrawdownTable
                                 schedule={drawdownSchedule}
-                                state={state}
-                                dispatch={dispatch}
                             />
                         )}
                     </div>

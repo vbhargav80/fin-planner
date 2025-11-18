@@ -5,9 +5,9 @@ export const PRINCIPAL = {
 };
 
 export const OFFSET_BALANCE = {
-    MIN: 800000,
-    MAX: 1000000,
-    STEP: 50000,
+    MIN: 0, // Lowered min to 0 for flexibility
+    MAX: 1500000, // INCREASED per request
+    STEP: 10000, // Finer steps
 };
 
 export const INTEREST_RATE = {

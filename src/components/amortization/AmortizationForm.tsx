@@ -1,4 +1,3 @@
-// File: src/components/amortization/AmortizationForm.tsx
 import React, { useState } from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { ToggleSwitch } from '../common/ToggleSwitch';
@@ -6,8 +5,7 @@ import { RangeSlider } from '../common/RangeSlider';
 import { Tabs } from '../common/Tabs';
 import type { AmortizationCalculatorState } from '../../types/amortization.types';
 import * as AmortizationConstants from '../../constants/amortization';
-import { Briefcase, Wallet, CheckCircle2 } from 'lucide-react';
-// Import formatter
+import { Briefcase, Wallet, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
 interface AmortizationFormProps {
@@ -31,11 +29,11 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
         actualMonthlyRepayment,
         calculateOptimalExpenditure,
         calculateOptimalWorkingYears,
+        calculateOptimalOffsetBalance, // NEW
     } = calculator;
 
     const { interestRate, principal, monthlyRepayment, initialRentalIncome, initialOffsetBalance, monthlyExpenditure, monthlyExpenditurePre2031, rentalGrowthRate, isRefinanced, considerOffsetIncome, offsetIncomeRate, continueWorking, yearsWorking, netIncome } = state;
 
-    // Handlers to capture values and show specific feedback
     const handleOptimizeExpenditure = () => {
         const result = calculateOptimalExpenditure();
         setSuccessMsg(`Expenditure optimized to ${formatCurrency(result)}/mo`);
@@ -48,16 +46,21 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
         setTimeout(() => setSuccessMsg(null), 4000);
     };
 
+    // NEW Handler
+    const handleOptimizeOffset = () => {
+        const result = calculateOptimalOffsetBalance();
+        const increase = result - initialOffsetBalance;
+        const msg = increase > 0
+            ? `Offset increased by ${formatCurrency(increase)} to ${formatCurrency(result)}`
+            : `Offset optimized to ${formatCurrency(result)}`;
+        setSuccessMsg(msg);
+        setTimeout(() => setSuccessMsg(null), 4000);
+    };
+
     return (
-        <div
-            className="md:w-[35%] p-6 sm:p-8 bg-white/95 backdrop-blur md:sticky md:top-[4rem] md:self-start md:h-[calc(100vh-4rem)] md:overflow-y-auto"
-        >
-            <h2 className="text-3xl font-bold text-gray-900">
-                Amortization Calculator
-            </h2>
-            <p className="mt-2 text-gray-600">
-                Monthly schedule from Jan 2026 to Dec 2040. Results update automatically.
-            </p>
+        <div className="md:w-[35%] p-6 sm:p-8 bg-white/95 backdrop-blur md:sticky md:top-[4rem] md:self-start md:h-[calc(100vh-4rem)] md:overflow-y-auto">
+            <h2 className="text-3xl font-bold text-gray-900">Amortization Calculator</h2>
+            <p className="mt-2 text-gray-600">Monthly schedule from Jan 2026 to Dec 2040. Results update automatically.</p>
 
             <Tabs tabs={TABS} variant="pill" activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} className="mt-6" />
 
@@ -213,6 +216,28 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
 
                 {activeTab === 'strategies' && (
                     <section className="animate-fade-in space-y-4">
+                        {/* NEW Strategy Card */}
+                        <div
+                            onClick={handleOptimizeOffset}
+                            className="group bg-gradient-to-br from-blue-50 to-white p-5 rounded-xl border border-blue-100 hover:border-blue-300 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden"
+                        >
+                            <div className="flex items-start gap-4 relative z-10">
+                                <div className="p-3 bg-blue-100 text-blue-600 rounded-lg group-hover:scale-110 transition-transform">
+                                    <ShieldCheck size={24} />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-gray-900 text-lg group-hover:text-blue-700 transition-colors">Secure Offset Longevity</h4>
+                                    <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                                        Calculate the starting offset balance required to ensure your funds last until the end of the loan term.
+                                    </p>
+                                    <div className="mt-3 inline-block bg-white px-2 py-1 rounded text-xs font-medium text-gray-500 border border-gray-200">
+                                        Current: {formatCurrency(initialOffsetBalance)}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-colors" />
+                        </div>
+
                         <div
                             onClick={handleOptimizeExpenditure}
                             className="group bg-gradient-to-br from-indigo-50 to-white p-5 rounded-xl border border-indigo-100 hover:border-indigo-300 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden"
@@ -226,7 +251,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                     <p className="text-sm text-gray-600 mt-1 leading-relaxed">
                                         Find the maximum monthly expenditure you can afford while still zeroing out your loan by the end of the term.
                                     </p>
-                                    {/* Current Value Badge */}
                                     <div className="mt-3 inline-block bg-white px-2 py-1 rounded text-xs font-medium text-gray-500 border border-gray-200">
                                         Current: {formatCurrency(monthlyExpenditure)}/mo
                                     </div>
@@ -248,7 +272,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                                     <p className="text-sm text-gray-600 mt-1 leading-relaxed">
                                         Calculate the minimum working years and income required to meet your loan obligations safely.
                                     </p>
-                                    {/* Current Value Badge */}
                                     <div className="mt-3 inline-block bg-white px-2 py-1 rounded text-xs font-medium text-gray-500 border border-gray-200">
                                         Current: {yearsWorking} years @ {formatCurrency(netIncome)}/mo
                                     </div>

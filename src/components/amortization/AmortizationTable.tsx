@@ -9,7 +9,6 @@ interface AmortizationTableProps {
 
 export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator }) => {
     const {
-        state: { considerOffsetIncome },
         amortizationData,
         hasDepletedOffsetRows,
     } = calculator;
@@ -121,22 +120,19 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
             <div
                 ref={scrollContainerRef}
                 className="bg-indigo-800 rounded-lg shadow-inner flex-grow overflow-auto custom-scrollbar"
+                style={{ scrollbarGutter: 'stable' }} // FIX: Reserves space for scrollbar
             >
                 <table className="min-w-full text-left relative border-collapse">
                     <thead ref={theadRef} className="bg-indigo-900 sticky top-0 z-20 shadow-md">
                     <tr>
                         <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Date</th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Start Bal</th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">End Bal</th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Offset</th>
+                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Loan Balance</th>
+                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Offset Balance</th>
                         <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Repayment</th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Net Rent</th>
-                        {considerOffsetIncome && (
-                            <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Offset Inc</th>
-                        )}
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">In</th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Out</th>
-                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Net</th>
+                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Total In</th>
+                        <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Total Out</th>
+                        {/* FIX: Added pr-6 for extra padding on the right */}
+                        <th scope="col" className="pl-4 pr-6 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Net Result</th>
                     </tr>
                     </thead>
                     <tbody className="bg-indigo-800 divide-y divide-indigo-700">
@@ -163,17 +159,13 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                                 className={`transition-colors duration-200 ${bgClass}`}
                             >
                                 <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium text-white ${stickyTdClass}`} style={stickyTdStyle}>{row.date}</td>
-                                <td className={`px-4 py-3 whitespace-nowrap text-sm text-indigo-200 font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.beginningBalance)}</td>
                                 <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium text-white font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.endingBalance)}</td>
                                 <td className={`px-4 py-3 whitespace-nowrap text-sm text-indigo-100 font-medium font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.offsetBalance)}</td>
                                 <td className={`px-4 py-3 whitespace-nowrap text-sm text-green-300 font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.repayment)}</td>
-                                <td className={`px-4 py-3 whitespace-nowrap text-sm text-blue-300 font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.rentalIncome)}</td>
-                                {considerOffsetIncome && (
-                                    <td className={`px-4 py-3 whitespace-nowrap text-sm text-purple-300 font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.offsetIncome)}</td>
-                                )}
                                 <td className={`px-4 py-3 whitespace-nowrap text-sm text-green-300 font-medium font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.totalIncoming)}</td>
                                 <td className={`px-4 py-3 whitespace-nowrap text-sm text-orange-300 font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.totalOutgoing)}</td>
-                                <td className={`px-4 py-3 whitespace-nowrap text-sm font-medium font-mono text-right ${row.totalShortfall < 0 ? 'text-red-300' : 'text-green-300'} ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.totalShortfall)}</td>
+                                {/* FIX: Added pr-6 for extra padding on the right */}
+                                <td className={`pl-4 pr-6 py-3 whitespace-nowrap text-sm font-medium font-mono text-right ${row.totalShortfall < 0 ? 'text-red-300' : 'text-green-300'} ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.totalShortfall)}</td>
                             </tr>
                         );
                     })}

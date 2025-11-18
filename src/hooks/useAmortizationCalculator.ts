@@ -72,6 +72,35 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         return { years: finalYears, income: optimalIncome };
     };
 
+    // NEW: Logic to find minimum offset required to never deplete
+    const calculateOptimalOffsetBalance = () => {
+        const inputs = { ...state };
+        let low = 0;
+        let high = 5000000; // Search up to $5M
+        let optimalOffset = high;
+
+        for (let i = 0; i < 30; i++) {
+            const mid = (low + high) / 2;
+            const { schedule } = calculateAmortizationSchedule({ ...inputs, initialOffsetBalance: mid });
+
+            // Check if offset EVER drops below zero
+            const neverDepleted = schedule.every(row => row.offsetBalance >= 0);
+
+            if (neverDepleted) {
+                optimalOffset = mid;
+                high = mid; // Try to find a lower valid amount
+            } else {
+                low = mid; // Need more money
+            }
+        }
+
+        // Round to nearest $1,000 for cleanliness
+        const roundedOffset = Math.ceil(optimalOffset / 1000) * 1000;
+
+        dispatch({ type: 'SET_INITIAL_OFFSET_BALANCE', payload: roundedOffset });
+        return roundedOffset;
+    };
+
     useEffect(() => {
         const { schedule, actualMonthlyRepayment: calculatedRepayment } = calculateAmortizationSchedule(state);
         setAmortizationData(schedule);
@@ -86,6 +115,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         actualMonthlyRepayment,
         calculateOptimalExpenditure,
         calculateOptimalWorkingYears,
+        calculateOptimalOffsetBalance, // Export
         hasDepletedOffsetRows,
     };
 }

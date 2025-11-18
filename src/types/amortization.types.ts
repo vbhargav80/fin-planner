@@ -54,5 +54,6 @@ export interface AmortizationCalculatorState {
     actualMonthlyRepayment: number;
     calculateOptimalExpenditure: () => number;
     calculateOptimalWorkingYears: () => { years: number; income: number };
+    calculateOptimalOffsetBalance: () => number; // NEW
     hasDepletedOffsetRows: boolean;
 }

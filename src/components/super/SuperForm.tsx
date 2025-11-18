@@ -6,13 +6,11 @@ import { ToggleSwitch } from '../common/ToggleSwitch';
 import * as SuperConstants from '../../constants/super';
 import { Tabs } from '../common/Tabs';
 import { SegmentedControl } from '../common/SegmentedControl';
-import { TrendingUp, Sunset, Wallet, PiggyBank, User, Target } from 'lucide-react';
+import { TrendingUp, Sunset, Wallet, PiggyBank, User, Target, ArrowRight } from 'lucide-react';
 
 interface SuperFormProps {
     calculator: SuperCalculatorState;
 }
-
-type Phase = 'accumulation' | 'retirement';
 
 export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
     const {
@@ -35,20 +33,22 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         wifeContributionChangeAge = 50,
     } = state;
 
-    const [activePhase, setActivePhase] = useState<Phase>('accumulation');
+    const [activePhase, setActivePhase] = useState<'accumulation' | 'retirement'>('accumulation');
     const [contributorTab, setContributorTab] = useState<'me' | 'spouse'>('me');
 
     const [useAgeBasedMe, setUseAgeBasedMe] = useState(false);
     const [useAgeBasedSpouse, setUseAgeBasedSpouse] = useState(false);
 
-    // UPDATED: Labels with Icons and new text
-    const PHASE_TABS: { id: Phase; label: React.ReactNode }[] = [
+    // UPDATED: Added visual cues for sequential phases
+    const PHASE_TABS = [
         {
             id: 'accumulation',
             label: (
                 <span className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-bold">1</span>
                     <TrendingUp size={18} />
-                    Build Wealth
+                    <span>Build Wealth</span>
+                    <ArrowRight size={14} className="ml-2 text-gray-300" />
                 </span>
             )
         },
@@ -56,8 +56,9 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
             id: 'retirement',
             label: (
                 <span className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-500 text-[10px] font-bold">2</span>
                     <Sunset size={18} />
-                    Plan Retirement
+                    <span>Plan Retirement</span>
                 </span>
             )
         },
@@ -106,11 +107,10 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                 <p className="mt-2 text-gray-600 mb-6">Optimize your super growth and retirement income.</p>
 
                 <div className="mb-6">
-                    {/* UPDATED: Uses underline variant with icon tabs */}
                     <Tabs
                         tabs={PHASE_TABS}
                         activeTab={activePhase}
-                        onTabClick={setActivePhase}
+                        onTabClick={(id) => setActivePhase(id as any)}
                         variant="underline"
                     />
                 </div>
@@ -281,7 +281,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             </div>
                         )}
 
-                        {/* 3B. MODE: TARGET GOAL (Inputs: Goal, Output: Result) */}
+                        {/* 3B. Target Goal (Inputs: Goal, Output: Result) */}
                         {calcMode === 'contribution' && (
                             <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm animate-fade-in">
                                 <div className="flex items-center gap-2 text-gray-900 font-bold mb-4">
@@ -299,7 +299,6 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                     formatValue={(v) => formatCurrency(v)}
                                 />
 
-                                {/* RESULT DISPLAY */}
                                 <div className="mt-6 bg-indigo-50 border border-indigo-100 rounded-lg p-4 flex items-center justify-between">
                                     <div>
                                         <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Required Contribution</span>
@@ -314,7 +313,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             </div>
                         )}
 
-                        {/* 4. Assumptions (Always Visible) */}
+                        {/* 4. Assumptions */}
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                             <div className="flex items-center gap-2 text-gray-700 font-bold mb-3">
                                 <TrendingUp size={20} />

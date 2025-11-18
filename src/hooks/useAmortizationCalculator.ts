@@ -28,21 +28,26 @@ function reducer(state: State, action: Action): State {
         case 'SET_RETIREMENT_DATE': return { ...state, retirementDate: action.payload };
         case 'SET_CONTINUE_WORKING': return { ...state, continueWorking: action.payload };
         case 'SET_YEARS_WORKING': return { ...state, yearsWorking: action.payload };
+
+        // FIXED: The reducer just takes the payload (which is the config state)
         case 'RESET': return action.payload;
+
         default: return state;
     }
 }
 
 export function useAmortizationCalculator(): AmortizationCalculatorState {
     const { config } = useConfig();
-    // Correctly use config.amortization as the initial state source
+
+    // Important: We pass config.amortization as the default.
+    // Because ConfigContext is now synchronous, this will contain your Admin settings immediately.
     const [state, dispatch] = usePersistentReducer(reducer, config.amortization, 'amortization-v7');
 
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
-    // Correctly use config value for the default repayment state
     const [actualMonthlyRepayment, setActualMonthlyRepayment] = useState(config.amortization.monthlyRepayment);
     const [hasDepletedOffsetRows, setHasDepletedOffsetRows] = useState(false);
 
+    // ... (Optimizers remain the same) ...
     const calculateOptimalExpenditure = () => {
         const inputs = { ...state };
         let low = 0, high = 50000, optimalExpenditure = state.retirementLivingExpenses;
@@ -75,24 +80,18 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
     const calculateOptimalWorkingYears = () => {
         dispatch({ type: 'SET_CONTINUE_WORKING', payload: true });
         const inputs = { ...state, continueWorking: true };
-
         let optimalYears = -1;
         for (let years = 0; years <= 10; years++) {
             const { schedule } = calculateAmortizationSchedule({ ...inputs, yearsWorking: years });
-            if (schedule.length > 0 && schedule[schedule.length - 1].offsetBalance >= 0) {
-                optimalYears = years;
-                break;
-            }
+            if (schedule.length > 0 && schedule[schedule.length - 1].offsetBalance >= 0) { optimalYears = years; break; }
         }
         const finalYears = optimalYears === -1 ? 10 : optimalYears;
-
         let low = 0, high = 50000, optimalIncome = state.transitionalSalary;
         for (let i = 0; i < 30; i++) {
             const mid = (low + high) / 2;
             const { schedule } = calculateAmortizationSchedule({ ...inputs, yearsWorking: finalYears, transitionalSalary: mid });
             if (schedule.length > 0 && schedule[schedule.length - 1].offsetBalance < 0) low = mid; else { optimalIncome = mid; high = mid; }
         }
-
         dispatch({ type: 'SET_YEARS_WORKING', payload: finalYears });
         dispatch({ type: 'SET_TRANSITIONAL_SALARY', payload: optimalIncome });
         return { years: finalYears, income: optimalIncome };

@@ -1,17 +1,30 @@
-// File: src/App.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from './components/common/Navbar';
 import { SuperCalculator } from './components/super/SuperCalculator';
 import { AmortizationCalculator } from './components/amortization/AmortizationCalculator';
 import { DrawdownSimulator } from './components/drawdown-simulator/DrawdownSimulator';
 import { BudgetPlanner } from './components/budget/BudgetPlanner';
 import { Dashboard } from './components/dashboard/Dashboard';
-import { AdminScreen } from './components/admin/AdminScreen'; // New
+import { AdminScreen } from './components/admin/AdminScreen';
 import type { CalculatorId } from './types/common.types';
-import { ConfigProvider } from './contexts/ConfigContext'; // New
+import { ConfigProvider } from './contexts/ConfigContext';
 
 export default function App() {
-    const [activeCalculator, setActiveCalculator] = useState<CalculatorId>('dashboard');
+    // 1. Initialize state from Local Storage (or default to 'dashboard')
+    const [activeCalculator, setActiveCalculator] = useState<CalculatorId>(() => {
+        const saved = localStorage.getItem('app-active-screen');
+        // Simple validation to ensure we don't crash on invalid keys
+        const validScreens = ['dashboard', 'super', 'homeLoan', 'drawdown', 'budget', 'admin'];
+        if (saved && validScreens.includes(saved)) {
+            return saved as CalculatorId;
+        }
+        return 'dashboard';
+    });
+
+    // 2. Save the current screen whenever it changes
+    useEffect(() => {
+        localStorage.setItem('app-active-screen', activeCalculator);
+    }, [activeCalculator]);
 
     const renderCalculator = () => {
         switch (activeCalculator) {

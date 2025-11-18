@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import type { NavbarProps } from '../../types/common.types';
 import { ConfirmationModal } from './ConfirmationModal';
+import { STORAGE_KEYS } from '../../constants/storageKeys';
 
 export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,16 +22,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
     const handleGlobalReset = () => {
         const keysToClear = [
             // Current Keys (Must match what is in your hooks)
-            'amortization-v7',
-            'super-v3',
-            'drawdown-v3',
-            'budget-v2',
-
-            // Legacy Keys (Good to keep to clean up old data)
-            'amortization-v1', 'amortization-v2', 'amortization-v3', 'amortization-v4', 'amortization-v5', 'amortization-v6',
-            'super-v1', 'super-v2',
-            'drawdown-v1', 'drawdown-v2',
-            'budget-v1'
+            STORAGE_KEYS.AMORTIZATION,
+            STORAGE_KEYS.SUPER,
+            STORAGE_KEYS.DRAWDOWN,
+            STORAGE_KEYS.BUDGET,
+            // Legacy Keys
+            ...STORAGE_KEYS.LEGACY
         ];
 
         keysToClear.forEach(key => localStorage.removeItem(key));

@@ -4,6 +4,7 @@ import { useConfig } from '../contexts/ConfigContext';
 import type { SuperCalculatorState, State, Action } from '../types/super.types';
 import { calculateSuper } from '../utils/calculations/superCalculations';
 import { LIFESTYLE_AMOUNTS } from '../constants/super';
+import { STORAGE_KEYS } from "../constants/storageKeys.ts";
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -60,7 +61,7 @@ function reducer(state: State, action: Action): State {
 export function useSuperCalculator(): SuperCalculatorState {
     const { config } = useConfig();
     // Use new key v5 because we changed state schema
-    const [state, dispatch] = usePersistentReducer(reducer, config.super, 'super-v5');
+    const [state, dispatch] = usePersistentReducer(reducer, config.super, STORAGE_KEYS.SUPER);
 
     const myContributionCurrent = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionCurrent : state.myYearlyContributionCurrent;
     const myContributionFuture = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionFuture : state.myYearlyContributionFuture;

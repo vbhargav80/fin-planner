@@ -12,6 +12,8 @@ interface SuperFormProps {
     calculator: SuperCalculatorState;
 }
 
+type Phase = 'accumulation' | 'retirement';
+
 export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
     const {
         state,
@@ -33,20 +35,20 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         wifeContributionChangeAge = 50,
     } = state;
 
-    const [activePhase, setActivePhase] = useState<'accumulation' | 'retirement'>('accumulation');
+    const [activePhase, setActivePhase] = useState<Phase>('accumulation');
     const [contributorTab, setContributorTab] = useState<'me' | 'spouse'>('me');
 
     const [useAgeBasedMe, setUseAgeBasedMe] = useState(false);
     const [useAgeBasedSpouse, setUseAgeBasedSpouse] = useState(false);
 
     // UPDATED: Labels with Icons and new text
-    const PHASE_TABS = [
+    const PHASE_TABS: { id: Phase; label: React.ReactNode }[] = [
         {
             id: 'accumulation',
             label: (
                 <span className="flex items-center gap-2">
                     <TrendingUp size={18} />
-                    1. Build Wealth
+                    Build Wealth
                 </span>
             )
         },
@@ -55,7 +57,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
             label: (
                 <span className="flex items-center gap-2">
                     <Sunset size={18} />
-                    2. Plan Retirement
+                    Plan Retirement
                 </span>
             )
         },
@@ -108,7 +110,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                     <Tabs
                         tabs={PHASE_TABS}
                         activeTab={activePhase}
-                        onTabClick={(id) => setActivePhase(id as any)}
+                        onTabClick={setActivePhase}
                         variant="underline"
                     />
                 </div>

@@ -3,6 +3,7 @@ import { usePersistentReducer } from './usePersistentReducer';
 import { useConfig } from '../contexts/ConfigContext';
 import type { SaleDrawdownState, State, Action } from '../types/drawdown.types';
 import { computeSaleDrawdownDerived } from '../utils/calculations/drawdownCalculations';
+import { STORAGE_KEYS } from "../constants/storageKeys.ts";
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -27,7 +28,7 @@ function reducer(state: State, action: Action): State {
 
 export function useSaleDrawdownCalculator(): SaleDrawdownState {
     const { config } = useConfig();
-    const [state, dispatch] = usePersistentReducer(reducer, config.drawdown, 'drawdown-v3');
+    const [state, dispatch] = usePersistentReducer(reducer, config.drawdown, STORAGE_KEYS.DRAWDOWN);
 
     const derived = useMemo(
         () =>

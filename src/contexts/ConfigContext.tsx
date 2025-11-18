@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState } from 'react';
 import { SYSTEM_DEFAULTS } from '../constants/defaultValues';
 import type { AppConfig, ConfigContextType } from '../types/config.types';
+import { STORAGE_KEYS } from "../constants/storageKeys.ts";
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'app-defaults-v1';
+const STORAGE_KEY = STORAGE_KEYS.APP_DEFAULTS;
 
 export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [config, setConfig] = useState<AppConfig>(() => {

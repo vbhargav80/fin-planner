@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { usePersistentReducer } from './usePersistentReducer';
 import { useConfig } from '../contexts/ConfigContext'; // 1. Import Context
 import type { State, Action, BudgetPlannerState } from '../types/budget.types';
+import { STORAGE_KEYS } from "../constants/storageKeys.ts";
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -30,7 +31,7 @@ export function useBudgetPlanner(): BudgetPlannerState {
     const { config } = useConfig(); // 2. Get config from context
 
     // Pass config.budget as the initial state
-    const [state, dispatch] = usePersistentReducer(reducer, config.budget, 'budget-v1');
+    const [state, dispatch] = usePersistentReducer(reducer, config.budget, STORAGE_KEYS.BUDGET);
 
     const derived = useMemo(() => {
         const totalIncome = state.incomes.reduce((sum, item) => {

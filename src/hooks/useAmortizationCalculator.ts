@@ -4,6 +4,7 @@ import { useConfig } from '../contexts/ConfigContext';
 import type { AmortizationRow, AmortizationCalculatorState, State, Action } from '../types/amortization.types';
 import { calculateAmortizationSchedule } from '../utils/calculations/amortizationCalculations';
 import * as AmortizationConstants from '../constants/amortization';
+import { STORAGE_KEYS } from "../constants/storageKeys.ts";
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -41,7 +42,7 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
 
     // Important: We pass config.amortization as the default.
     // Because ConfigContext is now synchronous, this will contain your Admin settings immediately.
-    const [state, dispatch] = usePersistentReducer(reducer, config.amortization, 'amortization-v7');
+    const [state, dispatch] = usePersistentReducer(reducer, config.amortization, STORAGE_KEYS.AMORTIZATION);
 
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
     const [actualMonthlyRepayment, setActualMonthlyRepayment] = useState(config.amortization.monthlyRepayment);

@@ -86,9 +86,12 @@ export const SuperSummary: React.FC<SuperSummaryProps> = ({ results }) => {
                     <div className="text-indigo-200 space-y-2 text-left bg-indigo-800 p-4 rounded-lg">
                         <p>
                             With a combined monthly contribution of{' '}
-                            <strong>{formatCurrency(results.pmt)} (pre-50)</strong> and{' '}
-                            <strong>{formatCurrency(results.pmtPost50 || 0)} (post-50)</strong> for{' '}
-                            <strong>{results.years} years</strong>:
+                            <strong>{formatCurrency(results.pmt)}</strong> and{' '}
+                            {/* FIXED: Use pmtFuture instead of pmtPost50 */}
+                            {results.pmtFuture !== undefined && results.pmtFuture !== results.pmt && (
+                                <><strong>{formatCurrency(results.pmtFuture)} (future step)</strong> </>
+                            )}
+                            for <strong>{results.years} years</strong>:
                         </p>
                         <ul className="list-disc list-inside space-y-1">
                             <li>

@@ -2,7 +2,7 @@ import React from 'react';
 import type { ToggleSwitchProps } from '../../types/common.types';
 
 export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onChange }) => (
-    <label className="flex items-center justify-between cursor-pointer">
+    <label className="flex items-center justify-between cursor-pointer gap-3">
         <span className="text-sm font-medium text-gray-700">{label}</span>
         <div className="relative">
             <input

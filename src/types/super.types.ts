@@ -14,10 +14,16 @@ export interface SuperInputs {
     contributionFrequency: ContributionFrequency;
     makeExtraContribution: boolean;
     targetBalance?: number;
-    myContributionPre50?: number;
-    myContributionPost50?: number;
-    wifeContributionPre50?: number;
-    wifeContributionPost50?: number;
+
+    // Updated Names
+    myContributionCurrent?: number;
+    myContributionFuture?: number;
+    myContributionChangeAge?: number;
+
+    wifeContributionCurrent?: number;
+    wifeContributionFuture?: number;
+    wifeContributionChangeAge?: number;
+
     myExtraYearlyContribution?: number;
     wifeExtraYearlyContribution?: number;
     myExtraContributionYears?: number;
@@ -29,7 +35,7 @@ export interface SuperInputs {
 
 export interface SuperResultData {
     pmt: number;
-    pmtPost50?: number;
+    pmtFuture?: number; // RENAMED: Was pmtPost50
     target?: number;
     projectedBalance?: number;
     calcMode: CalcMode;
@@ -51,14 +57,21 @@ export interface State {
     calcMode: CalcMode;
     contributionFrequency: ContributionFrequency;
     makeExtraContribution: boolean;
-    myMonthlyContributionPre50: number;
-    myMonthlyContributionPost50: number;
-    wifeMonthlyContributionPre50: number;
-    wifeMonthlyContributionPost50: number;
-    myYearlyContributionPre50: number;
-    myYearlyContributionPost50: number;
-    wifeYearlyContributionPre50: number;
-    wifeYearlyContributionPost50: number;
+
+    // Updated Names
+    myMonthlyContributionCurrent: number;
+    myMonthlyContributionFuture: number;
+    wifeMonthlyContributionCurrent: number;
+    wifeMonthlyContributionFuture: number;
+
+    myYearlyContributionCurrent: number;
+    myYearlyContributionFuture: number;
+    wifeYearlyContributionCurrent: number;
+    wifeYearlyContributionFuture: number;
+
+    myContributionChangeAge: number;
+    wifeContributionChangeAge: number;
+
     myExtraYearlyContribution: number;
     myExtraContributionYears: number;
     wifeExtraYearlyContribution: number;
@@ -79,10 +92,15 @@ export type Action =
     | { type: 'SET_CALC_MODE'; payload: CalcMode }
     | { type: 'SET_CONTRIBUTION_FREQUENCY'; payload: ContributionFrequency }
     | { type: 'SET_MAKE_EXTRA_CONTRIBUTION'; payload: boolean }
-    | { type: 'SET_MY_CONTRIBUTION_PRE_50'; payload: number }
-    | { type: 'SET_MY_CONTRIBUTION_POST_50'; payload: number }
-    | { type: 'SET_WIFE_CONTRIBUTION_PRE_50'; payload: number }
-    | { type: 'SET_WIFE_CONTRIBUTION_POST_50'; payload: number }
+
+    | { type: 'SET_MY_CONTRIBUTION_CURRENT'; payload: number }
+    | { type: 'SET_MY_CONTRIBUTION_FUTURE'; payload: number }
+    | { type: 'SET_WIFE_CONTRIBUTION_CURRENT'; payload: number }
+    | { type: 'SET_WIFE_CONTRIBUTION_FUTURE'; payload: number }
+
+    | { type: 'SET_MY_CONTRIBUTION_CHANGE_AGE'; payload: number }
+    | { type: 'SET_WIFE_CONTRIBUTION_CHANGE_AGE'; payload: number }
+
     | { type: 'SET_MY_EXTRA_YEARLY_CONTRIBUTION'; payload: number }
     | { type: 'SET_MY_EXTRA_CONTRIBUTION_YEARS'; payload: number }
     | { type: 'SET_WIFE_EXTRA_YEARLY_CONTRIBUTION'; payload: number }
@@ -114,8 +132,9 @@ export interface SuperCalculatorState {
     error: string;
     breakdownData: SuperBreakdownRow[];
     drawdownSchedule: DrawdownRow[];
-    myContributionPre50: number;
-    myContributionPost50: number;
-    wifeContributionPre50: number;
-    wifeContributionPost50: number;
+
+    myContributionCurrent: number;
+    myContributionFuture: number;
+    wifeContributionCurrent: number;
+    wifeContributionFuture: number;
 }

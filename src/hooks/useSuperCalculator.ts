@@ -8,7 +8,6 @@ import { LIFESTYLE_AMOUNTS } from '../constants/super';
 function reducer(state: State, action: Action): State {
     switch (action.type) {
         case 'SET_MY_AGE': return { ...state, myAge: action.payload };
-        // ... (all existing setters) ...
         case 'SET_WIFE_AGE': return { ...state, wifeAge: action.payload };
         case 'SET_MY_SUPER': return { ...state, mySuper: action.payload };
         case 'SET_WIFE_SUPER': return { ...state, wifeSuper: action.payload };
@@ -18,14 +17,34 @@ function reducer(state: State, action: Action): State {
         case 'SET_CALC_MODE': return { ...state, calcMode: action.payload };
         case 'SET_CONTRIBUTION_FREQUENCY': return { ...state, contributionFrequency: action.payload };
         case 'SET_MAKE_EXTRA_CONTRIBUTION': return { ...state, makeExtraContribution: action.payload };
+
+        // RENAMED REDUCERS
+        case 'SET_MY_CONTRIBUTION_CURRENT':
+            return state.contributionFrequency === 'monthly'
+                ? { ...state, myMonthlyContributionCurrent: action.payload }
+                : { ...state, myYearlyContributionCurrent: action.payload };
+        case 'SET_MY_CONTRIBUTION_FUTURE':
+            return state.contributionFrequency === 'monthly'
+                ? { ...state, myMonthlyContributionFuture: action.payload }
+                : { ...state, myYearlyContributionFuture: action.payload };
+
+        case 'SET_WIFE_CONTRIBUTION_CURRENT':
+            return state.contributionFrequency === 'monthly'
+                ? { ...state, wifeMonthlyContributionCurrent: action.payload }
+                : { ...state, wifeYearlyContributionCurrent: action.payload };
+        case 'SET_WIFE_CONTRIBUTION_FUTURE':
+            return state.contributionFrequency === 'monthly'
+                ? { ...state, wifeMonthlyContributionFuture: action.payload }
+                : { ...state, wifeYearlyContributionFuture: action.payload };
+
+        case 'SET_MY_CONTRIBUTION_CHANGE_AGE': return { ...state, myContributionChangeAge: action.payload };
+        case 'SET_WIFE_CONTRIBUTION_CHANGE_AGE': return { ...state, wifeContributionChangeAge: action.payload };
+
         case 'SET_MY_EXTRA_YEARLY_CONTRIBUTION': return { ...state, myExtraYearlyContribution: action.payload };
         case 'SET_MY_EXTRA_CONTRIBUTION_YEARS': return { ...state, myExtraContributionYears: action.payload };
         case 'SET_WIFE_EXTRA_YEARLY_CONTRIBUTION': return { ...state, wifeExtraYearlyContribution: action.payload };
         case 'SET_WIFE_EXTRA_CONTRIBUTION_YEARS': return { ...state, wifeExtraContributionYears: action.payload };
-        case 'SET_MY_CONTRIBUTION_PRE_50': return state.contributionFrequency === 'monthly' ? { ...state, myMonthlyContributionPre50: action.payload } : { ...state, myYearlyContributionPre50: action.payload };
-        case 'SET_MY_CONTRIBUTION_POST_50': return state.contributionFrequency === 'monthly' ? { ...state, myMonthlyContributionPost50: action.payload } : { ...state, myYearlyContributionPost50: action.payload };
-        case 'SET_WIFE_CONTRIBUTION_PRE_50': return state.contributionFrequency === 'monthly' ? { ...state, wifeMonthlyContributionPre50: action.payload } : { ...state, wifeYearlyContributionPre50: action.payload };
-        case 'SET_WIFE_CONTRIBUTION_POST_50': return state.contributionFrequency === 'monthly' ? { ...state, wifeMonthlyContributionPost50: action.payload } : { ...state, wifeYearlyContributionPost50: action.payload };
+
         case 'SET_DRAWDOWN_LIFESTYLE': {
             const lifestyle = action.payload;
             const newAmount = lifestyle !== 'custom' ? LIFESTYLE_AMOUNTS[lifestyle] : state.drawdownAnnualAmount;
@@ -33,27 +52,28 @@ function reducer(state: State, action: Action): State {
         }
         case 'SET_DRAWDOWN_ANNUAL_AMOUNT': return { ...state, drawdownAnnualAmount: action.payload, drawdownLifestyle: 'custom' };
         case 'SET_DRAWDOWN_RETURN': return { ...state, drawdownReturn: action.payload };
-        case 'RESET': return action.payload as State; // NEW
+        case 'RESET': return action.payload;
         default: return state;
     }
 }
 
 export function useSuperCalculator(): SuperCalculatorState {
-    const { config } = useConfig(); // NEW
-    const [state, dispatch] = usePersistentReducer(reducer, config.super, 'super-v3');
+    const { config } = useConfig();
+    // Use new key v5 because we changed state schema
+    const [state, dispatch] = usePersistentReducer(reducer, config.super, 'super-v5');
 
-    const myContributionPre50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPre50 : state.myYearlyContributionPre50;
-    const myContributionPost50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPost50 : state.myYearlyContributionPost50;
-    const wifeContributionPre50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPre50 : state.wifeYearlyContributionPre50;
-    const wifeContributionPost50 = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionPost50 : state.wifeYearlyContributionPost50;
+    const myContributionCurrent = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionCurrent : state.myYearlyContributionCurrent;
+    const myContributionFuture = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionFuture : state.myYearlyContributionFuture;
+    const wifeContributionCurrent = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionCurrent : state.wifeYearlyContributionCurrent;
+    const wifeContributionFuture = state.contributionFrequency === 'monthly' ? state.wifeMonthlyContributionFuture : state.wifeYearlyContributionFuture;
 
     const { results, breakdownData, drawdownSchedule, error } = useMemo(() => {
         const inputs = {
             ...state,
-            myContributionPre50,
-            myContributionPost50,
-            wifeContributionPre50,
-            wifeContributionPost50,
+            myContributionCurrent,
+            myContributionFuture,
+            wifeContributionCurrent,
+            wifeContributionFuture,
         };
         const result = calculateSuper(inputs, state.calcMode);
         return {
@@ -62,7 +82,7 @@ export function useSuperCalculator(): SuperCalculatorState {
             drawdownSchedule: result.drawdownSchedule,
             error: result.error || '',
         };
-    }, [state, myContributionPre50, myContributionPost50, wifeContributionPre50, wifeContributionPost50]);
+    }, [state, myContributionCurrent, myContributionFuture, wifeContributionCurrent, wifeContributionFuture]);
 
     return {
         state,
@@ -71,9 +91,10 @@ export function useSuperCalculator(): SuperCalculatorState {
         error,
         breakdownData,
         drawdownSchedule,
-        myContributionPre50,
-        myContributionPost50,
-        wifeContributionPre50,
-        wifeContributionPost50,
+        // Exposed values
+        myContributionCurrent,
+        myContributionFuture,
+        wifeContributionCurrent,
+        wifeContributionFuture,
     };
 }

@@ -1,4 +1,3 @@
-// File: src/utils/calculations/superCalculations.ts
 import type {
     SuperInputs,
     SuperResultData,
@@ -21,8 +20,9 @@ function calculateFutureValue(
     startAge: number,
     targetAge: number,
     startBalance: number,
-    contributionPre50: number,
-    contributionPost50: number,
+    contributionCurrent: number,
+    contributionFuture: number,
+    changeAge: number,
     extraYearlyContribution: number,
     monthlyRate: number,
     extraContributionYears: number,
@@ -43,7 +43,7 @@ function calculateFutureValue(
         runningBalance += interestEarned;
 
         const currentAge = startAge + Math.floor((i - 1) / 12);
-        const grossContribution = currentAge < 50 ? contributionPre50 : contributionPost50;
+        const grossContribution = currentAge < changeAge ? contributionCurrent : contributionFuture;
         const netContribution = grossContribution * (1 - CONTRIBUTION_TAX_RATE);
 
         if (frequency === 'monthly') {
@@ -69,7 +69,6 @@ function calculateFutureValue(
     return { finalBalance: runningBalance, breakdown };
 }
 
-// NEW: Calculate Drawdown Phase
 function calculateDrawdownSchedule(
     startBalance: number,
     startAge: number,
@@ -82,20 +81,14 @@ function calculateDrawdownSchedule(
     const monthlyRate = (annualReturn / 100) / 12;
 
     let monthIndex = 0;
-    const maxMonths = (100 - startAge) * 12; // Calculate until age 100
+    const maxMonths = (100 - startAge) * 12;
 
     while (currentBalance > 0 && monthIndex < maxMonths) {
         const start = currentBalance;
-
-        // 1. Drawdown happens first
         let drawdown = monthlyDrawdown;
-        if (drawdown > start) {
-            drawdown = start;
-        }
+        if (drawdown > start) drawdown = start;
 
         const afterDrawdown = start - drawdown;
-
-        // 2. Earnings on remaining balance
         const earnings = afterDrawdown * monthlyRate;
         const end = afterDrawdown + earnings;
 
@@ -123,26 +116,16 @@ export function calculateSuper(
     calcMode: CalcMode
 ): CalculationResult {
     const {
-        myAge,
-        wifeAge,
-        mySuper,
-        wifeSuper,
-        targetAge,
-        netReturn,
-        targetBalance,
-        myContributionPre50,
-        myContributionPost50,
-        wifeContributionPre50,
-        wifeContributionPost50,
-        myExtraYearlyContribution,
-        wifeExtraYearlyContribution,
-        myExtraContributionYears,
-        wifeExtraContributionYears,
-        contributionFrequency,
-        makeExtraContribution,
-        // NEW INPUTS
-        drawdownAnnualAmount,
-        drawdownReturn,
+        myAge, wifeAge, mySuper, wifeSuper,
+        targetAge, netReturn, targetBalance,
+
+        myContributionCurrent, myContributionFuture, myContributionChangeAge,
+        wifeContributionCurrent, wifeContributionFuture, wifeContributionChangeAge,
+
+        myExtraYearlyContribution, wifeExtraYearlyContribution,
+        myExtraContributionYears, wifeExtraContributionYears,
+        contributionFrequency, makeExtraContribution,
+        drawdownAnnualAmount, drawdownReturn,
     } = inputs;
 
     const baseInputs = [myAge, wifeAge, mySuper, wifeSuper, targetAge, netReturn];
@@ -179,13 +162,12 @@ export function calculateSuper(
             target: targetBalance,
         };
 
-        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, requiredGrossTotalPMT, requiredGrossTotalPMT, 0, monthlyRate, 0, 'monthly', false);
+        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, requiredGrossTotalPMT, requiredGrossTotalPMT, 0, 0, monthlyRate, 0, 'monthly', false);
         const wifeRetirementAge = wifeAge + yearsToGrow;
-        const wifeFinal = calculateFutureValue(wifeAge, wifeRetirementAge, wifeSuper, requiredGrossTotalPMT, requiredGrossTotalPMT, 0, monthlyRate, 0, 'monthly', false);
+        const wifeFinal = calculateFutureValue(wifeAge, wifeRetirementAge, wifeSuper, requiredGrossTotalPMT, requiredGrossTotalPMT, 0, 0, monthlyRate, 0, 'monthly', false);
 
         finalBalance = myFinal.finalBalance + wifeFinal.finalBalance;
 
-        // Prioritize My Age for breakdown
         const longerBreakdown = myFinal.breakdown.length >= wifeFinal.breakdown.length ? myFinal.breakdown : wifeFinal.breakdown;
         const shorterBreakdown = myFinal.breakdown.length >= wifeFinal.breakdown.length ? wifeFinal.breakdown : myFinal.breakdown;
 
@@ -196,16 +178,22 @@ export function calculateSuper(
 
     } else {
         const wifeRetirementAge = wifeAge + yearsToGrow;
-        const myFinal = calculateFutureValue(myAge, targetAge, mySuper, myContributionPre50!, myContributionPost50!, myExtraYearlyContribution!, monthlyRate, myExtraContributionYears!, contributionFrequency, makeExtraContribution);
-        const wifeFinal = calculateFutureValue(wifeAge, wifeRetirementAge, wifeSuper, wifeContributionPre50!, wifeContributionPost50!, wifeExtraYearlyContribution!, monthlyRate, wifeExtraContributionYears!, contributionFrequency, makeExtraContribution);
+
+        const myFinal = calculateFutureValue(myAge, targetAge, mySuper,
+            myContributionCurrent!, myContributionFuture!, myContributionChangeAge!,
+            myExtraYearlyContribution!, monthlyRate, myExtraContributionYears!, contributionFrequency, makeExtraContribution);
+
+        const wifeFinal = calculateFutureValue(wifeAge, wifeRetirementAge, wifeSuper,
+            wifeContributionCurrent!, wifeContributionFuture!, wifeContributionChangeAge!,
+            wifeExtraYearlyContribution!, monthlyRate, wifeExtraContributionYears!, contributionFrequency, makeExtraContribution);
 
         finalBalance = myFinal.finalBalance + wifeFinal.finalBalance;
         fvOfCurrentSuper = (mySuper + wifeSuper) * Math.pow(1 + monthlyRate, yearsToGrow * 12);
 
         finalResults = {
             projectedBalance: finalBalance,
-            pmt: myContributionPre50,
-            pmtPost50: myContributionPost50,
+            pmt: myContributionCurrent,
+            pmtFuture: myContributionFuture, // FIXED: Use new key
         };
 
         const longerBreakdown = myFinal.breakdown.length >= wifeFinal.breakdown.length ? myFinal.breakdown : wifeFinal.breakdown;
@@ -227,7 +215,6 @@ export function calculateSuper(
         pmt: finalResults.pmt || 0,
     };
 
-    // Calculate Drawdown
     const drawdownSchedule = calculateDrawdownSchedule(
         finalBalance,
         targetAge,

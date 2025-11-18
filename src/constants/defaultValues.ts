@@ -9,19 +9,14 @@ export const SYSTEM_DEFAULTS: AppConfig = {
         monthlyRepayment: 6800,
         initialRentalIncome: 4300,
         initialOffsetBalance: 1000000,
-
-        // Updated Keys
         monthlySalary: 10000,
-        transitionalSalary: 10000,
-
+        transitionalSalary: 5000,
         currentLivingExpenses: 10000,
-        retirementLivingExpenses: 10000,
-
+        retirementLivingExpenses: 8000,
         rentalGrowthRate: 2.5,
         isRefinanced: false,
         considerOffsetIncome: false,
         offsetIncomeRate: 3,
-
         retirementDate: '2031-01',
         continueWorking: false,
         yearsWorking: 3,
@@ -37,14 +32,21 @@ export const SYSTEM_DEFAULTS: AppConfig = {
         calcMode: 'contribution',
         contributionFrequency: 'monthly',
         makeExtraContribution: false,
-        myMonthlyContributionPre50: 1000,
-        myMonthlyContributionPost50: 0,
-        wifeMonthlyContributionPre50: 200,
-        wifeMonthlyContributionPost50: 0,
-        myYearlyContributionPre50: 1500,
-        myYearlyContributionPost50: 0,
-        wifeYearlyContributionPre50: 1500,
-        wifeYearlyContributionPost50: 0,
+
+        // RENAMED FIELDS
+        myMonthlyContributionCurrent: 1000,
+        myMonthlyContributionFuture: 1000,
+        wifeMonthlyContributionCurrent: 200,
+        wifeMonthlyContributionFuture: 200,
+
+        myYearlyContributionCurrent: 15000,
+        myYearlyContributionFuture: 15000,
+        wifeYearlyContributionCurrent: 3000,
+        wifeYearlyContributionFuture: 3000,
+
+        myContributionChangeAge: 50,
+        wifeContributionChangeAge: 50,
+
         myExtraYearlyContribution: 2000,
         wifeExtraYearlyContribution: 2000,
         myExtraContributionYears: 1,

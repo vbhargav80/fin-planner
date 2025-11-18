@@ -6,7 +6,7 @@ import { ToggleSwitch } from '../common/ToggleSwitch';
 import * as SuperConstants from '../../constants/super';
 import { Tabs } from '../common/Tabs';
 import { SegmentedControl } from '../common/SegmentedControl';
-import { TrendingUp, Sunset, Wallet, PiggyBank, User, Calculator, Target } from 'lucide-react';
+import { TrendingUp, Sunset, Wallet, PiggyBank, User, Target } from 'lucide-react';
 
 interface SuperFormProps {
     calculator: SuperCalculatorState;
@@ -18,10 +18,10 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
         dispatch,
         results,
         error,
-        myContributionPre50,
-        myContributionPost50,
-        wifeContributionPre50,
-        wifeContributionPost50,
+        myContributionCurrent,
+        myContributionFuture,
+        wifeContributionCurrent,
+        wifeContributionFuture,
     } = calculator;
 
     const {
@@ -32,8 +32,6 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
     } = state;
 
     const [activePhase, setActivePhase] = useState<'accumulation' | 'retirement'>('accumulation');
-
-    // Sub-tabs for "Me" vs "Spouse" contributions
     const [contributorTab, setContributorTab] = useState<'me' | 'spouse'>('me');
 
     const [useAgeBasedMe, setUseAgeBasedMe] = useState(false);
@@ -68,15 +66,15 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
     const handleUnifiedChange = (
         value: number,
         person: 'me' | 'spouse',
-        type: 'SET_MY_CONTRIBUTION_PRE_50' | 'SET_WIFE_CONTRIBUTION_PRE_50'
+        type: 'SET_MY_CONTRIBUTION_CURRENT' | 'SET_WIFE_CONTRIBUTION_CURRENT'
     ) => {
         dispatch({ type, payload: value });
 
         if (person === 'me' && !useAgeBasedMe) {
-            dispatch({ type: 'SET_MY_CONTRIBUTION_POST_50', payload: value });
+            dispatch({ type: 'SET_MY_CONTRIBUTION_FUTURE', payload: value });
         }
         if (person === 'spouse' && !useAgeBasedSpouse) {
-            dispatch({ type: 'SET_WIFE_CONTRIBUTION_POST_50', payload: value });
+            dispatch({ type: 'SET_WIFE_CONTRIBUTION_FUTURE', payload: value });
         }
     };
 
@@ -161,27 +159,40 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                 {contributorTab === 'me' ? (
                                     <div className="space-y-5 animate-fade-in">
                                         <div className="flex justify-end">
-                                            <ToggleSwitch label="Vary after age 50?" checked={useAgeBasedMe} onChange={setUseAgeBasedMe} />
+                                            <ToggleSwitch label="Vary strategy in future?" checked={useAgeBasedMe} onChange={setUseAgeBasedMe} />
                                         </div>
 
+                                        {useAgeBasedMe && (
+                                            <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mb-2">
+                                                <RangeSlider
+                                                    label="Change Strategy at Age"
+                                                    value={state.myContributionChangeAge}
+                                                    min={SuperConstants.CONTRIBUTION_CHANGE_AGE.MIN}
+                                                    max={targetAge - 1}
+                                                    step={1}
+                                                    onChange={(v) => dispatch({ type: 'SET_MY_CONTRIBUTION_CHANGE_AGE', payload: v })}
+                                                />
+                                            </div>
+                                        )}
+
                                         <RangeSlider
-                                            label={useAgeBasedMe ? "Contribution (Current)" : "Regular Contribution"}
-                                            value={myContributionPre50}
+                                            label={useAgeBasedMe ? `Contribution (Pre-${state.myContributionChangeAge})` : "Regular Contribution"}
+                                            value={myContributionCurrent}
                                             min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN}
                                             max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX}
                                             step={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.STEP : SuperConstants.YEARLY_CONTRIBUTION.STEP}
-                                            onChange={(v) => handleUnifiedChange(v, 'me', 'SET_MY_CONTRIBUTION_PRE_50')}
+                                            onChange={(v) => handleUnifiedChange(v, 'me', 'SET_MY_CONTRIBUTION_CURRENT')}
                                             formatValue={(v) => formatCurrency(v)}
                                         />
 
                                         {useAgeBasedMe && (
                                             <RangeSlider
-                                                label="Contribution (Post-50)"
-                                                value={myContributionPost50}
+                                                label={`Contribution (Age ${state.myContributionChangeAge}+)`}
+                                                value={myContributionFuture}
                                                 min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN}
                                                 max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX}
                                                 step={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.STEP : SuperConstants.YEARLY_CONTRIBUTION.STEP}
-                                                onChange={(v) => dispatch({ type: 'SET_MY_CONTRIBUTION_POST_50', payload: v })}
+                                                onChange={(v) => dispatch({ type: 'SET_MY_CONTRIBUTION_FUTURE', payload: v })}
                                                 formatValue={(v) => formatCurrency(v)}
                                             />
                                         )}
@@ -199,25 +210,39 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                 ) : (
                                     <div className="space-y-5 animate-fade-in">
                                         <div className="flex justify-end">
-                                            <ToggleSwitch label="Vary after age 50?" checked={useAgeBasedSpouse} onChange={setUseAgeBasedSpouse} />
+                                            <ToggleSwitch label="Vary strategy in future?" checked={useAgeBasedSpouse} onChange={setUseAgeBasedSpouse} />
                                         </div>
+
+                                        {useAgeBasedSpouse && (
+                                            <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mb-2">
+                                                <RangeSlider
+                                                    label="Change Strategy at Age"
+                                                    value={state.wifeContributionChangeAge}
+                                                    min={SuperConstants.CONTRIBUTION_CHANGE_AGE.MIN}
+                                                    max={targetAge - 1}
+                                                    step={1}
+                                                    onChange={(v) => dispatch({ type: 'SET_WIFE_CONTRIBUTION_CHANGE_AGE', payload: v })}
+                                                />
+                                            </div>
+                                        )}
+
                                         <RangeSlider
-                                            label={useAgeBasedSpouse ? "Contribution (Current)" : "Regular Contribution"}
-                                            value={wifeContributionPre50}
+                                            label={useAgeBasedSpouse ? `Contribution (Pre-${state.wifeContributionChangeAge})` : "Regular Contribution"}
+                                            value={wifeContributionCurrent}
                                             min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN}
                                             max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX}
                                             step={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.STEP : SuperConstants.YEARLY_CONTRIBUTION.STEP}
-                                            onChange={(v) => handleUnifiedChange(v, 'spouse', 'SET_WIFE_CONTRIBUTION_PRE_50')}
+                                            onChange={(v) => handleUnifiedChange(v, 'spouse', 'SET_WIFE_CONTRIBUTION_CURRENT')}
                                             formatValue={(v) => formatCurrency(v)}
                                         />
                                         {useAgeBasedSpouse && (
                                             <RangeSlider
-                                                label="Contribution (Post-50)"
-                                                value={wifeContributionPost50}
+                                                label={`Contribution (Age ${state.wifeContributionChangeAge}+)`}
+                                                value={wifeContributionFuture}
                                                 min={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MIN : SuperConstants.YEARLY_CONTRIBUTION.MIN}
                                                 max={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.MAX : SuperConstants.YEARLY_CONTRIBUTION.MAX}
                                                 step={isMonthly ? SuperConstants.MONTHLY_CONTRIBUTION.STEP : SuperConstants.YEARLY_CONTRIBUTION.STEP}
-                                                onChange={(v) => dispatch({ type: 'SET_WIFE_CONTRIBUTION_POST_50', payload: v })}
+                                                onChange={(v) => dispatch({ type: 'SET_WIFE_CONTRIBUTION_FUTURE', payload: v })}
                                                 formatValue={(v) => formatCurrency(v)}
                                             />
                                         )}
@@ -280,7 +305,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                     </div>
                 )}
 
-                {/* ==================== SPEND PHASE ==================== */}
+                {/* ... (Spend Phase remains the same) ... */}
                 {activePhase === 'retirement' && (
                     <div className="space-y-6 animate-fade-in">
                         <div className="border-l-4 border-orange-500 bg-orange-50/50 p-4 rounded-r-lg">
@@ -296,8 +321,15 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                 step={SuperConstants.TARGET_AGE.STEP}
                                 onChange={(v) => dispatch({ type: 'SET_TARGET_AGE', payload: v })}
                             />
+                            <div className="mt-4">
+                                {/* Optional Goal Balance Slider only if mode is Contribution */}
+                                {calcMode === 'contribution' && (
+                                    <RangeSlider label="Target Combined Balance" value={targetBalance || 0} min={SuperConstants.TARGET_BALANCE.MIN} max={SuperConstants.TARGET_BALANCE.MAX} step={SuperConstants.TARGET_BALANCE.STEP} onChange={(v) => dispatch({ type: 'SET_TARGET_BALANCE', payload: v })} formatValue={(v) => formatCurrency(v)} />
+                                )}
+                            </div>
                         </div>
 
+                        {/* 2. Lifestyle Settings (Moved from Results!) */}
                         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                             <div className="flex items-center gap-2 text-gray-900 font-bold mb-4">
                                 <User size={20} className="text-indigo-500" />

@@ -6,6 +6,7 @@ import { Tabs } from '../common/Tabs';
 import { SegmentedControl } from '../common/SegmentedControl';
 import * as DrawdownConstants from '../../constants/drawdown';
 import type { SaleDrawdownState } from '../../types/drawdown.types';
+import { Scale } from 'lucide-react';
 
 interface Props { model: SaleDrawdownState }
 
@@ -21,16 +22,15 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
     const TAX_RATES = [16, 30, 37, 45] as const;
 
     return (
-        <div className="w-full md:w-[35%] p-6 sm:p-8">
+        <div className="w-full md:w-[35%] p-6 sm:p-8 overflow-y-auto max-h-[calc(100vh-4rem)] sticky top-16 self-start">
             <h2 className="text-3xl font-bold text-gray-900">Drawdown Simulator</h2>
             <p className="mt-2 text-gray-600">Net sale proceeds calculator with monthly drawdown plan.</p>
 
-            {/* Tabs */}
             <Tabs tabs={TABS} activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} variant="underline" className="mt-6" />
 
             <div className="mt-6">
                 {activeTab === 'sale' && (
-                    <section className="space-y-4">
+                    <section className="space-y-4 animate-fade-in">
                         <h3 className="text-lg font-medium text-gray-900">Sale Calculation</h3>
                         <div className="grid grid-cols-1 gap-4">
                             <RangeSlider
@@ -65,7 +65,7 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <RangeSlider
-                                    label="Depreciation Claimed"
+                                    label="Depreciation"
                                     value={state.depreciationClaimed}
                                     min={DrawdownConstants.DEPRECIATION_CLAIMED.MIN}
                                     max={DrawdownConstants.DEPRECIATION_CLAIMED.MAX}
@@ -116,52 +116,69 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                 )}
 
                 {activeTab === 'plan' && (
-                    <section className="space-y-4">
-                        <h3 className="text-lg font-medium text-gray-900">Drawdown Plan</h3>
-                        <div className="grid grid-cols-1 gap-4">
+                    <section className="space-y-6 animate-fade-in">
+                        <div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-4">Drawdown Settings</h3>
+                            <div className="grid grid-cols-1 gap-4">
+                                <RangeSlider
+                                    label="Monthly Drawdown"
+                                    value={state.monthlyDrawdown}
+                                    min={DrawdownConstants.MONTHLY_DRAWDOWN.MIN}
+                                    max={DrawdownConstants.MONTHLY_DRAWDOWN.MAX}
+                                    step={DrawdownConstants.MONTHLY_DRAWDOWN.STEP}
+                                    onChange={(v) => dispatch({ type: 'SET_MONTHLY_DRAWDOWN', payload: v })}
+                                    formatValue={(v) => fmtCurrency(v)}
+                                />
+                                <RangeSlider
+                                    label="Est. Annual Interest Rate (%)"
+                                    value={state.annualInterestRate}
+                                    min={DrawdownConstants.ANNUAL_INTEREST_RATE.MIN}
+                                    max={DrawdownConstants.ANNUAL_INTEREST_RATE.MAX}
+                                    step={DrawdownConstants.ANNUAL_INTEREST_RATE.STEP}
+                                    onChange={(v) => dispatch({ type: 'SET_ANNUAL_INTEREST_RATE', payload: v })}
+                                    formatValue={(v) => `${v.toFixed(2)}%`}
+                                />
+                                <MonthYearPicker
+                                    id="startMonth"
+                                    label="Drawdown Start Date"
+                                    value={state.startMonth}
+                                    onChange={(v) => dispatch({ type: 'SET_START_MONTH', payload: v })}
+                                    minYear={2000}
+                                    maxYear={2100}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Opportunity Cost Analysis Section */}
+                        <div className="bg-orange-50 rounded-xl p-4 border border-orange-100 space-y-4">
+                            <div className="flex items-center gap-2 text-orange-800 border-b border-orange-200 pb-2 mb-2">
+                                <Scale size={18} />
+                                <h4 className="text-sm font-bold uppercase tracking-wide">Opportunity Cost Analysis</h4>
+                            </div>
+
+                            <p className="text-xs text-orange-700/80">
+                                Compare your drawdown income against the rental income you would forego by selling the asset.
+                            </p>
+
                             <RangeSlider
-                                label="Net Monthly Rent"
+                                label="Foregone Monthly Rent"
                                 value={state.netMonthlyRent}
                                 min={DrawdownConstants.NET_MONTHLY_RENT.MIN}
                                 max={DrawdownConstants.NET_MONTHLY_RENT.MAX}
                                 step={DrawdownConstants.NET_MONTHLY_RENT.STEP}
                                 onChange={(v) => dispatch({ type: 'SET_NET_MONTHLY_RENT', payload: v })}
                                 formatValue={(v) => fmtCurrency(v)}
+                                valueClassName="text-sm font-bold text-orange-700 font-mono"
                             />
                             <RangeSlider
-                                label="Net Monthly Rent Growth Rate (%)"
+                                label="Rental Growth Rate (%)"
                                 value={state.netRentGrowthRate}
                                 min={DrawdownConstants.NET_RENT_GROWTH_RATE.MIN}
                                 max={DrawdownConstants.NET_RENT_GROWTH_RATE.MAX}
                                 step={DrawdownConstants.NET_RENT_GROWTH_RATE.STEP}
                                 onChange={(v) => dispatch({ type: 'SET_NET_RENT_GROWTH_RATE', payload: v })}
                                 formatValue={(v) => `${v.toFixed(2)}%`}
-                            />
-                            <RangeSlider
-                                label="Est. Annual Interest Rate (%)"
-                                value={state.annualInterestRate}
-                                min={DrawdownConstants.ANNUAL_INTEREST_RATE.MIN}
-                                max={DrawdownConstants.ANNUAL_INTEREST_RATE.MAX}
-                                step={DrawdownConstants.ANNUAL_INTEREST_RATE.STEP}
-                                onChange={(v) => dispatch({ type: 'SET_ANNUAL_INTEREST_RATE', payload: v })}
-                                formatValue={(v) => `${v.toFixed(2)}%`}
-                            />
-                            <RangeSlider
-                                label="Monthly Drawdown"
-                                value={state.monthlyDrawdown}
-                                min={DrawdownConstants.MONTHLY_DRAWDOWN.MIN}
-                                max={DrawdownConstants.MONTHLY_DRAWDOWN.MAX}
-                                step={DrawdownConstants.MONTHLY_DRAWDOWN.STEP}
-                                onChange={(v) => dispatch({ type: 'SET_MONTHLY_DRAWDOWN', payload: v })}
-                                formatValue={(v) => fmtCurrency(v)}
-                            />
-                            <MonthYearPicker
-                                id="startMonth"
-                                label="Drawdown Start Date"
-                                value={state.startMonth}
-                                onChange={(v) => dispatch({ type: 'SET_START_MONTH', payload: v })}
-                                minYear={2000}
-                                maxYear={2100}
+                                valueClassName="text-sm font-bold text-orange-700 font-mono"
                             />
                         </div>
                     </section>

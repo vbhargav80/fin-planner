@@ -17,20 +17,17 @@ function reducer(state: State, action: Action): State {
         case 'SET_MONTHLY_REPAYMENT': return { ...state, monthlyRepayment: action.payload };
         case 'SET_INITIAL_RENTAL_INCOME': return { ...state, initialRentalIncome: action.payload };
         case 'SET_INITIAL_OFFSET_BALANCE': return { ...state, initialOffsetBalance: action.payload };
-        case 'SET_RENTAL_GROWTH_RATE': return { ...state, rentalGrowthRate: action.payload };
-        case 'SET_IS_REFINANCED': return { ...state, isRefinanced: action.payload };
-        case 'SET_CONSIDER_OFFSET_INCOME': return { ...state, considerOffsetIncome: action.payload };
-        case 'SET_OFFSET_INCOME_RATE': return { ...state, offsetIncomeRate: action.payload };
-
-        // Updated Actions matching new types
         case 'SET_MONTHLY_SALARY': return { ...state, monthlySalary: action.payload };
         case 'SET_TRANSITIONAL_SALARY': return { ...state, transitionalSalary: action.payload };
         case 'SET_CURRENT_LIVING_EXPENSES': return { ...state, currentLivingExpenses: action.payload };
         case 'SET_RETIREMENT_LIVING_EXPENSES': return { ...state, retirementLivingExpenses: action.payload };
+        case 'SET_RENTAL_GROWTH_RATE': return { ...state, rentalGrowthRate: action.payload };
+        case 'SET_IS_REFINANCED': return { ...state, isRefinanced: action.payload };
+        case 'SET_CONSIDER_OFFSET_INCOME': return { ...state, considerOffsetIncome: action.payload };
+        case 'SET_OFFSET_INCOME_RATE': return { ...state, offsetIncomeRate: action.payload };
         case 'SET_RETIREMENT_DATE': return { ...state, retirementDate: action.payload };
         case 'SET_CONTINUE_WORKING': return { ...state, continueWorking: action.payload };
         case 'SET_YEARS_WORKING': return { ...state, yearsWorking: action.payload };
-
         case 'RESET': return action.payload;
         default: return state;
     }
@@ -38,15 +35,15 @@ function reducer(state: State, action: Action): State {
 
 export function useAmortizationCalculator(): AmortizationCalculatorState {
     const { config } = useConfig();
-    // Version 6 to force reset and pick up new keys
-    const [state, dispatch] = usePersistentReducer(reducer, config.amortization, 'amortization-v6');
+    // Correctly use config.amortization as the initial state source
+    const [state, dispatch] = usePersistentReducer(reducer, config.amortization, 'amortization-v7');
 
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
+    // Correctly use config value for the default repayment state
     const [actualMonthlyRepayment, setActualMonthlyRepayment] = useState(config.amortization.monthlyRepayment);
     const [hasDepletedOffsetRows, setHasDepletedOffsetRows] = useState(false);
 
     const calculateOptimalExpenditure = () => {
-        // Optimizes RETIREMENT expenditure
         const inputs = { ...state };
         let low = 0, high = 50000, optimalExpenditure = state.retirementLivingExpenses;
         for (let i = 0; i < 30; i++) {
@@ -79,7 +76,6 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         dispatch({ type: 'SET_CONTINUE_WORKING', payload: true });
         const inputs = { ...state, continueWorking: true };
 
-        // 1. Find minimum YEARS (0-10)
         let optimalYears = -1;
         for (let years = 0; years <= 10; years++) {
             const { schedule } = calculateAmortizationSchedule({ ...inputs, yearsWorking: years });
@@ -90,7 +86,6 @@ export function useAmortizationCalculator(): AmortizationCalculatorState {
         }
         const finalYears = optimalYears === -1 ? 10 : optimalYears;
 
-        // 2. Find minimum TRANSITIONAL SALARY for those years
         let low = 0, high = 50000, optimalIncome = state.transitionalSalary;
         for (let i = 0; i < 30; i++) {
             const mid = (low + high) / 2;

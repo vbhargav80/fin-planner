@@ -79,7 +79,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                 {activeTab === 'cashflow' && (
                     <section className="animate-fade-in space-y-6">
 
-                        {/* Phase 1: Career */}
                         <div className="border-l-4 border-indigo-500 bg-indigo-50/50 p-4 rounded-r-lg">
                             <div className="flex items-center gap-2 text-indigo-900 font-bold mb-4">
                                 <Briefcase size={20} />
@@ -97,7 +96,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
 
                         <div className="flex justify-center -my-2 text-gray-300"><ArrowRight className="rotate-90" /></div>
 
-                        {/* Phase 2: Transition */}
                         <div className={`border-l-4 ${continueWorking ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-300 bg-gray-50'} p-4 rounded-r-lg transition-colors`}>
                             <div className="flex items-center justify-between mb-2">
                                 <div className={`flex items-center gap-2 font-bold ${continueWorking ? 'text-emerald-900' : 'text-gray-500'}`}>
@@ -118,7 +116,6 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
 
                         <div className="flex justify-center -my-2 text-gray-300"><ArrowRight className="rotate-90" /></div>
 
-                        {/* Phase 3: Full Retirement */}
                         <div className="border-l-4 border-orange-500 bg-orange-50/50 p-4 rounded-r-lg">
                             <div className="flex items-center gap-2 text-orange-900 font-bold mb-4">
                                 <Sunset size={20} />

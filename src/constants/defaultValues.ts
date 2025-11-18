@@ -10,7 +10,7 @@ export const SYSTEM_DEFAULTS: AppConfig = {
         initialRentalIncome: 4300,
         initialOffsetBalance: 1000000,
 
-        // New Fields
+        // Updated Keys
         monthlySalary: 10000,
         transitionalSalary: 5000,
 

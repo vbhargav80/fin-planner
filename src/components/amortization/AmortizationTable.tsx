@@ -11,13 +11,17 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
     const {
         amortizationData,
         hasDepletedOffsetRows,
+        state: { retirementDate }
     } = calculator;
 
     const theadRef = useRef<HTMLTableSectionElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
     const [headerHeight, setHeaderHeight] = useState(0);
-    const [isJan2031Pinned, setIsJan2031Pinned] = useState(false);
+    const [isRetirementPinned, setIsRetirementPinned] = useState(false);
+
+    // Extract year for the button label (YYYY-MM -> YYYY)
+    const retirementYear = retirementDate.split('-')[0];
 
     useLayoutEffect(() => {
         const thead = theadRef.current;
@@ -51,8 +55,9 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
         container.scrollTo({ top: targetTop, behavior: 'smooth' });
     };
 
-    const handleScrollToRefinance = () => {
-        const index = amortizationData.findIndex((row) => row.date === 'Jan 2031');
+    const handleScrollToRetirement = () => {
+        // Find the row marked as the retirement transition
+        const index = amortizationData.findIndex((row) => row.isRetirementRow);
         if (index !== -1) scrollToIndex(index);
     };
 
@@ -64,8 +69,8 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
     useEffect(() => {
         const container = scrollContainerRef.current;
         if (!container) return;
-        const index = amortizationData.findIndex(r => r.date === 'Jan 2031');
-        if (index === -1) { setIsJan2031Pinned(false); return; }
+        const index = amortizationData.findIndex(r => r.isRetirementRow);
+        if (index === -1) { setIsRetirementPinned(false); return; }
 
         let ticking = false;
         const handle = () => {
@@ -75,7 +80,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
             const rowRect = rowEl.getBoundingClientRect();
             const relativeTop = rowRect.top - containerRect.top;
             const shouldPin = relativeTop <= headerHeight + 1;
-            setIsJan2031Pinned(prev => (prev !== shouldPin ? shouldPin : prev));
+            setIsRetirementPinned(prev => (prev !== shouldPin ? shouldPin : prev));
         };
         const onScroll = () => {
             if (ticking) return;
@@ -98,11 +103,12 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
 
                 <div className="flex flex-wrap justify-center gap-3">
                     <button
-                        onClick={handleScrollToRefinance}
+                        onClick={handleScrollToRetirement}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-indigo-100 rounded-full transition-colors border border-indigo-500"
                     >
                         <Calendar size={14} />
-                        Jump to Refinance (2031)
+                        {/* Dynamic Label */}
+                        Jump to Retirement ({retirementYear})
                     </button>
 
                     {hasDepletedOffsetRows && (
@@ -120,7 +126,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
             <div
                 ref={scrollContainerRef}
                 className="bg-indigo-800 rounded-lg shadow-inner flex-grow overflow-auto custom-scrollbar"
-                style={{ scrollbarGutter: 'stable' }} // FIX: Reserves space for scrollbar
+                style={{ scrollbarGutter: 'stable' }}
             >
                 <table className="min-w-full text-left relative border-collapse">
                     <thead ref={theadRef} className="bg-indigo-900 sticky top-0 z-20 shadow-md">
@@ -131,19 +137,18 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                         <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Repayment</th>
                         <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Total In</th>
                         <th scope="col" className="px-4 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Total Out</th>
-                        {/* FIX: Added pr-6 for extra padding on the right */}
                         <th scope="col" className="pl-4 pr-6 py-3 text-right text-xs font-semibold text-indigo-100 uppercase tracking-wider whitespace-nowrap">Net Result</th>
                     </tr>
                     </thead>
                     <tbody className="bg-indigo-800 divide-y divide-indigo-700">
                     {amortizationData.map((row, index) => {
-                        const isJanRow = row.date === 'Jan 2031';
+                        const isRetirementRow = row.isRetirementRow;
                         const isNegativeOffset = row.offsetBalance <= 0;
 
-                        const stickyActive = isJanRow && isJan2031Pinned;
+                        const stickyActive = isRetirementRow && isRetirementPinned;
                         const bgClass = isNegativeOffset
                             ? 'bg-red-900/40 hover:bg-red-900/60'
-                            : isJanRow
+                            : isRetirementRow
                                 ? 'bg-indigo-900'
                                 : 'hover:bg-indigo-700/50';
 
@@ -164,7 +169,6 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                                 <td className={`px-4 py-3 whitespace-nowrap text-sm text-green-300 font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.repayment)}</td>
                                 <td className={`px-4 py-3 whitespace-nowrap text-sm text-green-300 font-medium font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.totalIncoming)}</td>
                                 <td className={`px-4 py-3 whitespace-nowrap text-sm text-orange-300 font-mono text-right ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.totalOutgoing)}</td>
-                                {/* FIX: Added pr-6 for extra padding on the right */}
                                 <td className={`pl-4 pr-6 py-3 whitespace-nowrap text-sm font-medium font-mono text-right ${row.totalShortfall < 0 ? 'text-red-300' : 'text-green-300'} ${stickyTdClass}`} style={stickyTdStyle}>{formatCurrency(row.totalShortfall)}</td>
                             </tr>
                         );

@@ -1,6 +1,6 @@
 import type {
     DrawdownRow,
-    SaleInputs,              // now exported via alias
+    SaleInputs,
     DrawdownPlanInputs,
     SaleDrawdownDerived,
 } from '../../types/drawdown.types';
@@ -26,6 +26,7 @@ function addMonthsUTC(d: Date, add: number): Date {
 
 export function calculateSaleAndTaxes(sale: SaleInputs) {
     const salePrice = clampNonNegative(sale.salePrice);
+    const outstandingLoan = clampNonNegative(sale.outstandingLoan);
     const costBase = clampNonNegative(sale.costBase);
     const depreciation = clampNonNegative(sale.depreciationClaimed);
     const sellingCosts = clampNonNegative(sale.sellingCosts);
@@ -33,17 +34,21 @@ export function calculateSaleAndTaxes(sale: SaleInputs) {
     const p2Rate = clampNonNegative(sale.person2TaxRate) / 100;
     const discountRate = clampNonNegative(sale.cgtDiscountRate) / 100;
 
+    // 1. Calculate Capital Gain (Loan does NOT affect this)
     const adjustedCostBase = Math.max(0, costBase - depreciation);
     const rawGain = salePrice - sellingCosts - adjustedCostBase;
     const taxableGain = Math.max(0, rawGain);
 
+    // 2. Apply Discount
     const perOwnerDiscountedGain = (taxableGain * 0.5) * (1 - discountRate);
 
+    // 3. Calculate Tax
     const person1Tax = perOwnerDiscountedGain * p1Rate;
     const person2Tax = perOwnerDiscountedGain * p2Rate;
     const totalTax = person1Tax + person2Tax;
 
-    const netProceeds = Math.max(0, salePrice - sellingCosts - totalTax);
+    // 4. Calculate Net Proceeds (Price - Loan - Costs - Tax)
+    const netProceeds = Math.max(0, salePrice - outstandingLoan - sellingCosts - totalTax);
 
     return { taxableGain, person1Tax, person2Tax, totalTax, netProceeds };
 }
@@ -87,7 +92,6 @@ export function buildDrawdownSchedule(
         const endBalance = Math.max(0, available - draw);
 
         schedule.push({
-            // removed `index` to satisfy DrawdownRow
             dateLabel: formatMonthLabel(date),
             startBalance,
             interestEarned: interest,

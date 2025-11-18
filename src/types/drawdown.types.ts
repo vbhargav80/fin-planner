@@ -11,6 +11,7 @@ export interface DrawdownRow {
 
 export interface SaleInputs {
     salePrice: number;
+    outstandingLoan: number;
     costBase: number;
     depreciationClaimed: number;
     sellingCosts: number;
@@ -31,6 +32,7 @@ export type State = SaleInputs & DrawdownPlanInputs;
 
 export type Action =
     | { type: 'SET_SALE_PRICE'; payload: number }
+    | { type: 'SET_OUTSTANDING_LOAN'; payload: number }
     | { type: 'SET_COST_BASE'; payload: number }
     | { type: 'SET_DEPRECIATION_CLAIMED'; payload: number }
     | { type: 'SET_SELLING_COSTS'; payload: number }

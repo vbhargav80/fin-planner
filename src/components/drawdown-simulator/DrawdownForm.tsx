@@ -1,4 +1,3 @@
-// File: 'src/components/drawdown-simulator/DrawdownForm.tsx'
 import React, { useState } from 'react';
 import { InputGroup } from '../common/InputGroup';
 import { RangeSlider } from '../common/RangeSlider';
@@ -43,6 +42,17 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                                 onChange={(v) => dispatch({ type: 'SET_SALE_PRICE', payload: v })}
                                 formatValue={(v) => fmtCurrency(v)}
                             />
+
+                            <RangeSlider
+                                label="Outstanding Loan"
+                                value={state.outstandingLoan}
+                                min={DrawdownConstants.OUTSTANDING_LOAN.MIN}
+                                max={DrawdownConstants.OUTSTANDING_LOAN.MAX}
+                                step={DrawdownConstants.OUTSTANDING_LOAN.STEP}
+                                onChange={(v) => dispatch({ type: 'SET_OUTSTANDING_LOAN', payload: v })}
+                                formatValue={(v) => fmtCurrency(v)}
+                            />
+
                             <RangeSlider
                                 label="Cost Base"
                                 value={state.costBase}
@@ -53,7 +63,6 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                                 formatValue={(v) => fmtCurrency(v)}
                             />
 
-                            {/* Depreciation Claimed and Selling Costs side-by-side */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <RangeSlider
                                     label="Depreciation Claimed"
@@ -75,7 +84,6 @@ export const DrawdownForm: React.FC<Props> = ({ model }) => {
                                 />
                             </div>
 
-                            {/* Tax rates side-by-side */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <SegmentedControl
                                     label="Person 1 Tax Rate"

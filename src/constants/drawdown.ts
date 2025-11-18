@@ -4,6 +4,12 @@ export const SALE_PRICE = {
     STEP: 50_000,
 };
 
+export const OUTSTANDING_LOAN = {
+    MIN: 0,
+    MAX: 200_000,
+    STEP: 10_000,
+};
+
 export const COST_BASE = {
     MIN: 300_000,
     MAX: 500_000,

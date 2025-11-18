@@ -1,11 +1,12 @@
-import { useMemo } from 'react'; // Remove useReducer
-import { usePersistentReducer } from './usePersistentReducer'; // Add this
+import { useMemo } from 'react';
+import { usePersistentReducer } from './usePersistentReducer';
 import type { SaleDrawdownState, State, Action } from '../types/drawdown.types';
 import { computeSaleDrawdownDerived } from '../utils/calculations/drawdownCalculations';
 
 const initialState: State = {
     // Sale Calculation
     salePrice: 1_000_000,
+    outstandingLoan: 200_000,
     costBase: 350_000,
     depreciationClaimed: 50_000,
     sellingCosts: 50_000,
@@ -23,6 +24,7 @@ const initialState: State = {
 function reducer(state: State, action: Action): State {
     switch (action.type) {
         case 'SET_SALE_PRICE': return { ...state, salePrice: action.payload };
+        case 'SET_OUTSTANDING_LOAN': return { ...state, outstandingLoan: action.payload }; // NEW
         case 'SET_COST_BASE': return { ...state, costBase: action.payload };
         case 'SET_DEPRECIATION_CLAIMED': return { ...state, depreciationClaimed: action.payload };
         case 'SET_SELLING_COSTS': return { ...state, sellingCosts: action.payload };
@@ -39,14 +41,29 @@ function reducer(state: State, action: Action): State {
 }
 
 export function useSaleDrawdownCalculator(): SaleDrawdownState {
-    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'drawdown-v1');
+    // Use 'drawdown-v2' to reset state and pick up the new default
+    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'drawdown-v2');
 
     const derived = useMemo(
         () =>
             computeSaleDrawdownDerived(
-                // The calculation function expects two objects, so we split the state
-                { salePrice: state.salePrice, costBase: state.costBase, depreciationClaimed: state.depreciationClaimed, sellingCosts: state.sellingCosts, person1TaxRate: state.person1TaxRate, person2TaxRate: state.person2TaxRate, cgtDiscountRate: state.cgtDiscountRate },
-                { annualInterestRate: state.annualInterestRate, monthlyDrawdown: state.monthlyDrawdown, startMonth: state.startMonth, netMonthlyRent: state.netMonthlyRent, netRentGrowthRate: state.netRentGrowthRate }
+                {
+                    salePrice: state.salePrice,
+                    outstandingLoan: state.outstandingLoan, // PASS NEW FIELD
+                    costBase: state.costBase,
+                    depreciationClaimed: state.depreciationClaimed,
+                    sellingCosts: state.sellingCosts,
+                    person1TaxRate: state.person1TaxRate,
+                    person2TaxRate: state.person2TaxRate,
+                    cgtDiscountRate: state.cgtDiscountRate
+                },
+                {
+                    annualInterestRate: state.annualInterestRate,
+                    monthlyDrawdown: state.monthlyDrawdown,
+                    startMonth: state.startMonth,
+                    netMonthlyRent: state.netMonthlyRent,
+                    netRentGrowthRate: state.netRentGrowthRate
+                }
             ),
         [state]
     );

@@ -6,6 +6,7 @@ import type { BudgetPlannerState } from '../../types/budget.types';
 import { IncomeList } from './IncomeList';
 import { ExpensesManager } from './ExpensesManager';
 import { OptimizerList } from './OptimizerList';
+import { useConfig } from "../../contexts/ConfigContext.tsx";
 
 interface Props {
     model: BudgetPlannerState;
@@ -15,6 +16,7 @@ interface Props {
 export const BudgetForm: React.FC<Props> = ({ model, onViewChange }) => {
     const [viewMode, setViewMode] = useState<'income' | 'expenses' | 'optimize'>('income');
     const { state, dispatch, totalIncome, isAdminMode } = model;
+    const { config } = useConfig();
 
     const VIEW_TABS = [
         { id: 'income', label: 'Income' },
@@ -50,7 +52,7 @@ export const BudgetForm: React.FC<Props> = ({ model, onViewChange }) => {
     // --- RESET LOGIC ---
     const handleReset = () => {
         if (window.confirm('Are you sure you want to reset all budget data? This cannot be undone.')) {
-            dispatch({ type: 'RESET_BUDGET' });
+            dispatch({ type: 'RESET_BUDGET', payload: config.budget });
         }
     };
 

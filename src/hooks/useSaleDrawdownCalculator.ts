@@ -1,27 +1,8 @@
-// File: src/hooks/useSaleDrawdownCalculator.ts
 import { useMemo } from 'react';
 import { usePersistentReducer } from './usePersistentReducer';
+import { useConfig } from '../contexts/ConfigContext';
 import type { SaleDrawdownState, State, Action } from '../types/drawdown.types';
 import { computeSaleDrawdownDerived } from '../utils/calculations/drawdownCalculations';
-
-const initialState: State = {
-    // Sale Calculation
-    salePrice: 1_000_000,
-    outstandingLoan: 200_000,
-    costBase: 600_000,
-    depreciationClaimed: 50_000,
-    sellingCosts: 25_000,
-    person1TaxRate: 45,
-    person2TaxRate: 37,
-    cgtDiscountRate: 50,
-    // Drawdown Plan
-    annualInterestRate: 4,
-    monthlyDrawdown: 8_000,
-    startMonth: '2031-01',
-    netMonthlyRent: 3_000,
-    netRentGrowthRate: 3,
-    capitalGrowthRate: 3, // NEW DEFAULT
-};
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -38,14 +19,15 @@ function reducer(state: State, action: Action): State {
         case 'SET_START_MONTH': return { ...state, startMonth: action.payload };
         case 'SET_NET_MONTHLY_RENT': return { ...state, netMonthlyRent: action.payload };
         case 'SET_NET_RENT_GROWTH_RATE': return { ...state, netRentGrowthRate: action.payload };
-        case 'SET_CAPITAL_GROWTH_RATE': return { ...state, capitalGrowthRate: action.payload }; // NEW
+        case 'SET_CAPITAL_GROWTH_RATE': return { ...state, capitalGrowthRate: action.payload };
+        case 'RESET': return action.payload as State; // NEW
         default: return state;
     }
 }
 
 export function useSaleDrawdownCalculator(): SaleDrawdownState {
-    // Bump version to v3 to reset state and pick up new fields
-    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'drawdown-v3');
+    const { config } = useConfig();
+    const [state, dispatch] = usePersistentReducer(reducer, config.drawdown, 'drawdown-v3');
 
     const derived = useMemo(
         () =>
@@ -66,7 +48,7 @@ export function useSaleDrawdownCalculator(): SaleDrawdownState {
                     startMonth: state.startMonth,
                     netMonthlyRent: state.netMonthlyRent,
                     netRentGrowthRate: state.netRentGrowthRate,
-                    capitalGrowthRate: state.capitalGrowthRate // PASS NEW FIELD
+                    capitalGrowthRate: state.capitalGrowthRate
                 }
             ),
         [state]

@@ -1,15 +1,14 @@
-// File: src/components/common/Navbar.tsx
 import React, { useState } from 'react';
 import {
     Landmark, LayoutDashboard, CalendarRange, PiggyBank,
-    Menu, X, Wallet, Home, RotateCcw
+    Menu, X, Wallet, Home, RotateCcw, Settings
 } from 'lucide-react';
 import type { NavbarProps } from '../../types/common.types';
-import { ConfirmationModal } from './ConfirmationModal'; // Import the new modal
+import { ConfirmationModal } from './ConfirmationModal';
 
 export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isResetModalOpen, setIsResetModalOpen] = useState(false); // State for modal
+    const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
     const navItems = [
         { id: 'dashboard' as const, name: 'Dashboard', icon: Home },
@@ -24,8 +23,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
             'amortization-v1',
             'super-v1',
             'super-v2',
+            'super-v3',
             'drawdown-v1',
-            'budget-v1'
+            'drawdown-v2',
+            'drawdown-v3',
+            'budget-v1',
+            'budget-v2'
         ];
 
         keysToClear.forEach(key => localStorage.removeItem(key));
@@ -71,7 +74,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
 
                         {/* Right Side: Global Actions & Mobile Menu */}
                         <div className="flex items-center gap-2">
-                            {/* Reset Button - Now triggers modal */}
+                            {/* Admin Button */}
+                            <button
+                                onClick={() => onNavigate('admin')}
+                                className={`p-2 rounded-full transition-colors ${activeCalculator === 'admin' ? 'text-white bg-gray-800' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
+                                title="Admin Settings"
+                            >
+                                <Settings size={20} />
+                            </button>
+
+                            {/* Reset Button */}
                             <button
                                 onClick={() => setIsResetModalOpen(true)}
                                 className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-800 rounded-full transition-colors"
@@ -114,6 +126,20 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
                                     <span>{item.name}</span>
                                 </button>
                             ))}
+                            <button
+                                onClick={() => {
+                                    onNavigate('admin');
+                                    setIsMenuOpen(false);
+                                }}
+                                className={`w-full text-left flex items-center gap-3 px-3 py-3 rounded-md text-base font-medium transition-colors ${
+                                    activeCalculator === 'admin'
+                                        ? 'bg-indigo-600 text-white'
+                                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                                }`}
+                            >
+                                <Settings size={20} />
+                                <span>Admin</span>
+                            </button>
                         </div>
                     </div>
                 )}

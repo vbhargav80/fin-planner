@@ -1,3 +1,4 @@
+// File: src/types/drawdown.types.ts
 import type { Dispatch } from 'react';
 
 export interface DrawdownRow {
@@ -51,7 +52,8 @@ export type Action =
     | { type: 'SET_START_MONTH'; payload: string }
     | { type: 'SET_NET_MONTHLY_RENT'; payload: number }
     | { type: 'SET_NET_RENT_GROWTH_RATE'; payload: number }
-    | { type: 'SET_CAPITAL_GROWTH_RATE'; payload: number };
+    | { type: 'SET_CAPITAL_GROWTH_RATE'; payload: number }
+    | { type: 'RESET'; payload: State }; // UPDATED
 
 export interface SaleDrawdownDerived {
     taxableGain: number;

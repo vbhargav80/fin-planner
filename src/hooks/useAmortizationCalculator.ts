@@ -1,26 +1,9 @@
-// File: src/hooks/useAmortizationCalculator.ts
 import { useState, useEffect, useCallback } from 'react';
 import { usePersistentReducer } from './usePersistentReducer';
+import { useConfig } from '../contexts/ConfigContext'; // NEW
 import type { AmortizationRow, AmortizationCalculatorState, State, Action } from '../types/amortization.types';
 import { calculateAmortizationSchedule } from '../utils/calculations/amortizationCalculations';
 import * as AmortizationConstants from '../constants/amortization';
-
-const initialState: State = {
-    interestRate: 6,
-    principal: 900000,
-    monthlyRepayment: 6800,
-    initialRentalIncome: 4300,
-    initialOffsetBalance: 1000000,
-    monthlyExpenditure: 10000,
-    monthlyExpenditurePre2031: 1000,
-    rentalGrowthRate: 2.5,
-    isRefinanced: false,
-    considerOffsetIncome: false,
-    offsetIncomeRate: 3,
-    continueWorking: false,
-    yearsWorking: 3,
-    netIncome: 10000,
-};
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -43,102 +26,67 @@ function reducer(state: State, action: Action): State {
         case 'SET_CONTINUE_WORKING': return { ...state, continueWorking: action.payload };
         case 'SET_YEARS_WORKING': return { ...state, yearsWorking: action.payload };
         case 'SET_NET_INCOME': return { ...state, netIncome: action.payload };
+        case 'RESET': return action.payload as State; // NEW
         default: return state;
     }
 }
 
 export function useAmortizationCalculator(): AmortizationCalculatorState {
-    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'amortization-v1');
+    const { config } = useConfig(); // NEW
+    const [state, dispatch] = usePersistentReducer(reducer, config.amortization, 'amortization-v1');
+
     const [amortizationData, setAmortizationData] = useState<AmortizationRow[]>([]);
     const [scrollTo2031, setScrollTo2031] = useState(0);
-    const [actualMonthlyRepayment, setActualMonthlyRepayment] = useState(initialState.monthlyRepayment);
+    const [actualMonthlyRepayment, setActualMonthlyRepayment] = useState(config.amortization.monthlyRepayment);
     const [scrollToFirstDepletedOffset, setScrollToFirstDepletedOffset] = useState(0);
     const [hasDepletedOffsetRows, setHasDepletedOffsetRows] = useState(false);
 
-    const triggerScrollTo2031 = () => {
-        setScrollTo2031(c => c + 1);
-    };
-
-    const clearScrollTo2031 = useCallback(() => {
-        setScrollTo2031(0);
-    }, []);
-
-    const triggerScrollToFirstDepletedOffset = () => {
-        setScrollToFirstDepletedOffset(c => c + 1);
-    };
-
-    const clearScrollToFirstDepletedOffset = useCallback(() => {
-        setScrollToFirstDepletedOffset(0);
-    }, []);
+    // ... (scroll handlers remain same) ...
+    const triggerScrollTo2031 = () => setScrollTo2031(c => c + 1);
+    const clearScrollTo2031 = useCallback(() => setScrollTo2031(0), []);
+    const triggerScrollToFirstDepletedOffset = () => setScrollToFirstDepletedOffset(c => c + 1);
+    const clearScrollToFirstDepletedOffset = useCallback(() => setScrollToFirstDepletedOffset(0), []);
 
     const calculateOptimalExpenditure = () => {
+        // ... (logic remains same)
         const inputs = { ...state };
-
-        let low = 0;
-        let high = 50000;
-        let optimalExpenditure = state.monthlyExpenditure;
-
+        let low = 0, high = 50000, optimalExpenditure = state.monthlyExpenditure;
         for (let i = 0; i < 30; i++) {
             const mid = (low + high) / 2;
             const { schedule } = calculateAmortizationSchedule({ ...inputs, monthlyExpenditure: mid });
             const finalOffsetBalance = schedule.length > 0 ? schedule[schedule.length - 1].offsetBalance : 0;
-
-            if (finalOffsetBalance < 0) {
-                high = mid;
-            } else {
-                optimalExpenditure = mid;
-                low = mid;
-            }
+            if (finalOffsetBalance < 0) high = mid; else { optimalExpenditure = mid; low = mid; }
         }
-
         dispatch({ type: 'SET_MONTHLY_EXPENDITURE', payload: optimalExpenditure });
-        return optimalExpenditure; // Return the result
+        return optimalExpenditure;
     };
 
     const calculateOptimalWorkingYears = () => {
+        // ... (logic remains same)
         dispatch({ type: 'SET_CONTINUE_WORKING', payload: true });
         const inputs = { ...state, continueWorking: true };
-
         let optimalYears = -1;
         for (let years = 0; years <= 10; years++) {
             const { schedule } = calculateAmortizationSchedule({ ...inputs, yearsWorking: years });
-            const finalOffsetBalance = schedule.length > 0 ? schedule[schedule.length - 1].offsetBalance : 0;
-            if (finalOffsetBalance >= 0) {
-                optimalYears = years;
-                break;
-            }
+            if (schedule.length > 0 && schedule[schedule.length - 1].offsetBalance >= 0) { optimalYears = years; break; }
         }
-
         const finalYears = optimalYears === -1 ? 10 : optimalYears;
-
-        let low = 0;
-        let high = 50000;
-        let optimalIncome = state.netIncome;
-
+        let low = 0, high = 50000, optimalIncome = state.netIncome;
         for (let i = 0; i < 30; i++) {
             const mid = (low + high) / 2;
             const { schedule } = calculateAmortizationSchedule({ ...inputs, yearsWorking: finalYears, netIncome: mid });
-            const finalOffsetBalance = schedule.length > 0 ? schedule[schedule.length - 1].offsetBalance : 0;
-
-            if (finalOffsetBalance < 0) {
-                low = mid;
-            } else {
-                optimalIncome = mid;
-                high = mid;
-            }
+            if (schedule.length > 0 && schedule[schedule.length - 1].offsetBalance < 0) low = mid; else { optimalIncome = mid; high = mid; }
         }
-
         dispatch({ type: 'SET_YEARS_WORKING', payload: finalYears });
         dispatch({ type: 'SET_NET_INCOME', payload: optimalIncome });
-        return { years: finalYears, income: optimalIncome }; // Return the result
+        return { years: finalYears, income: optimalIncome };
     };
 
     useEffect(() => {
         const { schedule, actualMonthlyRepayment: calculatedRepayment } = calculateAmortizationSchedule(state);
         setAmortizationData(schedule);
         setActualMonthlyRepayment(calculatedRepayment);
-        const hasDepleted = schedule.some(row => row.offsetBalance <= 0);
-        setHasDepletedOffsetRows(hasDepleted);
+        setHasDepletedOffsetRows(schedule.some(row => row.offsetBalance <= 0));
     }, [state]);
 
     return {

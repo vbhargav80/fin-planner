@@ -1,43 +1,14 @@
-// File: src/hooks/useSuperCalculator.ts
 import { useMemo } from 'react';
 import { usePersistentReducer } from './usePersistentReducer';
+import { useConfig } from '../contexts/ConfigContext';
 import type { SuperCalculatorState, State, Action } from '../types/super.types';
 import { calculateSuper } from '../utils/calculations/superCalculations';
 import { LIFESTYLE_AMOUNTS } from '../constants/super';
 
-const initialState: State = {
-    myAge: 45,
-    wifeAge: 42,
-    mySuper: 400000,
-    wifeSuper: 110000,
-    targetAge: 60,
-    targetBalance: 1500000,
-    netReturn: 7,
-    calcMode: 'contribution',
-    contributionFrequency: 'monthly',
-    makeExtraContribution: false,
-    myMonthlyContributionPre50: 1000,
-    myMonthlyContributionPost50: 0,
-    wifeMonthlyContributionPre50: 200,
-    wifeMonthlyContributionPost50: 0,
-    myYearlyContributionPre50: 1500,
-    myYearlyContributionPost50: 0,
-    wifeYearlyContributionPre50: 1500,
-    wifeYearlyContributionPost50: 0,
-    myExtraYearlyContribution: 2000,
-    wifeExtraYearlyContribution: 2000,
-    myExtraContributionYears: 1,
-    wifeExtraContributionYears: 1,
-
-    // NEW: Drawdown Defaults
-    drawdownLifestyle: 'comfortable',
-    drawdownAnnualAmount: 80000,
-    drawdownReturn: 7,
-};
-
 function reducer(state: State, action: Action): State {
     switch (action.type) {
         case 'SET_MY_AGE': return { ...state, myAge: action.payload };
+        // ... (all existing setters) ...
         case 'SET_WIFE_AGE': return { ...state, wifeAge: action.payload };
         case 'SET_MY_SUPER': return { ...state, mySuper: action.payload };
         case 'SET_WIFE_SUPER': return { ...state, wifeSuper: action.payload };
@@ -51,41 +22,25 @@ function reducer(state: State, action: Action): State {
         case 'SET_MY_EXTRA_CONTRIBUTION_YEARS': return { ...state, myExtraContributionYears: action.payload };
         case 'SET_WIFE_EXTRA_YEARLY_CONTRIBUTION': return { ...state, wifeExtraYearlyContribution: action.payload };
         case 'SET_WIFE_EXTRA_CONTRIBUTION_YEARS': return { ...state, wifeExtraContributionYears: action.payload };
-        case 'SET_MY_CONTRIBUTION_PRE_50':
-            return state.contributionFrequency === 'monthly'
-                ? { ...state, myMonthlyContributionPre50: action.payload }
-                : { ...state, myYearlyContributionPre50: action.payload };
-        case 'SET_MY_CONTRIBUTION_POST_50':
-            return state.contributionFrequency === 'monthly'
-                ? { ...state, myMonthlyContributionPost50: action.payload }
-                : { ...state, myYearlyContributionPost50: action.payload };
-        case 'SET_WIFE_CONTRIBUTION_PRE_50':
-            return state.contributionFrequency === 'monthly'
-                ? { ...state, wifeMonthlyContributionPre50: action.payload }
-                : { ...state, wifeYearlyContributionPre50: action.payload };
-        case 'SET_WIFE_CONTRIBUTION_POST_50':
-            return state.contributionFrequency === 'monthly'
-                ? { ...state, wifeMonthlyContributionPost50: action.payload }
-                : { ...state, wifeYearlyContributionPost50: action.payload };
-
-        // NEW: Drawdown Reducers
+        case 'SET_MY_CONTRIBUTION_PRE_50': return state.contributionFrequency === 'monthly' ? { ...state, myMonthlyContributionPre50: action.payload } : { ...state, myYearlyContributionPre50: action.payload };
+        case 'SET_MY_CONTRIBUTION_POST_50': return state.contributionFrequency === 'monthly' ? { ...state, myMonthlyContributionPost50: action.payload } : { ...state, myYearlyContributionPost50: action.payload };
+        case 'SET_WIFE_CONTRIBUTION_PRE_50': return state.contributionFrequency === 'monthly' ? { ...state, wifeMonthlyContributionPre50: action.payload } : { ...state, wifeYearlyContributionPre50: action.payload };
+        case 'SET_WIFE_CONTRIBUTION_POST_50': return state.contributionFrequency === 'monthly' ? { ...state, wifeMonthlyContributionPost50: action.payload } : { ...state, wifeYearlyContributionPost50: action.payload };
         case 'SET_DRAWDOWN_LIFESTYLE': {
             const lifestyle = action.payload;
             const newAmount = lifestyle !== 'custom' ? LIFESTYLE_AMOUNTS[lifestyle] : state.drawdownAnnualAmount;
             return { ...state, drawdownLifestyle: lifestyle, drawdownAnnualAmount: newAmount };
         }
-        case 'SET_DRAWDOWN_ANNUAL_AMOUNT':
-            return { ...state, drawdownAnnualAmount: action.payload, drawdownLifestyle: 'custom' };
-        case 'SET_DRAWDOWN_RETURN':
-            return { ...state, drawdownReturn: action.payload };
-
+        case 'SET_DRAWDOWN_ANNUAL_AMOUNT': return { ...state, drawdownAnnualAmount: action.payload, drawdownLifestyle: 'custom' };
+        case 'SET_DRAWDOWN_RETURN': return { ...state, drawdownReturn: action.payload };
+        case 'RESET': return action.payload as State; // NEW
         default: return state;
     }
 }
 
 export function useSuperCalculator(): SuperCalculatorState {
-    // Use 'super-v2' key to avoid conflicts with old data structure
-    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'super-v2');
+    const { config } = useConfig(); // NEW
+    const [state, dispatch] = usePersistentReducer(reducer, config.super, 'super-v3');
 
     const myContributionPre50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPre50 : state.myYearlyContributionPre50;
     const myContributionPost50 = state.contributionFrequency === 'monthly' ? state.myMonthlyContributionPost50 : state.myYearlyContributionPost50;

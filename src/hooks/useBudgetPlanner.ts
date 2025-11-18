@@ -1,161 +1,8 @@
+// File: src/hooks/useBudgetPlanner.ts
 import { useMemo } from 'react';
 import { usePersistentReducer } from './usePersistentReducer';
-import type { State, Action, BudgetPlannerState, ExpenseItem } from '../types/budget.types';
-
-const uuid = () => crypto.randomUUID();
-
-const mkItem = (
-    name: string,
-    amount: number,
-    iconKey?: string,
-    isFixed: boolean = false,
-    subGroup?: string,
-    isHidden: boolean = false
-): ExpenseItem => ({
-    id: uuid(),
-    name,
-    amount,
-    iconKey,
-    reduction: 0,
-    isFixed,
-    subGroup,
-    isHidden
-});
-
-const initialState: State = {
-    isAdminMode: false,
-    incomes: [
-        { id: uuid(), name: 'Salary', amount: 9000, initialAmount: 9000, iconKey: 'work' },
-        { id: uuid(), name: 'Investment Property Rent', amount: 2100, initialAmount: 2100, iconKey: 'housing' },
-    ],
-    expenseCategories: [
-        {
-            id: uuid(),
-            name: 'Housing',
-            iconKey: 'housing',
-            items: [
-                mkItem('Mortgage Repayment', 1050, 'housing', true),
-                mkItem('Rates', 200, 'rates', true),
-                mkItem('Body Corporate', 50, 'housing', true),
-                mkItem('Insurance', 150, 'rates'),
-                mkItem('Maintenance', 300, 'service'),
-            ]
-        },
-        {
-            id: uuid(),
-            name: 'Investment Property Expenses',
-            iconKey: 'housing',
-            items: [
-                mkItem('Mortgage Repayment', 2800, 'debt', true),
-                mkItem('Insurance', 180, 'rates', false),
-                mkItem('Council Rates', 200, 'rates', true),
-                mkItem('Water Rates', 80, 'water', true),
-                mkItem('Land Tax', 200, 'rates', true),
-                mkItem('Maintenance', 150, 'service', false),
-            ]
-        },
-        {
-            id: uuid(),
-            name: 'Utilities',
-            iconKey: 'utilities',
-            items: [
-                mkItem('Electricity', 150, 'electricity'),
-                mkItem('Gas', 150, 'gas'),
-                mkItem('Water', 150, 'water', true),
-                mkItem('Internet', 120, 'internet'),
-                mkItem('Mobile', 250, 'mobile'),
-            ]
-        },
-        {
-            id: uuid(),
-            name: 'Transport',
-            iconKey: 'transport',
-            items: [
-                mkItem('Fuel', 250, 'transport', false, 'Nissan'),
-                mkItem('Rego', 100, 'rates', true, 'Nissan'),
-                mkItem('Insurance', 100, 'rates', false, 'Nissan'),
-                mkItem('Servicing', 70, 'service', false, 'Nissan'),
-                mkItem('Roadside Assist', 10, 'alert', false, 'Nissan'),
-                mkItem('Fuel', 250, 'transport', false, 'Kia'),
-                mkItem('Rego', 100, 'rates', true, 'Kia'),
-                mkItem('Insurance', 100, 'rates', false, 'Kia'),
-                mkItem('Servicing', 70, 'service', false, 'Kia'),
-                mkItem('Roadside Assist', 10, 'alert', false, 'Kia'),
-                mkItem('Train', 120, 'train'),
-            ]
-        },
-        {
-            id: uuid(),
-            name: 'Groceries & Essential',
-            iconKey: 'groceries',
-            items: [
-                mkItem('Groceries', 1000, 'groceries'),
-            ]
-        },
-        {
-            id: uuid(),
-            name: 'Health & Insurance',
-            iconKey: 'health',
-            items: [
-                mkItem('Private Health', 350, 'health', true),
-                mkItem('Dental', 150, 'health'),
-                mkItem('Prescriptions', 150, 'health'),
-            ]
-        },
-        {
-            id: uuid(),
-            name: 'Childcare & Education',
-            iconKey: 'childcare',
-            items: [
-                mkItem('Radhika Fees', 500, 'education', true),
-                mkItem('Nabhi Swimming', 120, 'childcare'),
-                mkItem('Radhika Swimming', 120, 'childcare'),
-                mkItem('Tuition - Karen', 350, 'education'),
-                mkItem('Tuition - Bright Minds', 150, 'education'),
-            ]
-        },
-        {
-            id: uuid(),
-            name: 'Debt & Savings',
-            iconKey: 'debt',
-            items: [
-                mkItem('Package Fee', 50, 'debt', true),
-            ]
-        },
-        {
-            id: uuid(),
-            name: 'Lifestyle & Recreation',
-            iconKey: 'lifestyle',
-            items: [
-                // Coffee hidden by default
-                mkItem('Coffee', 300, 'lifestyle', false, undefined, true),
-                mkItem('Dining Out', 400, 'dining'),
-                mkItem('Misc', 300, 'entertainment'),
-            ]
-        },
-        {
-            id: uuid(),
-            name: 'Personal & Clothing',
-            iconKey: 'personal',
-            items: [
-                mkItem('Haircuts', 100, 'hair'),
-                mkItem('Clothing', 400, 'clothing'),
-                mkItem('Cosmetics', 100, 'personal'),
-            ]
-        },
-        {
-            id: uuid(),
-            name: 'Misc',
-            iconKey: 'misc',
-            items: [
-                mkItem('Gifts', 200, 'gift'),
-                mkItem('Donations', 100, 'gift'),
-                mkItem('Unexpected Costs', 200, 'alert'),
-                mkItem('Software Subscriptions', 150, 'internet'),
-            ]
-        },
-    ]
-};
+import { useConfig } from '../contexts/ConfigContext'; // 1. Import Context
+import type { State, Action, BudgetPlannerState } from '../types/budget.types';
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -171,17 +18,21 @@ function reducer(state: State, action: Action): State {
         case 'UPDATE_EXPENSE_REDUCTION': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, reduction: action.payload.reduction } : item) }) };
         case 'TOGGLE_EXPENSE_FIXED': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, isFixed: !item.isFixed, reduction: 0 } : item) }) };
         case 'TOGGLE_ADMIN_MODE': return { ...state, isAdminMode: !state.isAdminMode };
-        case 'RESET_BUDGET': return initialState;
+
+        // 3. FIXED: Use the payload (from config) instead of hardcoded state
+        case 'RESET_BUDGET': return action.payload as State;
+
         default: return state;
     }
 }
 
 export function useBudgetPlanner(): BudgetPlannerState {
-    // Use persistent reducer
-    const [state, dispatch] = usePersistentReducer(reducer, initialState, 'budget-v1');
+    const { config } = useConfig(); // 2. Get config from context
+
+    // Pass config.budget as the initial state
+    const [state, dispatch] = usePersistentReducer(reducer, config.budget, 'budget-v1');
 
     const derived = useMemo(() => {
-        // INCOME: Skip hidden items unless Admin Mode is ON
         const totalIncome = state.incomes.reduce((sum, item) => {
             if (item.isHidden && !state.isAdminMode) return sum;
             return sum + item.amount;
@@ -192,7 +43,6 @@ export function useBudgetPlanner(): BudgetPlannerState {
 
         state.expenseCategories.forEach(cat => {
             cat.items.forEach(item => {
-                // EXPENSES: Skip hidden items unless Admin Mode is ON
                 if (item.isHidden && !state.isAdminMode) return;
 
                 totalExpenses += item.amount;
@@ -209,7 +59,7 @@ export function useBudgetPlanner(): BudgetPlannerState {
             totalIncome, totalExpenses, remaining,
             totalOptimizedExpenses, potentialSavings, projectedRemaining
         };
-    }, [state]); // Recalculates whenever state (including isAdminMode) changes
+    }, [state]);
 
     return { state, dispatch, isAdminMode: state.isAdminMode, ...derived };
 }

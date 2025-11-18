@@ -1,6 +1,7 @@
+// File: src/types/common.types.ts
 import React from 'react';
 
-export type CalculatorId = 'dashboard' | 'super' | 'homeLoan' | 'drawdown' | 'budget';
+export type CalculatorId = 'dashboard' | 'super' | 'homeLoan' | 'drawdown' | 'budget' | 'admin';
 
 export interface NavbarProps {
     activeCalculator: CalculatorId;
@@ -13,7 +14,6 @@ export interface SidebarProps {
 }
 
 export interface InputGroupProps {
-    // CHANGED: label can now be a ReactNode
     label: string | React.ReactNode;
     id: string;
     value: string | number;

@@ -1,4 +1,3 @@
-// File: src/types/amortization.types.ts
 import type { Dispatch } from 'react';
 
 export interface AmortizationRow {
@@ -45,7 +44,8 @@ export type Action =
     | { type: 'SET_OFFSET_INCOME_RATE'; payload: number }
     | { type: 'SET_CONTINUE_WORKING'; payload: boolean }
     | { type: 'SET_YEARS_WORKING'; payload: number }
-    | { type: 'SET_NET_INCOME'; payload: number };
+    | { type: 'SET_NET_INCOME'; payload: number }
+    | { type: 'RESET'; payload: State }; // UPDATED
 
 export interface AmortizationCalculatorState {
     state: State;
@@ -58,7 +58,6 @@ export interface AmortizationCalculatorState {
     scrollToFirstDepletedOffset: number;
     triggerScrollToFirstDepletedOffset: () => void;
     clearScrollToFirstDepletedOffset: () => void;
-    // UPDATED: Functions now return the calculated values
     calculateOptimalExpenditure: () => number;
     calculateOptimalWorkingYears: () => { years: number; income: number };
     hasDepletedOffsetRows: boolean;

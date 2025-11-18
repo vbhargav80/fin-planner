@@ -105,13 +105,19 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
 
                         {/* 2. Contribution Strategy (The "Levers") */}
                         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2 text-gray-900 font-bold">
+                            <div className="flex items-center justify-between mb-4 gap-4">
+                                <div className="flex items-center gap-2 text-gray-900 font-bold whitespace-nowrap">
                                     <PiggyBank size={20} className="text-emerald-500" />
                                     <h3>Contribution Strategy</h3>
                                 </div>
-                                <div className="w-40">
-                                    <Tabs tabs={FREQUENCY_TABS} activeTab={contributionFrequency} onTabClick={(id) => dispatch({ type: 'SET_CONTRIBUTION_FREQUENCY', payload: id as any })} variant="pill" />
+                                {/* FIX: Removed w-40 and changed variant for better contrast */}
+                                <div className="flex-shrink-0 min-w-[140px]">
+                                    <Tabs
+                                        tabs={FREQUENCY_TABS}
+                                        activeTab={contributionFrequency}
+                                        onTabClick={(id) => dispatch({ type: 'SET_CONTRIBUTION_FREQUENCY', payload: id as any })}
+                                        variant="segmented" // Lighter, cleaner look
+                                    />
                                 </div>
                             </div>
 

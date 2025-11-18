@@ -20,7 +20,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
     const [headerHeight, setHeaderHeight] = useState(0);
     const [isRetirementPinned, setIsRetirementPinned] = useState(false);
 
-    // Extract year for the button label (YYYY-MM -> YYYY)
+    // Extract just the year for the button label
     const retirementYear = retirementDate.split('-')[0];
 
     useLayoutEffect(() => {
@@ -56,7 +56,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
     };
 
     const handleScrollToRetirement = () => {
-        // Find the row marked as the retirement transition
+        // Find the row flagged as the retirement transition
         const index = amortizationData.findIndex((row) => row.isRetirementRow);
         if (index !== -1) scrollToIndex(index);
     };
@@ -69,6 +69,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
     useEffect(() => {
         const container = scrollContainerRef.current;
         if (!container) return;
+        // Check for the retirement flag instead of hardcoded date
         const index = amortizationData.findIndex(r => r.isRetirementRow);
         if (index === -1) { setIsRetirementPinned(false); return; }
 
@@ -107,7 +108,6 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-indigo-100 rounded-full transition-colors border border-indigo-500"
                     >
                         <Calendar size={14} />
-                        {/* Dynamic Label */}
                         Jump to Retirement ({retirementYear})
                     </button>
 
@@ -142,6 +142,7 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
                     </thead>
                     <tbody className="bg-indigo-800 divide-y divide-indigo-700">
                     {amortizationData.map((row, index) => {
+                        // Check the flag we set in the calculations
                         const isRetirementRow = row.isRetirementRow;
                         const isNegativeOffset = row.offsetBalance <= 0;
 

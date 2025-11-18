@@ -12,10 +12,10 @@ export const SYSTEM_DEFAULTS: AppConfig = {
 
         // Updated Keys
         monthlySalary: 10000,
-        transitionalSalary: 5000,
+        transitionalSalary: 10000,
 
         currentLivingExpenses: 10000,
-        retirementLivingExpenses: 8000,
+        retirementLivingExpenses: 10000,
 
         rentalGrowthRate: 2.5,
         isRefinanced: false,

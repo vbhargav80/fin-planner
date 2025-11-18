@@ -20,15 +20,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
 
     const handleGlobalReset = () => {
         const keysToClear = [
-            'amortization-v1',
-            'super-v1',
-            'super-v2',
+            // Current Keys (Must match what is in your hooks)
+            'amortization-v7',
             'super-v3',
-            'drawdown-v1',
-            'drawdown-v2',
             'drawdown-v3',
-            'budget-v1',
-            'budget-v2'
+            'budget-v2',
+
+            // Legacy Keys (Good to keep to clean up old data)
+            'amortization-v1', 'amortization-v2', 'amortization-v3', 'amortization-v4', 'amortization-v5', 'amortization-v6',
+            'super-v1', 'super-v2',
+            'drawdown-v1', 'drawdown-v2',
+            'budget-v1'
         ];
 
         keysToClear.forEach(key => localStorage.removeItem(key));

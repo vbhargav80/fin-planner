@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useConfig } from '../../contexts/ConfigContext';
 import { Tabs } from '../common/Tabs';
 import { InputGroup } from '../common/InputGroup';
+import { MonthYearPicker } from '../common/MonthYearPicker'; // Added Import
 import { Save, RotateCcw, ShieldAlert } from 'lucide-react';
 
 export const AdminScreen: React.FC = () => {
@@ -70,13 +71,26 @@ export const AdminScreen: React.FC = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 {activeTab === 'amortization' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* NEW: Retirement Date Picker */}
+                        <div className="md:col-span-2 pb-4 border-b border-gray-100">
+                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Timeline Settings</h3>
+                            <div className="max-w-xs">
+                                <MonthYearPicker
+                                    label="Default Retirement Date"
+                                    value={localConfig.amortization.retirementDate}
+                                    onChange={(v) => updateField('amortization', 'retirementDate', v)}
+                                    minYear={2025}
+                                    maxYear={2060}
+                                />
+                            </div>
+                        </div>
+
                         <InputGroup label="Principal ($)" id="principal" value={localConfig.amortization.principal} onChange={(v) => updateField('amortization', 'principal', v)} symbol="$" />
                         <InputGroup label="Interest Rate (%)" id="interestRate" value={localConfig.amortization.interestRate} onChange={(v) => updateField('amortization', 'interestRate', v)} symbol="%" />
                         <InputGroup label="Monthly Repayment ($)" id="monthlyRepayment" value={localConfig.amortization.monthlyRepayment} onChange={(v) => updateField('amortization', 'monthlyRepayment', v)} symbol="$" />
                         <InputGroup label="Offset Balance ($)" id="offset" value={localConfig.amortization.initialOffsetBalance} onChange={(v) => updateField('amortization', 'initialOffsetBalance', v)} symbol="$" />
                         <InputGroup label="Initial Rent ($)" id="rent" value={localConfig.amortization.initialRentalIncome} onChange={(v) => updateField('amortization', 'initialRentalIncome', v)} symbol="$" />
 
-                        {/* UPDATED FIELDS FOR NEW MODEL */}
                         <InputGroup label="Monthly Salary ($)" id="monthlySalary" value={localConfig.amortization.monthlySalary} onChange={(v) => updateField('amortization', 'monthlySalary', v)} symbol="$" />
                         <InputGroup label="Current Living Expenses ($)" id="currentExpenses" value={localConfig.amortization.currentLivingExpenses} onChange={(v) => updateField('amortization', 'currentLivingExpenses', v)} symbol="$" />
                         <InputGroup label="Retirement Living Expenses ($)" id="retireExpenses" value={localConfig.amortization.retirementLivingExpenses} onChange={(v) => updateField('amortization', 'retirementLivingExpenses', v)} symbol="$" />

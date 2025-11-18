@@ -20,7 +20,8 @@ export function calculateMonthlyRepayment(
 
 function parseMonthString(monthStr: string): Date {
     const [y, m] = monthStr.split('-').map(Number);
-    return new Date(Date.UTC(y || 2031, (m || 1) - 1, 1, 0, 0, 0));
+    // Create date at 12:00 UTC to match LOAN_START_DATE conventions
+    return new Date(Date.UTC(y || 2031, (m || 1) - 1, 1, 12, 0, 0));
 }
 
 export function calculateAmortizationSchedule(
@@ -48,7 +49,7 @@ export function calculateAmortizationSchedule(
 
     while (currentDate <= LOAN_END_DATE) {
         // Annual Rent Increase
-        if (currentDate.getMonth() === 0 && currentDate.getFullYear() > LOAN_START_DATE.getFullYear()) {
+        if (currentDate.getUTCMonth() === 0 && currentDate.getUTCFullYear() > LOAN_START_DATE.getUTCFullYear()) {
             currentMonthlyRental *= (1 + annualRentalGrowthDecimal);
         }
 
@@ -105,6 +106,11 @@ export function calculateAmortizationSchedule(
         const newOffsetBalance = currentOffsetBalance + totalIncoming - totalOutgoing;
         const totalShortfall = totalIncoming - totalOutgoing;
 
+        // Robust Date Comparison (Year & Month only)
+        const isRetirementRow =
+            currentDate.getUTCFullYear() === retirementDate.getUTCFullYear() &&
+            currentDate.getUTCMonth() === retirementDate.getUTCMonth();
+
         data.push({
             date: formatDate(currentDate),
             beginningBalance: currentLoanBalance,
@@ -116,13 +122,14 @@ export function calculateAmortizationSchedule(
             totalShortfall,
             endingBalance: Math.max(0, endingBalance),
             offsetBalance: newOffsetBalance,
-            isRetirementRow: currentDate.getTime() === retirementDate.getTime()
+            isRetirementRow // Correctly flagged now
         });
 
         currentLoanBalance = Math.max(0, endingBalance);
         currentOffsetBalance = newOffsetBalance;
 
-        currentDate.setMonth(currentDate.getMonth() + 1);
+        // Safe Month Increment (UTC)
+        currentDate.setUTCMonth(currentDate.getUTCMonth() + 1);
     }
 
     let finalRepayment = inputs.monthlyRepayment;

@@ -9,15 +9,22 @@ export const SYSTEM_DEFAULTS: AppConfig = {
         monthlyRepayment: 6800,
         initialRentalIncome: 4300,
         initialOffsetBalance: 1000000,
-        monthlyExpenditure: 10000,
-        monthlyExpenditurePre2031: 1000,
+
+        // New Fields
+        monthlySalary: 10000,
+        transitionalSalary: 5000,
+
+        currentLivingExpenses: 10000,
+        retirementLivingExpenses: 8000,
+
         rentalGrowthRate: 2.5,
         isRefinanced: false,
         considerOffsetIncome: false,
         offsetIncomeRate: 3,
+
+        retirementDate: '2031-01',
         continueWorking: false,
         yearsWorking: 3,
-        netIncome: 10000,
     },
     super: {
         myAge: 45,

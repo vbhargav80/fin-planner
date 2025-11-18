@@ -75,9 +75,12 @@ export const AdminScreen: React.FC = () => {
                         <InputGroup label="Monthly Repayment ($)" id="monthlyRepayment" value={localConfig.amortization.monthlyRepayment} onChange={(v) => updateField('amortization', 'monthlyRepayment', v)} symbol="$" />
                         <InputGroup label="Offset Balance ($)" id="offset" value={localConfig.amortization.initialOffsetBalance} onChange={(v) => updateField('amortization', 'initialOffsetBalance', v)} symbol="$" />
                         <InputGroup label="Initial Rent ($)" id="rent" value={localConfig.amortization.initialRentalIncome} onChange={(v) => updateField('amortization', 'initialRentalIncome', v)} symbol="$" />
-                        <InputGroup label="Net Income ($)" id="income" value={localConfig.amortization.netIncome} onChange={(v) => updateField('amortization', 'netIncome', v)} symbol="$" />
-                        <InputGroup label="Monthly Expense ($)" id="expense" value={localConfig.amortization.monthlyExpenditure} onChange={(v) => updateField('amortization', 'monthlyExpenditure', v)} symbol="$" />
-                        <InputGroup label="Pre-2031 Expense ($)" id="pre2031" value={localConfig.amortization.monthlyExpenditurePre2031} onChange={(v) => updateField('amortization', 'monthlyExpenditurePre2031', v)} symbol="$" />
+
+                        {/* UPDATED FIELDS FOR NEW MODEL */}
+                        <InputGroup label="Monthly Salary ($)" id="monthlySalary" value={localConfig.amortization.monthlySalary} onChange={(v) => updateField('amortization', 'monthlySalary', v)} symbol="$" />
+                        <InputGroup label="Current Living Expenses ($)" id="currentExpenses" value={localConfig.amortization.currentLivingExpenses} onChange={(v) => updateField('amortization', 'currentLivingExpenses', v)} symbol="$" />
+                        <InputGroup label="Retirement Living Expenses ($)" id="retireExpenses" value={localConfig.amortization.retirementLivingExpenses} onChange={(v) => updateField('amortization', 'retirementLivingExpenses', v)} symbol="$" />
+                        <InputGroup label="Transitional Salary ($)" id="transSalary" value={localConfig.amortization.transitionalSalary} onChange={(v) => updateField('amortization', 'transitionalSalary', v)} symbol="$" />
                     </div>
                 )}
 

@@ -1,30 +1,26 @@
-// File: 'src/utils/calculations/amortizationCalculations.ts'
 import type { AmortizationRow, State as AmortizationInputs } from '../../types/amortization.types';
 import { formatDate } from '../formatters';
 
-const LOAN_DETAILS = {
-    startDate: new Date('2026-01-01T12:00:00Z'),
-    endDate: new Date('2040-12-01T12:00:00Z'),
-};
-
-// Working income is considered only from Jan 2031 onwards
-const WORKING_START_DATE = new Date('2031-01-01T00:00:00Z');
+const LOAN_START_DATE = new Date('2026-01-01T12:00:00Z');
+const LOAN_END_DATE = new Date('2040-12-01T12:00:00Z');
 
 export function calculateMonthlyRepayment(
     principal: number,
     interestRate: number
 ): number {
     if (principal <= 0) return 0;
-
     const monthlyInterestRate = interestRate / 100 / 12;
-    if (monthlyInterestRate <= 0) {
-        return principal / (25 * 12);
-    }
+    if (monthlyInterestRate <= 0) return principal / (25 * 12);
 
-    const n = 25 * 12; // 300 payments for a 25-year term
+    const n = 25 * 12;
     const numerator = monthlyInterestRate * Math.pow(1 + monthlyInterestRate, n);
     const denominator = Math.pow(1 + monthlyInterestRate, n) - 1;
     return principal * (numerator / denominator);
+}
+
+function parseMonthString(monthStr: string): Date {
+    const [y, m] = monthStr.split('-').map(Number);
+    return new Date(Date.UTC(y || 2031, (m || 1) - 1, 1, 0, 0, 0));
 }
 
 export function calculateAmortizationSchedule(
@@ -38,70 +34,80 @@ export function calculateAmortizationSchedule(
     const monthlyInterestRate = inputs.interestRate / 100 / 12;
     const annualRentalGrowthDecimal = inputs.rentalGrowthRate / 100;
     const monthlyOffsetIncomeRate = inputs.offsetIncomeRate / 100 / 12;
-    const currentDate = new Date(LOAN_DETAILS.startDate);
 
-    // Working starts from Jan 2031 and continues for `yearsWorking`
-    const workingStartDate = new Date(WORKING_START_DATE);
-    const workingEndDate = new Date(workingStartDate);
-    workingEndDate.setFullYear(workingEndDate.getFullYear() + inputs.yearsWorking);
+    const currentDate = new Date(LOAN_START_DATE);
+    const retirementDate = parseMonthString(inputs.retirementDate);
 
-    const pre2031Cutoff = new Date('2031-01-01T00:00:00Z');
-    const refinanceEffectiveDate = new Date('2031-01-01T00:00:00Z');
+    // Calculate the "Transition End" date
+    const transitionEndDate = new Date(retirementDate);
+    if (inputs.continueWorking) {
+        transitionEndDate.setFullYear(transitionEndDate.getFullYear() + inputs.yearsWorking);
+    }
 
     let refiMonthlyPayment: number | null = null;
 
-    while (currentDate <= LOAN_DETAILS.endDate) {
-        if (currentDate.getMonth() === 0 && currentDate.getFullYear() > LOAN_DETAILS.startDate.getFullYear()) {
+    while (currentDate <= LOAN_END_DATE) {
+        // Annual Rent Increase
+        if (currentDate.getMonth() === 0 && currentDate.getFullYear() > LOAN_START_DATE.getFullYear()) {
             currentMonthlyRental *= (1 + annualRentalGrowthDecimal);
         }
 
-        const beginningBalance = currentLoanBalance;
+        // --- 1. DETERMINE PHASE ---
+        const isCareerPhase = currentDate < retirementDate;
+        // Transition Phase: After retirement date, but before extra work ends
+        const isTransitionPhase = currentDate >= retirementDate && currentDate < transitionEndDate;
 
-        let repaymentForMonth = 0;
-        let endingBalance = beginningBalance;
+        const isWorking = isCareerPhase || isTransitionPhase;
 
-        const excessOffset = Math.max(0, currentOffsetBalance - beginningBalance);
+        // --- 2. INCOME ---
+        let salaryIncome = 0;
+        if (isCareerPhase) {
+            salaryIncome = inputs.monthlySalary; // Phase 1: Full Career
+        } else if (isTransitionPhase && inputs.continueWorking) {
+            salaryIncome = inputs.transitionalSalary; // Phase 2: Transition Salary
+        }
+
+        const excessOffset = Math.max(0, currentOffsetBalance - currentLoanBalance);
         const offsetIncome = inputs.considerOffsetIncome ? excessOffset * monthlyOffsetIncomeRate : 0;
 
-        if (beginningBalance > 0) {
-            const effectiveBalanceForInterest = Math.max(0, beginningBalance - currentOffsetBalance);
+        const totalIncoming = currentMonthlyRental + salaryIncome + offsetIncome;
+
+        // --- 3. EXPENSES ---
+        const currentExpenditure = isWorking
+            ? inputs.currentLivingExpenses
+            : inputs.retirementLivingExpenses;
+
+        // --- 4. LOAN REPAYMENT ---
+        let repaymentForMonth = 0;
+        let endingBalance = currentLoanBalance;
+
+        if (currentLoanBalance > 0) {
+            const effectiveBalanceForInterest = Math.max(0, currentLoanBalance - currentOffsetBalance);
             const interestCharged = effectiveBalanceForInterest * monthlyInterestRate;
 
             let targetMonthlyRepayment = inputs.monthlyRepayment;
-            if (inputs.isRefinanced && currentDate >= refinanceEffectiveDate) {
-                targetMonthlyRepayment = refiMonthlyPayment ?? calculateMonthlyRepayment(beginningBalance, inputs.interestRate);
+
+            // Refinance Logic: Triggers on PLANNED retirement date
+            if (inputs.isRefinanced && !isCareerPhase) {
+                if (refiMonthlyPayment === null) {
+                    refiMonthlyPayment = calculateMonthlyRepayment(currentLoanBalance, inputs.interestRate);
+                }
+                targetMonthlyRepayment = refiMonthlyPayment;
             }
 
-            repaymentForMonth = Math.min(targetMonthlyRepayment, beginningBalance + interestCharged);
+            repaymentForMonth = Math.min(targetMonthlyRepayment, currentLoanBalance + interestCharged);
             const principalPaid = repaymentForMonth - interestCharged;
-            endingBalance = beginningBalance - principalPaid;
+            endingBalance = currentLoanBalance - principalPaid;
         }
 
-        if (inputs.isRefinanced &&
-            currentDate.getFullYear() === 2030 &&
-            currentDate.getMonth() === 11 /* Dec */) {
-            const refiPrincipal = Math.max(0, endingBalance);
-            refiMonthlyPayment = calculateMonthlyRepayment(refiPrincipal, inputs.interestRate);
-        }
-
-        // Working income only from Jan 2031 to `workingEndDate`
-        const workingIncomeEligible =
-            inputs.continueWorking &&
-            currentDate >= workingStartDate &&
-            currentDate < workingEndDate;
-        const workingIncome = workingIncomeEligible ? inputs.netIncome : 0;
-
-        const monthlyExpenditureForMonth =
-            currentDate < pre2031Cutoff ? inputs.monthlyExpenditurePre2031 : inputs.monthlyExpenditure;
-
-        const totalIncoming = currentMonthlyRental + workingIncome + offsetIncome;
-        const totalOutgoing = repaymentForMonth + monthlyExpenditureForMonth;
+        // --- 5. NET RESULT ---
+        const totalOutgoing = repaymentForMonth + currentExpenditure;
         const newOffsetBalance = currentOffsetBalance + totalIncoming - totalOutgoing;
         const totalShortfall = totalIncoming - totalOutgoing;
 
         data.push({
             date: formatDate(currentDate),
-            beginningBalance,
+            beginningBalance: currentLoanBalance,
             repayment: repaymentForMonth,
             rentalIncome: currentMonthlyRental,
             offsetIncome,
@@ -110,21 +116,18 @@ export function calculateAmortizationSchedule(
             totalShortfall,
             endingBalance: Math.max(0, endingBalance),
             offsetBalance: newOffsetBalance,
+            isRetirementRow: currentDate.getTime() === retirementDate.getTime()
         });
 
         currentLoanBalance = Math.max(0, endingBalance);
         currentOffsetBalance = newOffsetBalance;
-        currentDate.setMonth(currentDate.getMonth() + 1);
 
-        if (inputs.isRefinanced && currentDate >= refinanceEffectiveDate && refiMonthlyPayment === null) {
-            refiMonthlyPayment = calculateMonthlyRepayment(currentLoanBalance, inputs.interestRate);
-        }
+        currentDate.setMonth(currentDate.getMonth() + 1);
     }
 
     let finalRepayment = inputs.monthlyRepayment;
-    if (inputs.isRefinanced) {
-        // refiMonthlyPayment is calculated and set inside the loop
-        finalRepayment = refiMonthlyPayment ?? inputs.monthlyRepayment;
+    if (inputs.isRefinanced && refiMonthlyPayment !== null) {
+        finalRepayment = refiMonthlyPayment;
     }
 
     return { schedule: data, actualMonthlyRepayment: finalRepayment };

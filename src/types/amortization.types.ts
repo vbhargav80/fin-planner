@@ -11,23 +11,35 @@ export interface AmortizationRow {
     totalShortfall: number;
     endingBalance: number;
     offsetBalance: number;
+    isRetirementRow?: boolean;
 }
 
 export interface State {
+    // Loan
     interestRate: number;
     principal: number;
     monthlyRepayment: number;
-    initialRentalIncome: number;
     initialOffsetBalance: number;
-    monthlyExpenditure: number;
-    monthlyExpenditurePre2031: number;
-    rentalGrowthRate: number;
     isRefinanced: boolean;
+
+    // Income
+    initialRentalIncome: number;
+    monthlySalary: number;        // Income Phase 1 (Career)
+    transitionalSalary: number;   // Income Phase 2 (Extended Work)
+
+    // Expenses
+    currentLivingExpenses: number;    // Expenses Phase 1 & 2 (Working)
+    retirementLivingExpenses: number; // Expenses Phase 3 (Retired)
+
+    // Assumptions
+    rentalGrowthRate: number;
     considerOffsetIncome: boolean;
     offsetIncomeRate: number;
-    continueWorking: boolean;
-    yearsWorking: number;
-    netIncome: number;
+
+    // Timeline
+    retirementDate: string;       // YYYY-MM
+    continueWorking: boolean;     // Toggle for Phase 2
+    yearsWorking: number;         // Duration of Phase 2
 }
 
 export type Action =
@@ -36,15 +48,17 @@ export type Action =
     | { type: 'SET_MONTHLY_REPAYMENT'; payload: number }
     | { type: 'SET_INITIAL_RENTAL_INCOME'; payload: number }
     | { type: 'SET_INITIAL_OFFSET_BALANCE'; payload: number }
-    | { type: 'SET_MONTHLY_EXPENDITURE'; payload: number }
-    | { type: 'SET_MONTHLY_EXPENDITURE_PRE_2031'; payload: number }
+    | { type: 'SET_MONTHLY_SALARY'; payload: number }
+    | { type: 'SET_TRANSITIONAL_SALARY'; payload: number }
+    | { type: 'SET_CURRENT_LIVING_EXPENSES'; payload: number }
+    | { type: 'SET_RETIREMENT_LIVING_EXPENSES'; payload: number }
     | { type: 'SET_RENTAL_GROWTH_RATE'; payload: number }
     | { type: 'SET_IS_REFINANCED'; payload: boolean }
     | { type: 'SET_CONSIDER_OFFSET_INCOME'; payload: boolean }
     | { type: 'SET_OFFSET_INCOME_RATE'; payload: number }
+    | { type: 'SET_RETIREMENT_DATE'; payload: string }
     | { type: 'SET_CONTINUE_WORKING'; payload: boolean }
     | { type: 'SET_YEARS_WORKING'; payload: number }
-    | { type: 'SET_NET_INCOME'; payload: number }
     | { type: 'RESET'; payload: State };
 
 export interface AmortizationCalculatorState {
@@ -53,7 +67,7 @@ export interface AmortizationCalculatorState {
     amortizationData: AmortizationRow[];
     actualMonthlyRepayment: number;
     calculateOptimalExpenditure: () => number;
+    calculateOptimalOffsetBalance: () => number;
     calculateOptimalWorkingYears: () => { years: number; income: number };
-    calculateOptimalOffsetBalance: () => number; // NEW
     hasDepletedOffsetRows: boolean;
 }

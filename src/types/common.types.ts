@@ -1,4 +1,3 @@
-// File: src/types/common.types.ts
 import React from 'react';
 
 export type CalculatorId = 'dashboard' | 'super' | 'homeLoan' | 'drawdown' | 'budget' | 'admin';
@@ -23,7 +22,7 @@ export interface InputGroupProps {
     step?: number | string;
     disabled?: boolean;
     labelIcon?: React.ReactNode;
-    labelAction?: React.ReactNode; // NEW: Action button next to label
+    labelAction?: React.ReactNode; // NEW PROP
 }
 
 export interface ToggleSwitchProps {

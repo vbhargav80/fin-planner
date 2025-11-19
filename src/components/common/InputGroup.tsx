@@ -1,4 +1,3 @@
-// File: src/components/common/InputGroup.tsx
 import React from 'react';
 import type { InputGroupProps } from '../../types/common.types';
 
@@ -12,7 +11,7 @@ export const InputGroup: React.FC<InputGroupProps> = ({
                                                           step: customStep,
                                                           disabled = false,
                                                           labelIcon,
-                                                          labelAction // NEW
+                                                          labelAction // Destructure new prop
                                                       }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const num = parseFloat(e.target.value);
@@ -27,10 +26,13 @@ export const InputGroup: React.FC<InputGroupProps> = ({
         <div>
             {/* Header Row: Label + Action */}
             <div className="flex justify-between items-center mb-1">
+                {/* The Label itself */}
                 <label htmlFor={id} className="block text-sm font-medium text-gray-700 flex items-center gap-2">
                     {labelIcon && <span className="text-gray-400">{labelIcon}</span>}
                     {label}
                 </label>
+
+                {/* The Action (Button) is now a SIBLING, not a child */}
                 {labelAction && (
                     <div className="flex-shrink-0 ml-2">
                         {labelAction}

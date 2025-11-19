@@ -18,12 +18,14 @@ export const BudgetInsights: React.FC<Props> = ({ totalIncome, surplus, categori
         });
 
         const housingCost = housingCategories.reduce((total, cat) => {
-            return total + cat.items.reduce((sum, item) => sum + item.amount, 0);
+            // FIXED: Filter out hidden items
+            const visibleItemsTotal = cat.items
+                .filter(i => !i.isHidden)
+                .reduce((sum, item) => sum + item.amount, 0);
+            return total + visibleItemsTotal;
         }, 0);
 
         const housingRatio = totalIncome > 0 ? (housingCost / totalIncome) * 100 : 0;
-        // Common rule: Housing stress is often defined as > 30% of pre-tax income,
-        // but here we are likely using net income, so 30-35% is a reasonable warning threshold.
         const isHousingStress = housingRatio > 35;
 
         // 2. Calculate Savings Rate
@@ -38,7 +40,6 @@ export const BudgetInsights: React.FC<Props> = ({ totalIncome, surplus, categori
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 animate-fade-in">
 
-            {/* Insight 1: Savings Power */}
             <div className={`rounded-xl p-4 border ${metrics.isGoodSavings ? 'bg-emerald-900/30 border-emerald-500/30' : 'bg-indigo-800 border-indigo-600'}`}>
                 <div className="flex items-start gap-3">
                     <div className={`p-2 rounded-lg ${metrics.isGoodSavings ? 'bg-emerald-500/20 text-emerald-300' : 'bg-indigo-500/20 text-indigo-300'}`}>
@@ -61,7 +62,6 @@ export const BudgetInsights: React.FC<Props> = ({ totalIncome, surplus, categori
                 </div>
             </div>
 
-            {/* Insight 2: Housing Stress */}
             <div className={`rounded-xl p-4 border ${metrics.isHousingStress ? 'bg-orange-900/30 border-orange-500/30' : 'bg-indigo-800 border-indigo-600'}`}>
                 <div className="flex items-start gap-3">
                     <div className={`p-2 rounded-lg ${metrics.isHousingStress ? 'bg-orange-500/20 text-orange-300' : 'bg-indigo-500/20 text-indigo-300'}`}>

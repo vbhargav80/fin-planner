@@ -1,9 +1,8 @@
-// File: src/components/budget/OptimizerList.tsx
 import React, { useState, useMemo, useEffect } from 'react';
 import type { ExpenseCategory, Action, ExpenseItem } from '../../types/budget.types';
 import { formatCurrency } from '../../utils/formatters';
 import { CategoryIcon } from './CategoryIcon';
-import { Lock, Unlock, EyeOff } from 'lucide-react';
+import { Lock, Unlock, Eye, EyeOff } from 'lucide-react';
 import { Tabs } from '../common/Tabs';
 
 interface Props {
@@ -57,18 +56,16 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch, isAdminMo
 
     return (
         <div className="flex-1 overflow-hidden flex h-full">
-            {/* Sidebar */}
             <div className="w-1/3 bg-gray-50 border-r border-gray-200 overflow-y-auto custom-scrollbar">
                 <div className="py-2">
                     {categories.map(cat => {
-                        // FIXED: Only sum visible items
                         const catTotal = cat.items.reduce((sum, i) => {
-                            if (i.isHidden && !isAdminMode) return sum;
+                            if (i.isHidden) return sum;
                             return sum + i.amount;
                         }, 0);
 
                         const catSavings = cat.items.reduce((sum, i) => {
-                            if (i.isHidden && !isAdminMode) return sum;
+                            if (i.isHidden) return sum;
                             return sum + (i.amount * (i.reduction / 100));
                         }, 0);
 
@@ -101,7 +98,6 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch, isAdminMo
                 </div>
             </div>
 
-            {/* Detail Area */}
             <div className="w-2/3 bg-white overflow-y-auto p-6">
                 {activeCategory ? (
                     <div className="animate-fade-in">
@@ -138,9 +134,26 @@ export const OptimizerList: React.FC<Props> = ({ categories, dispatch, isAdminMo
                                                 <CategoryIcon iconKey={item.iconKey} size={18} className="text-gray-400" />
                                                 <span className={`text-sm font-medium flex items-center gap-2 ${item.isHidden ? 'text-red-500' : 'text-gray-700'}`}>
                                                     {item.name}
-                                                    {item.isHidden && <EyeOff size={14} className="text-red-400" />}
                                                 </span>
 
+                                                {/* TOGGLE HIDDEN */}
+                                                {isAdminMode && (
+                                                    <button
+                                                        onClick={() => dispatch({
+                                                            type: 'TOGGLE_EXPENSE_HIDDEN',
+                                                            payload: { categoryId: activeCategory.id, itemId: item.id }
+                                                        })}
+                                                        className="p-1 hover:bg-gray-100 rounded-full transition-colors ml-1"
+                                                        title={item.isHidden ? "Unhide Item" : "Hide Item"}
+                                                    >
+                                                        {item.isHidden
+                                                            ? <EyeOff size={14} className="text-red-400" />
+                                                            : <Eye size={14} className="text-gray-300 hover:text-gray-600" />
+                                                        }
+                                                    </button>
+                                                )}
+
+                                                {/* TOGGLE FIXED */}
                                                 <button
                                                     onClick={() => dispatch({
                                                         type: 'TOGGLE_EXPENSE_FIXED',

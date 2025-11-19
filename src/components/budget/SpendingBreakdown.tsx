@@ -12,11 +12,18 @@ interface Props {
 export const SpendingBreakdown: React.FC<Props> = memo(({ categories, totalExpenses }) => {
 
     const sortedCategories = useMemo(() => {
-        return [...categories].sort((a, b) => {
-            const totalA = a.items.reduce((sum, item) => sum + item.amount, 0);
-            const totalB = b.items.reduce((sum, item) => sum + item.amount, 0);
-            return totalB - totalA;
-        });
+        // Filter items first, then sort categories
+        return [...categories]
+            .map(cat => ({
+                ...cat,
+                // Create a "clean" version of items for display logic
+                items: cat.items.filter(i => !i.isHidden)
+            }))
+            .sort((a, b) => {
+                const totalA = a.items.reduce((sum, item) => sum + item.amount, 0);
+                const totalB = b.items.reduce((sum, item) => sum + item.amount, 0);
+                return totalB - totalA;
+            });
     }, [categories]);
 
     return (
@@ -30,16 +37,18 @@ export const SpendingBreakdown: React.FC<Props> = memo(({ categories, totalExpen
 
             <div className="space-y-5">
                 {sortedCategories.map(cat => {
+                    // Sum only visible items (filtered above)
                     const catTotal = cat.items.reduce((sum, i) => sum + i.amount, 0);
-                    const percentage = totalExpenses > 0 ? (catTotal / totalExpenses) * 100 : 0;
 
-                    if (percentage === 0) return null;
+                    // If category is empty or has $0 total after filtering, skip it
+                    if (catTotal === 0) return null;
+
+                    const percentage = totalExpenses > 0 ? (catTotal / totalExpenses) * 100 : 0;
 
                     return (
                         <div key={cat.id} className="group">
                             <div className="flex justify-between text-sm mb-2">
                                 <span className="text-indigo-100 font-medium group-hover:text-white transition-colors flex items-center gap-2">
-                                    {/* Add Category Icon Here */}
                                     <CategoryIcon iconKey={cat.iconKey} size={16} className="text-indigo-300 group-hover:text-indigo-200" />
                                     {cat.name}
                                 </span>

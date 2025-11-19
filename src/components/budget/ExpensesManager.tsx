@@ -1,11 +1,10 @@
-// File: src/components/budget/ExpensesManager.tsx
 import React, { useState, useMemo, useEffect } from 'react';
 import type { ExpenseCategory, Action, ExpenseItem } from '../../types/budget.types';
 import { formatCurrency } from '../../utils/formatters';
 import { InputGroup } from '../common/InputGroup';
 import { CategoryIcon } from './CategoryIcon';
 import { Tabs } from '../common/Tabs';
-import { EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface Props {
     categories: ExpenseCategory[];
@@ -49,12 +48,19 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch, isAdmin
         }
     }, [activeCategory?.id, isAdminMode]);
 
+    const getVisibleCategoryTotal = (cat: ExpenseCategory) => {
+        return cat.items.reduce((sum, item) => {
+            if (item.isHidden) return sum;
+            return sum + item.amount;
+        }, 0);
+    };
+
     return (
         <div className="flex-1 overflow-hidden flex h-full">
             <div className="w-1/3 bg-gray-50 border-r border-gray-200 overflow-y-auto custom-scrollbar">
                 <div className="py-2">
                     {categories.map(cat => {
-                        const catTotal = cat.items.reduce((sum, i) => sum + i.amount, 0);
+                        const catTotal = getVisibleCategoryTotal(cat);
                         const isActive = cat.id === activeCategoryId;
                         return (
                             <button
@@ -91,7 +97,7 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch, isAdmin
                             <div className="text-right">
                                 <span className="text-xs font-medium text-gray-500">Subtotal</span>
                                 <div className="text-lg font-bold text-indigo-600">
-                                    {formatCurrency(activeCategory.items.reduce((sum, i) => sum + i.amount, 0))}
+                                    {formatCurrency(getVisibleCategoryTotal(activeCategory))}
                                 </div>
                             </div>
                         </div>
@@ -109,22 +115,31 @@ export const ExpensesManager: React.FC<Props> = ({ categories, dispatch, isAdmin
 
                         <div className="grid grid-cols-1 gap-4">
                             {(groupedItems[activeSubGroup] || []).map(item => {
-                                const baseAmount = item.initialAmount ?? item.amount;
-                                const step = Math.max(1, Math.round(baseAmount * 0.05));
-
+                                const step = Math.max(1, Math.round(item.amount * 0.05));
                                 return (
                                     <InputGroup
                                         key={item.id}
                                         id={item.id}
                                         label={
-                                            item.isHidden ? (
-                                                <span className="flex items-center gap-2 text-red-500">
-                                                    {item.name}
-                                                    <EyeOff size={14} className="text-red-400" />
-                                                </span>
-                                            ) : (
-                                                item.name
-                                            )
+                                            <div className="flex items-center gap-2">
+                                                <span className={item.isHidden ? 'text-red-500' : ''}>{item.name}</span>
+                                                {/* ADMIN TOGGLE: Only show if admin mode is on */}
+                                                {isAdminMode && (
+                                                    <button
+                                                        onClick={() => dispatch({
+                                                            type: 'TOGGLE_EXPENSE_HIDDEN',
+                                                            payload: { categoryId: activeCategory.id, itemId: item.id }
+                                                        })}
+                                                        className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                                                        title={item.isHidden ? "Item is hidden (Click to show)" : "Item is visible (Click to hide)"}
+                                                    >
+                                                        {item.isHidden
+                                                            ? <EyeOff size={14} className="text-red-400" />
+                                                            : <Eye size={14} className="text-gray-300 hover:text-gray-600" />
+                                                        }
+                                                    </button>
+                                                )}
+                                            </div>
                                         }
                                         labelIcon={<CategoryIcon iconKey={item.iconKey} size={16} />}
                                         value={item.amount}

@@ -1,12 +1,12 @@
 // File: src/components/budget/BudgetForm.tsx
 import React, { useState, useRef } from 'react';
-import { Wallet, Lock, RotateCcw } from 'lucide-react';
+import { Wallet, Lock, RotateCcw, Banknote, CreditCard, Sparkles } from 'lucide-react';
 import { Tabs } from '../common/Tabs';
 import type { BudgetPlannerState } from '../../types/budget.types';
 import { IncomeList } from './IncomeList';
 import { ExpensesManager } from './ExpensesManager';
 import { OptimizerList } from './OptimizerList';
-import { useConfig } from "../../contexts/ConfigContext.tsx";
+import { useConfig } from "../../contexts/ConfigContext";
 
 interface Props {
     model: BudgetPlannerState;
@@ -14,14 +14,38 @@ interface Props {
 }
 
 export const BudgetForm: React.FC<Props> = ({ model, onViewChange }) => {
-    const [viewMode, setViewMode] = useState<'income' | 'expenses' | 'optimize'>('income');
+    const [viewMode, setViewMode] = useState<'income' | 'expenses' | 'optimize'>('expenses');
     const { state, dispatch, totalIncome, isAdminMode } = model;
     const { config } = useConfig();
 
     const VIEW_TABS = [
-        { id: 'income', label: 'Income' },
-        { id: 'expenses', label: 'Expenses' },
-        { id: 'optimize', label: 'Optimize' },
+        {
+            id: 'income',
+            label: (
+                <span className="flex items-center gap-2">
+                    <Banknote size={16} />
+                    Income
+                </span>
+            )
+        },
+        {
+            id: 'expenses',
+            label: (
+                <span className="flex items-center gap-2">
+                    <CreditCard size={16} />
+                    Expenses
+                </span>
+            )
+        },
+        {
+            id: 'optimize',
+            label: (
+                <span className="flex items-center gap-2">
+                    <Sparkles size={16} />
+                    Optimize
+                </span>
+            )
+        },
     ];
 
     const handleTabClick = (id: string) => {

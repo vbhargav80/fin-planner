@@ -193,7 +193,7 @@ export function calculateSuper(
         finalResults = {
             projectedBalance: finalBalance,
             pmt: myContributionCurrent,
-            pmtFuture: myContributionFuture, // FIXED: Use new key
+            pmtFuture: myContributionFuture,
         };
 
         const longerBreakdown = myFinal.breakdown.length >= wifeFinal.breakdown.length ? myFinal.breakdown : wifeFinal.breakdown;
@@ -213,6 +213,7 @@ export function calculateSuper(
         fvStart: fvOfCurrentSuper,
         finalBalance,
         pmt: finalResults.pmt || 0,
+        targetAge, // FIX: Pass targetAge correctly
     };
 
     const drawdownSchedule = calculateDrawdownSchedule(

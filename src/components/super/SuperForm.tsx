@@ -39,7 +39,6 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
     const [useAgeBasedMe, setUseAgeBasedMe] = useState(false);
     const [useAgeBasedSpouse, setUseAgeBasedSpouse] = useState(false);
 
-    // UPDATED: Labels with Icons and new text
     const PHASE_TABS = [
         {
             id: 'accumulation',
@@ -141,7 +140,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                             <label className="block text-xs font-bold text-gray-500 mb-3 uppercase tracking-wide">
                                 What is your primary goal?
                             </label>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <button
                                     type="button"
                                     onClick={() => dispatch({ type: 'SET_CALC_MODE', payload: 'balance' })}
@@ -158,7 +157,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
                                         <span className="font-bold text-sm">Forecast</span>
                                     </div>
                                     <p className="text-xs text-gray-500 leading-relaxed">
-                                        Project how much wealth you will accumulate based on your current strategy.
+                                        See how much wealth you will accumulate based on your current strategy.
                                     </p>
                                 </button>
 
@@ -264,14 +263,7 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
 
                                         {useAgeBasedSpouse && (
                                             <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mb-2">
-                                                <RangeSlider
-                                                    label="Change Strategy at Age"
-                                                    value={wifeContributionChangeAge}
-                                                    min={SuperConstants.CONTRIBUTION_CHANGE_AGE.MIN}
-                                                    max={targetAge - 1}
-                                                    step={1}
-                                                    onChange={(v) => dispatch({ type: 'SET_WIFE_CONTRIBUTION_CHANGE_AGE', payload: v })}
-                                                />
+                                                <RangeSlider label="Change Strategy at Age" value={wifeContributionChangeAge} min={SuperConstants.CONTRIBUTION_CHANGE_AGE.MIN} max={targetAge - 1} step={1} onChange={(v) => dispatch({ type: 'SET_WIFE_CONTRIBUTION_CHANGE_AGE', payload: v })} />
                                             </div>
                                         )}
 

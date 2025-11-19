@@ -35,7 +35,7 @@ export interface SuperInputs {
 
 export interface SuperResultData {
     pmt: number;
-    pmtFuture?: number; // RENAMED: Was pmtPost50
+    pmtFuture?: number;
     target?: number;
     projectedBalance?: number;
     calcMode: CalcMode;
@@ -44,6 +44,7 @@ export interface SuperResultData {
     rate: number;
     fvStart: number;
     finalBalance: number;
+    targetAge: number; // NEW FIELD
 }
 
 export interface State {

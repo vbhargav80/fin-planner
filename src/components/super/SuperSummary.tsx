@@ -11,7 +11,7 @@ interface SuperSummaryProps {
 export const SuperSummary: React.FC<SuperSummaryProps> = ({ results, drawdownSchedule }) => {
     // Calculate Longevity
     const lastRow = drawdownSchedule[drawdownSchedule.length - 1];
-    const runOutAge = lastRow ? lastRow.age : results.years + results.start; // rough fallback
+    const runOutAge = lastRow ? lastRow.age : results.years + results.start;
     const runsOut = lastRow && lastRow.endBalance <= 0;
 
     return (
@@ -31,17 +31,18 @@ export const SuperSummary: React.FC<SuperSummaryProps> = ({ results, drawdownSch
                         <div className="text-3xl lg:text-4xl font-bold text-white font-mono mb-1">
                             {formatCurrency(results.finalBalance)}
                         </div>
+                        {/* FIX: Use targetAge instead of calculation */}
                         <div className="text-xs text-indigo-300">
-                            at age {results.start + results.years}
+                            at age {results.targetAge}
                         </div>
                     </div>
                 ) : (
                     <div>
                         <div className="text-3xl lg:text-4xl font-bold text-white font-mono mb-1">
-                            {formatCurrency(results.pmt / 2)}
+                            {formatCurrency(results.pmt)}
                         </div>
                         <div className="text-xs text-indigo-300">
-                            per person / month
+                            combined total / month
                         </div>
                     </div>
                 )}

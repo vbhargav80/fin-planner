@@ -23,6 +23,7 @@ export interface InputGroupProps {
     step?: number | string;
     disabled?: boolean;
     labelIcon?: React.ReactNode;
+    labelAction?: React.ReactNode; // NEW: Action button next to label
 }
 
 export interface ToggleSwitchProps {

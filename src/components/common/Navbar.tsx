@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import type { NavbarProps } from '../../types/common.types';
 import { ConfirmationModal } from './ConfirmationModal';
-import { STORAGE_KEYS } from '../../constants/storageKeys';
+import { STORAGE_KEYS } from '../../constants/storageKeys'; // NEW IMPORT
 
 export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,12 +20,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
     ];
 
     const handleGlobalReset = () => {
+        // Dynamically build the list of keys to clear
         const keysToClear = [
-            // Current Keys (Must match what is in your hooks)
+            // Current Active Keys
             STORAGE_KEYS.AMORTIZATION,
             STORAGE_KEYS.SUPER,
             STORAGE_KEYS.DRAWDOWN,
             STORAGE_KEYS.BUDGET,
+            STORAGE_KEYS.APP_DEFAULTS,
+            // STORAGE_KEYS.ACTIVE_SCREEN, // Optional: Keep this commented if you want to stay on the same screen after reset
+
             // Legacy Keys
             ...STORAGE_KEYS.LEGACY
         ];
@@ -39,7 +43,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
             <nav className="bg-gray-900 text-white shadow-lg sticky top-0 z-40">
                 <div className="w-full mx-0 px-4">
                     <div className="flex items-center justify-between h-16">
-                        {/* Left Side: Logo & Links */}
                         <div className="flex items-center gap-6">
                             <div
                                 className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
@@ -51,7 +54,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
                                 </span>
                             </div>
 
-                            {/* Desktop Nav Items */}
                             <div className="hidden md:flex items-center space-x-1">
                                 {navItems.map((item) => (
                                     <button
@@ -71,9 +73,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
                             </div>
                         </div>
 
-                        {/* Right Side: Global Actions & Mobile Menu */}
                         <div className="flex items-center gap-2">
-                            {/* Admin Button */}
                             <button
                                 onClick={() => onNavigate('admin')}
                                 className={`p-2 rounded-full transition-colors ${activeCalculator === 'admin' ? 'text-white bg-gray-800' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
@@ -82,7 +82,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
                                 <Settings size={20} />
                             </button>
 
-                            {/* Reset Button */}
                             <button
                                 onClick={() => setIsResetModalOpen(true)}
                                 className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-800 rounded-full transition-colors"
@@ -91,7 +90,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
                                 <RotateCcw size={20} />
                             </button>
 
-                            {/* Mobile Menu Toggle */}
                             <div className="md:hidden">
                                 <button
                                     onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -104,7 +102,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
                     </div>
                 </div>
 
-                {/* Mobile Dropdown Menu */}
                 {isMenuOpen && (
                     <div className="md:hidden bg-gray-800 border-t border-gray-700">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
@@ -144,7 +141,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeCalculator, onNavigate }) 
                 )}
             </nav>
 
-            {/* MODAL COMPONENT */}
             <ConfirmationModal
                 isOpen={isResetModalOpen}
                 onClose={() => setIsResetModalOpen(false)}

@@ -3,7 +3,7 @@ import { usePersistentReducer } from './usePersistentReducer';
 import { useConfig } from '../contexts/ConfigContext';
 import type { SaleDrawdownState, State, Action } from '../types/drawdown.types';
 import { computeSaleDrawdownDerived } from '../utils/calculations/drawdownCalculations';
-import { STORAGE_KEYS } from "../constants/storageKeys.ts";
+import { STORAGE_KEYS } from "../constants/storageKeys";
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {

@@ -4,7 +4,7 @@ import { useConfig } from '../contexts/ConfigContext';
 import type { SuperCalculatorState, State, Action } from '../types/super.types';
 import { calculateSuper } from '../utils/calculations/superCalculations';
 import { LIFESTYLE_AMOUNTS } from '../constants/super';
-import { STORAGE_KEYS } from "../constants/storageKeys.ts";
+import { STORAGE_KEYS } from "../constants/storageKeys";
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {

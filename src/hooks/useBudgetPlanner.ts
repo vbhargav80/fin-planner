@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { usePersistentReducer } from './usePersistentReducer';
 import { useConfig } from '../contexts/ConfigContext'; // 1. Import Context
 import type { State, Action, BudgetPlannerState } from '../types/budget.types';
-import { STORAGE_KEYS } from "../constants/storageKeys.ts";
+import { STORAGE_KEYS } from "../constants/storageKeys";
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {

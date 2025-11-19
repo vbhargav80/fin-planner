@@ -15,6 +15,10 @@ interface AmortizationFormProps {
 
 export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }) => {
     const [activeTab, setActiveTab] = useState<'loan' | 'cashflow' | 'assumptions' | 'strategies'>('loan');
+
+    // NEW: State for the Cashflow internal tabs
+    const [cashflowPhase, setCashflowPhase] = useState<'career' | 'transition' | 'retirement'>('career');
+
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     const TABS = [
@@ -22,6 +26,40 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
         { id: 'cashflow', label: 'Cashflow & Life' },
         { id: 'assumptions', label: 'Assumptions' },
         { id: 'strategies', label: 'Strategies' },
+    ];
+
+    // NEW: Tabs for the Cashflow phases
+    const CASHFLOW_PHASE_TABS = [
+        {
+            id: 'career',
+            label: (
+                <span className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-bold">1</span>
+                    <Briefcase size={16} />
+                    <span>Career</span>
+                </span>
+            )
+        },
+        {
+            id: 'transition',
+            label: (
+                <span className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-bold">2</span>
+                    <Sun size={16} />
+                    <span>Transition</span>
+                </span>
+            )
+        },
+        {
+            id: 'retirement',
+            label: (
+                <span className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-orange-100 text-orange-600 text-[10px] font-bold">3</span>
+                    <Sunset size={16} />
+                    <span>Retirement</span>
+                </span>
+            )
+        },
     ];
 
     const {
@@ -64,7 +102,7 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
             <h2 className="text-3xl font-bold text-gray-900">Amortization Calculator</h2>
             <p className="mt-2 text-gray-600">Monthly schedule to 2040.</p>
 
-            <Tabs tabs={TABS} variant="segmented-indigo" activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} className="mt-6" />
+            <Tabs tabs={TABS} variant="pill" activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} className="mt-6" />
 
             <div className="mt-8 space-y-6">
                 {activeTab === 'loan' && (
@@ -79,55 +117,83 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
                 {activeTab === 'cashflow' && (
                     <section className="animate-fade-in space-y-6">
 
-                        <div className="border-l-4 border-indigo-500 bg-indigo-50/50 p-4 rounded-r-lg">
-                            <div className="flex items-center gap-2 text-indigo-900 font-bold mb-4">
-                                <Briefcase size={20} />
-                                <h3>Phase 1: Career</h3>
-                            </div>
-                            <div className="space-y-4">
-                                <RangeSlider label="Monthly Salary" value={monthlySalary} min={AmortizationConstants.MONTHLY_SALARY.MIN} max={AmortizationConstants.MONTHLY_SALARY.MAX} step={AmortizationConstants.MONTHLY_SALARY.STEP} onChange={(v) => dispatch({ type: 'SET_MONTHLY_SALARY', payload: v })} />
-                                <RangeSlider label="Current Living Expenses" value={currentLivingExpenses} min={AmortizationConstants.CURRENT_LIVING_EXPENSES.MIN} max={AmortizationConstants.CURRENT_LIVING_EXPENSES.MAX} step={AmortizationConstants.CURRENT_LIVING_EXPENSES.STEP} onChange={(v) => dispatch({ type: 'SET_CURRENT_LIVING_EXPENSES', payload: v })} />
-                                <RangeSlider label="Rental Income" value={initialRentalIncome} min={AmortizationConstants.INITIAL_RENTAL_INCOME.MIN} max={AmortizationConstants.INITIAL_RENTAL_INCOME.MAX} step={AmortizationConstants.INITIAL_RENTAL_INCOME.STEP} onChange={(v) => dispatch({ type: 'SET_INITIAL_RENTAL_INCOME', payload: v })} />
-                            </div>
-                            <div className="mt-6 bg-white p-3 rounded-lg border border-indigo-100 shadow-sm">
-                                <MonthYearPicker label="Career Ends On (Retirement Date)" value={retirementDate} onChange={(v) => dispatch({ type: 'SET_RETIREMENT_DATE', payload: v })} minYear={2026} maxYear={2040} />
-                            </div>
-                        </div>
+                        {/* Life Stage Tabs */}
+                        <Tabs
+                            tabs={CASHFLOW_PHASE_TABS}
+                            activeTab={cashflowPhase}
+                            onTabClick={(id) => setCashflowPhase(id as any)}
+                            variant="underline"
+                        />
 
-                        <div className="flex justify-center -my-2 text-gray-300"><ArrowRight className="rotate-90" /></div>
-
-                        <div className={`border-l-4 ${continueWorking ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-300 bg-gray-50'} p-4 rounded-r-lg transition-colors`}>
-                            <div className="flex items-center justify-between mb-2">
-                                <div className={`flex items-center gap-2 font-bold ${continueWorking ? 'text-emerald-900' : 'text-gray-500'}`}>
-                                    <Sun size={20} />
-                                    <h3>Phase 2: Transition</h3>
-                                </div>
-                                <ToggleSwitch label="" checked={continueWorking} onChange={(v) => dispatch({ type: 'SET_CONTINUE_WORKING', payload: v })} />
-                            </div>
-                            <p className="text-xs text-gray-500 mb-4">Optional period of extended work or semi-retirement after the date above.</p>
-
-                            {continueWorking && (
-                                <div className="space-y-4 animate-fade-in">
-                                    <RangeSlider label="Duration (Years)" value={yearsWorking} min={AmortizationConstants.YEARS_WORKING.MIN} max={AmortizationConstants.YEARS_WORKING.MAX} step={AmortizationConstants.YEARS_WORKING.STEP} onChange={(v) => dispatch({ type: 'SET_YEARS_WORKING', payload: v })} />
-                                    <RangeSlider label="Transitional Salary" value={transitionalSalary} min={AmortizationConstants.TRANSITIONAL_SALARY.MIN} max={AmortizationConstants.TRANSITIONAL_SALARY.MAX} step={AmortizationConstants.TRANSITIONAL_SALARY.STEP} onChange={(v) => dispatch({ type: 'SET_TRANSITIONAL_SALARY', payload: v })} />
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="flex justify-center -my-2 text-gray-300"><ArrowRight className="rotate-90" /></div>
-
-                        <div className="border-l-4 border-orange-500 bg-orange-50/50 p-4 rounded-r-lg">
-                            <div className="flex items-center gap-2 text-orange-900 font-bold mb-4">
-                                <Sunset size={20} />
-                                <h3>Phase 3: Full Retirement</h3>
-                            </div>
-                            <div className="space-y-4">
-                                <RangeSlider label="Retirement Living Expenses" value={retirementLivingExpenses} min={AmortizationConstants.RETIREMENT_LIVING_EXPENSES.MIN} max={AmortizationConstants.RETIREMENT_LIVING_EXPENSES.MAX} step={AmortizationConstants.RETIREMENT_LIVING_EXPENSES.STEP} onChange={(v) => dispatch({ type: 'SET_RETIREMENT_LIVING_EXPENSES', payload: v })} />
-                                <div className="pt-2 border-t border-orange-200/50">
-                                    <ToggleSwitch label="Refinance at Start of Phase?" checked={isRefinanced} onChange={(v) => dispatch({ type: 'SET_IS_REFINANCED', payload: v })} />
+                        {/* 1. Career Phase */}
+                        {cashflowPhase === 'career' && (
+                            <div className="space-y-6 animate-fade-in">
+                                <div className="bg-indigo-50 p-5 rounded-xl border border-indigo-100 shadow-sm">
+                                    <div className="flex items-center gap-2 text-indigo-900 font-bold mb-4">
+                                        <Briefcase size={20} />
+                                        <h3>Phase 1: Working Life</h3>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <RangeSlider label="Monthly Salary" value={monthlySalary} min={AmortizationConstants.MONTHLY_SALARY.MIN} max={AmortizationConstants.MONTHLY_SALARY.MAX} step={AmortizationConstants.MONTHLY_SALARY.STEP} onChange={(v) => dispatch({ type: 'SET_MONTHLY_SALARY', payload: v })} />
+                                        <RangeSlider label="Current Living Expenses" value={currentLivingExpenses} min={AmortizationConstants.CURRENT_LIVING_EXPENSES.MIN} max={AmortizationConstants.CURRENT_LIVING_EXPENSES.MAX} step={AmortizationConstants.CURRENT_LIVING_EXPENSES.STEP} onChange={(v) => dispatch({ type: 'SET_CURRENT_LIVING_EXPENSES', payload: v })} />
+                                        <RangeSlider label="Rental Income" value={initialRentalIncome} min={AmortizationConstants.INITIAL_RENTAL_INCOME.MIN} max={AmortizationConstants.INITIAL_RENTAL_INCOME.MAX} step={AmortizationConstants.INITIAL_RENTAL_INCOME.STEP} onChange={(v) => dispatch({ type: 'SET_INITIAL_RENTAL_INCOME', payload: v })} />
+                                    </div>
+                                    <div className="mt-6 bg-white p-3 rounded-lg border border-indigo-100 shadow-sm">
+                                        <MonthYearPicker label="Career Ends On (Retirement Date)" value={retirementDate} onChange={(v) => dispatch({ type: 'SET_RETIREMENT_DATE', payload: v })} minYear={2026} maxYear={2040} />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* 2. Transition Phase (Optional) */}
+                        {cashflowPhase === 'transition' && (
+                            <div className="space-y-6 animate-fade-in">
+                                <div className={`p-5 rounded-xl border transition-colors shadow-sm ${continueWorking ? 'border-emerald-500 bg-emerald-50/50' : 'border-gray-200 bg-gray-50'}`}>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className={`flex items-center gap-2 font-bold ${continueWorking ? 'text-emerald-900' : 'text-gray-500'}`}>
+                                            <Sun size={20} />
+                                            <h3>Phase 2: Semi-Retirement</h3>
+                                        </div>
+                                        <ToggleSwitch label="Enable" checked={continueWorking} onChange={(v) => dispatch({ type: 'SET_CONTINUE_WORKING', payload: v })} />
+                                    </div>
+                                    <p className="text-sm text-gray-600 mb-6">
+                                        An optional period of extended work or semi-retirement starting after your main career ends.
+                                    </p>
+
+                                    {continueWorking ? (
+                                        <div className="space-y-4 animate-fade-in">
+                                            <RangeSlider label="Duration (Years)" value={yearsWorking} min={AmortizationConstants.YEARS_WORKING.MIN} max={AmortizationConstants.YEARS_WORKING.MAX} step={AmortizationConstants.YEARS_WORKING.STEP} onChange={(v) => dispatch({ type: 'SET_YEARS_WORKING', payload: v })} />
+                                            <RangeSlider label="Transitional Salary" value={transitionalSalary} min={AmortizationConstants.TRANSITIONAL_SALARY.MIN} max={AmortizationConstants.TRANSITIONAL_SALARY.MAX} step={AmortizationConstants.TRANSITIONAL_SALARY.STEP} onChange={(v) => dispatch({ type: 'SET_TRANSITIONAL_SALARY', payload: v })} />
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-8 text-gray-400 text-sm italic">
+                                            Transition phase is disabled. You will move directly to full retirement.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 3. Full Retirement */}
+                        {cashflowPhase === 'retirement' && (
+                            <div className="space-y-6 animate-fade-in">
+                                <div className="bg-orange-50 p-5 rounded-xl border border-orange-200 shadow-sm">
+                                    <div className="flex items-center gap-2 text-orange-900 font-bold mb-4">
+                                        <Sunset size={20} />
+                                        <h3>Phase 3: Full Retirement</h3>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <RangeSlider label="Retirement Living Expenses" value={retirementLivingExpenses} min={AmortizationConstants.RETIREMENT_LIVING_EXPENSES.MIN} max={AmortizationConstants.RETIREMENT_LIVING_EXPENSES.MAX} step={AmortizationConstants.RETIREMENT_LIVING_EXPENSES.STEP} onChange={(v) => dispatch({ type: 'SET_RETIREMENT_LIVING_EXPENSES', payload: v })} />
+                                        <div className="pt-4 border-t border-orange-200/50">
+                                            <ToggleSwitch label="Refinance at Start of Phase?" checked={isRefinanced} onChange={(v) => dispatch({ type: 'SET_IS_REFINANCED', payload: v })} />
+                                            <p className="text-xs text-orange-700 mt-1">
+                                                Automatically switches to a new 25-year loan term when you retire to lower repayments.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </section>
                 )}
 

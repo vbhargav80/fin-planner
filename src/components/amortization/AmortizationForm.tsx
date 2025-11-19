@@ -6,7 +6,7 @@ import { MonthYearPicker } from '../common/MonthYearPicker';
 import { Tabs } from '../common/Tabs';
 import type { AmortizationCalculatorState } from '../../types/amortization.types';
 import * as AmortizationConstants from '../../constants/amortization';
-import { Wallet, CheckCircle2, ShieldCheck, Briefcase, ArrowRight, Sun, Sunset } from 'lucide-react';
+import { Wallet, CheckCircle2, ShieldCheck, Briefcase, Sun, Sunset } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
 interface AmortizationFormProps {

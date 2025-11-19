@@ -10,10 +10,8 @@ import type { CalculatorId } from './types/common.types';
 import { ConfigProvider } from './contexts/ConfigContext';
 
 export default function App() {
-    // 1. Initialize state from Local Storage (or default to 'dashboard')
     const [activeCalculator, setActiveCalculator] = useState<CalculatorId>(() => {
         const saved = localStorage.getItem('app-active-screen');
-        // Simple validation to ensure we don't crash on invalid keys
         const validScreens = ['dashboard', 'super', 'homeLoan', 'drawdown', 'budget', 'admin'];
         if (saved && validScreens.includes(saved)) {
             return saved as CalculatorId;
@@ -21,7 +19,6 @@ export default function App() {
         return 'dashboard';
     });
 
-    // 2. Save the current screen whenever it changes
     useEffect(() => {
         localStorage.setItem('app-active-screen', activeCalculator);
     }, [activeCalculator]);
@@ -37,7 +34,8 @@ export default function App() {
             case 'drawdown':
                 return <DrawdownSimulator />;
             case 'budget':
-                return <BudgetPlanner />;
+                // Pass the navigation handler
+                return <BudgetPlanner onNavigate={setActiveCalculator} />;
             case 'admin':
                 return <AdminScreen />;
             default:

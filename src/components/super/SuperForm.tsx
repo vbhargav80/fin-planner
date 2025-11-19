@@ -44,8 +44,9 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
             id: 'accumulation',
             label: (
                 <span className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-bold">1</span>
                     <TrendingUp size={18} />
-                    1. Build Wealth
+                    Build Wealth
                 </span>
             )
         },
@@ -53,8 +54,9 @@ export const SuperForm: React.FC<SuperFormProps> = ({ calculator }) => {
             id: 'retirement',
             label: (
                 <span className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-orange-100 text-orange-600 text-[10px] font-bold">2</span>
                     <Sunset size={18} />
-                    2. Plan Retirement
+                    Plan Retirement
                 </span>
             )
         },

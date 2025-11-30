@@ -23,7 +23,8 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
 
     const TABS = [
         { id: 'loan', label: 'Loan' },
-        { id: 'cashflow', label: 'Cashflow & Life' },
+        // CHANGE 1: Shortened label from 'Cashflow & Life' to 'Cashflow' to prevent scrolling
+        { id: 'cashflow', label: 'Cashflow' },
         { id: 'assumptions', label: 'Assumptions' },
         { id: 'strategies', label: 'Strategies' },
     ];
@@ -98,7 +99,9 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
     };
 
     return (
-        <div className="md:w-[35%] p-6 sm:p-8 bg-white/95 backdrop-blur md:sticky md:top-[4rem] md:self-start md:h-[calc(100vh-4rem)] md:overflow-y-auto">
+        // CHANGE 2: Updated width classes. Added 'xl:w-[40%]' so it stays wider on laptops (1280px+)
+        // CHANGE 3: Reduced padding to 'p-5' to give tabs more internal room
+        <div className="w-full md:w-[45%] xl:w-[40%] p-5 sm:p-6 bg-white/95 backdrop-blur md:sticky md:top-[4rem] md:self-start md:h-[calc(100vh-4rem)] md:overflow-y-auto">
             <h2 className="text-3xl font-bold text-gray-900">Amortization Calculator</h2>
             <p className="mt-2 text-gray-600">Monthly schedule to 2040.</p>
 

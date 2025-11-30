@@ -96,7 +96,8 @@ export const AmortizationTable: React.FC<AmortizationTableProps> = ({ calculator
     }, [amortizationData, headerHeight]);
 
     return (
-        <div className="md:w-[65%] bg-indigo-700 text-white p-6 sm:p-10 flex flex-col relative h-[calc(100vh-4rem)] sticky top-16">
+        // CHANGE 1: Adjusted widths to match the Form (md:w-[55%] xl:w-[60%])
+        <div className="w-full md:w-[55%] xl:w-[60%] bg-indigo-700 text-white p-6 sm:p-10 flex flex-col relative h-[calc(100vh-4rem)] sticky top-16">
             <div className="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
                 <h3 className="text-2xl font-bold text-white text-center lg:text-left">
                     Amortization Schedule

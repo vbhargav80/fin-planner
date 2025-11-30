@@ -6,7 +6,10 @@ import { MonthYearPicker } from '../common/MonthYearPicker';
 import { Tabs } from '../common/Tabs';
 import type { AmortizationCalculatorState } from '../../types/amortization.types';
 import * as AmortizationConstants from '../../constants/amortization';
-import { Wallet, CheckCircle2, ShieldCheck, Briefcase, Sun, Sunset } from 'lucide-react';
+import {
+    Wallet, CheckCircle2, ShieldCheck, Briefcase, Sun, Sunset,
+    Landmark, Calendar, Sliders, Zap
+} from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 
 interface AmortizationFormProps {
@@ -22,11 +25,42 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     const TABS = [
-        { id: 'loan', label: 'Loan' },
-        // CHANGE 1: Shortened label from 'Cashflow & Life' to 'Cashflow' to prevent scrolling
-        { id: 'cashflow', label: 'Cashflow' },
-        { id: 'assumptions', label: 'Assumptions' },
-        { id: 'strategies', label: 'Strategies' },
+        {
+            id: 'loan',
+            label: (
+                <span className="flex items-center justify-center gap-2">
+                    <Landmark size={16} />
+                    <span>Loan</span>
+                </span>
+            )
+        },
+        {
+            id: 'cashflow',
+            label: (
+                <span className="flex items-center justify-center gap-2">
+                    <Calendar size={16} />
+                    <span>Cashflow</span>
+                </span>
+            )
+        },
+        {
+            id: 'assumptions',
+            label: (
+                <span className="flex items-center justify-center gap-2">
+                    <Sliders size={16} />
+                    <span>Assumptions</span>
+                </span>
+            )
+        },
+        {
+            id: 'strategies',
+            label: (
+                <span className="flex items-center justify-center gap-2">
+                    <Zap size={16} />
+                    <span>Strategies</span>
+                </span>
+            )
+        },
     ];
 
     // NEW: Tabs for the Cashflow phases
@@ -99,13 +133,11 @@ export const AmortizationForm: React.FC<AmortizationFormProps> = ({ calculator }
     };
 
     return (
-        // CHANGE 2: Updated width classes. Added 'xl:w-[40%]' so it stays wider on laptops (1280px+)
-        // CHANGE 3: Reduced padding to 'p-5' to give tabs more internal room
         <div className="w-full md:w-[45%] xl:w-[40%] p-5 sm:p-6 bg-white/95 backdrop-blur md:sticky md:top-[4rem] md:self-start md:h-[calc(100vh-4rem)] md:overflow-y-auto">
             <h2 className="text-3xl font-bold text-gray-900">Amortization Calculator</h2>
             <p className="mt-2 text-gray-600">Monthly schedule to 2040.</p>
 
-            <Tabs tabs={TABS} variant="pill" activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} className="mt-6" />
+            <Tabs tabs={TABS} variant="segmented-indigo" activeTab={activeTab} onTabClick={(id) => setActiveTab(id as any)} className="mt-6" />
 
             <div className="mt-8 space-y-6">
                 {activeTab === 'loan' && (

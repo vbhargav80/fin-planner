@@ -18,7 +18,6 @@ function reducer(state: State, action: Action): State {
         case 'UPDATE_EXPENSE_REDUCTION': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, reduction: action.payload.reduction } : item) }) };
         case 'TOGGLE_EXPENSE_FIXED': return { ...state, expenseCategories: state.expenseCategories.map(cat => cat.id !== action.payload.categoryId ? cat : { ...cat, items: cat.items.map(item => item.id === action.payload.itemId ? { ...item, isFixed: !item.isFixed, reduction: 0 } : item) }) };
 
-        // NEW: Toggle isHidden state
         case 'TOGGLE_EXPENSE_HIDDEN': return {
             ...state,
             expenseCategories: state.expenseCategories.map(cat => {
@@ -34,19 +33,19 @@ function reducer(state: State, action: Action): State {
             })
         };
 
-        case 'TOGGLE_ADMIN_MODE': return { ...state, isAdminMode: !state.isAdminMode };
+        case 'TOGGLE_ADMIN_MODE': return { ...state, isAdminMode: !state.isAdminMode }; // Legacy, kept for reducer integrity but unused by UI
         case 'RESET_BUDGET': return action.payload;
         default: return state;
     }
 }
 
 export function useBudgetPlanner(): BudgetPlannerState {
-    const { config } = useConfig();
+    const { config, isAdminMode } = useConfig(); // Destructure global isAdminMode
     const [state, dispatch] = usePersistentReducer(reducer, config.budget, STORAGE_KEYS.BUDGET);
 
     const derived = useMemo(() => {
         const totalIncome = state.incomes.reduce((sum, item) => {
-            if (item.isHidden && !state.isAdminMode) return sum;
+            if (item.isHidden && !isAdminMode) return sum; // Use global isAdminMode
             return sum + item.amount;
         }, 0);
 
@@ -55,8 +54,10 @@ export function useBudgetPlanner(): BudgetPlannerState {
 
         state.expenseCategories.forEach(cat => {
             cat.items.forEach(item => {
-                // IMPORTANT: If item is hidden, it is NOT counted.
-                // To count it, the user must toggle it to Visible (isHidden: false) using the new action.
+                // IMPORTANT: If item is hidden, it is NOT counted unless in admin mode logic (visuals handled in UI)
+                // Actually, for calculations, hidden items are usually excluded unless we want to see "what if"
+                // The requirement is "shows and hides certain budget items".
+                // If it is hidden, it shouldn't affect the total unless visible.
                 if (item.isHidden) return;
 
                 totalExpenses += item.amount;
@@ -73,9 +74,10 @@ export function useBudgetPlanner(): BudgetPlannerState {
             totalIncome, totalExpenses, remaining,
             totalOptimizedExpenses, potentialSavings, projectedRemaining
         };
-    }, [state]);
+    }, [state, isAdminMode]);
 
     const reset = () => dispatch({ type: 'RESET_BUDGET', payload: config.budget });
 
-    return { state, dispatch, isAdminMode: state.isAdminMode, reset, ...derived };
+    // Override the state's isAdminMode with the global one
+    return { state, dispatch, isAdminMode, reset, ...derived };
 }

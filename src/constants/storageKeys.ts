@@ -4,6 +4,7 @@ export const STORAGE_KEYS = {
     // System Keys
     APP_DEFAULTS: 'app-defaults-v1',
     ACTIVE_SCREEN: 'app-active-screen',
+    ADMIN_MODE: 'app-admin-mode-v1', // NEW
 
     // Calculator State Keys (Matches your current hooks)
     AMORTIZATION: 'amortization-v7',

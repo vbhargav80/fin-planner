@@ -14,4 +14,7 @@ export interface ConfigContextType {
     config: AppConfig;
     updateConfig: (newConfig: AppConfig) => void;
     resetToSystemDefaults: () => void;
+    // NEW: Global Admin Mode Controls
+    isAdminMode: boolean;
+    toggleAdminMode: () => void;
 }

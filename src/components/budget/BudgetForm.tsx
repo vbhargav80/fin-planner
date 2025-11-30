@@ -1,5 +1,5 @@
 // File: src/components/budget/BudgetForm.tsx
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Wallet, Lock, RotateCcw, Banknote, CreditCard, Sparkles } from 'lucide-react';
 import { Tabs } from '../common/Tabs';
 import type { BudgetPlannerState } from '../../types/budget.types';
@@ -54,25 +54,6 @@ export const BudgetForm: React.FC<Props> = ({ model, onViewChange }) => {
         onViewChange(mode);
     };
 
-    // --- SECRET GESTURE LOGIC ---
-    const clickCountRef = useRef(0);
-    const timeoutRef = useRef<number | null>(null);
-
-    const handleSecretClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        clickCountRef.current += 1;
-
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        timeoutRef.current = window.setTimeout(() => {
-            clickCountRef.current = 0;
-        }, 1000);
-
-        if (clickCountRef.current === 5) {
-            dispatch({ type: 'TOGGLE_ADMIN_MODE' });
-            clickCountRef.current = 0;
-        }
-    };
-
     // --- RESET LOGIC ---
     const handleReset = () => {
         if (window.confirm('Are you sure you want to reset all budget data? This cannot be undone.')) {
@@ -89,10 +70,8 @@ export const BudgetForm: React.FC<Props> = ({ model, onViewChange }) => {
                         <div
                             className={`
                                 p-2 rounded-lg transition-all duration-200 ease-in-out
-                                cursor-pointer hover:scale-110 active:scale-95 hover:bg-indigo-50
                                 ${isAdminMode ? 'bg-red-100 text-red-600' : 'bg-indigo-100 text-indigo-600'}
                             `}
-                            onClick={handleSecretClick}
                             title={isAdminMode ? "Admin Mode Active" : undefined}
                         >
                             <Wallet size={24} />
